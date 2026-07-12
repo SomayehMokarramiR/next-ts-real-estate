@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -119,29 +117,6 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-
-  --color-primary500: #1e40af;
-  --color-primary600: #1b3a9f;
-  --color-primary700: #152d7c;
-  --color-secondary: #64748b;
-  --color-orange: #ff220c;
-  --color-app-bg: #ffffff;
-  --color-dark-them1: #353535;
-  --color-dark-them2: #272727;
-  --color-dark-them3: #212121;
-  --color-neutral-200: #f0f0f3;
-  --color-neutral-500: #d9d9e0;
-  --color-shadow: #48484829;
-  --color-text-body2: #8b8d98;
-  --color-gray3: #b9bbc6;
-  --color-gray4: #cdced6;
-  --color-black: #000000;
-  --color-white: #fffffa;
-
-  --primary-font: "vazirmatn", Arial, Helvetica, sans-serif;
-  --primary-font-bold: "vazirmatn Bold", Arial, Helvetica, sans-serif;
-  --primary-font-semibold: "vazirmatn SemiBold", Arial, Helvetica, sans-serif;
-  --primary-font-md: "vazirmatn Medium", Arial, Helvetica, sans-serif;
 }
 
 @layer base {
