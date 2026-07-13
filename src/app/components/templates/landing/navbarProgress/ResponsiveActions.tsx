@@ -69,8 +69,8 @@ export default function ResponsiveActions({
             flex
             items-center
             justify-center
-            w-9
-            h-9
+            w-8
+            h-8
             rounded-full
           "
           style={{

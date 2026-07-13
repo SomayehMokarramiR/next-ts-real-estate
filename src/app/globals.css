@@ -161,6 +161,9 @@
   html {
     font-size: var(--font-size);
   }
+  body {
+    font-family: var(--primary-font);
+  }
 
   h1 {
     font-size: var(--text-2xl);

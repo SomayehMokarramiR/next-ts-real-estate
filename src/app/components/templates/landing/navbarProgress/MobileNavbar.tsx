@@ -12,7 +12,7 @@ type Props = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function MobileMenu({ open, dark, setDark, setOpen }: Props) {
+export default function MobileNavbar({ open, dark, setDark, setOpen }: Props) {
   return (
     <div
       className={`
@@ -95,8 +95,8 @@ font-semibold
         <button
           onClick={() => setDark(!dark)}
           className="
-w-11
-h-11
+w-10
+h-10
 rounded-full
 flex
 items-center

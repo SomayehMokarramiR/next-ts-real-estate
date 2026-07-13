@@ -16,7 +16,7 @@ export default function NavbarActions({ dark, setDark }: Props) {
         onClick={() => setDark(!dark)}
         className="
           flex items-center justify-center
-          w-9 h-9
+          w-8 h-8
           rounded-full
           transition-all
           hover:brightness-125

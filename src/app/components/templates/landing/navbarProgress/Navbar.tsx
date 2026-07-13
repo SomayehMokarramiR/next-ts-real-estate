@@ -7,11 +7,11 @@ import Logo from "@/app/components/modules/logo/Logo";
 import DesktopNavbar from "./DesktopNavbar";
 import NavbarActions from "./NavbarActions";
 import ResponsiveActions from "./ResponsiveActions";
-import MobileNavbar from "./MobileNavbar";
+import MobileNavbar from "../navbarProgress/MobileNavbar";
 import TabletMenu from "./TabletMenu";
 
-import { useClickOutside } from "./hooks/useClickOutside";
-import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
+import { useClickOutside } from "../navbarProgress/hooks/useClickOutside";
+import { useLockBodyScroll } from "../navbarProgress/hooks/useLockBodyScroll";
 
 export default function Navbar() {
   const [dark, setDark] = useState(false);
@@ -57,7 +57,8 @@ export default function Navbar() {
       >
         {/* Logo */}
 
-        <a href="#" className="shrink-0" aria-label="خانه">
+        {/* <a href="#" className="shrink-0" aria-label="خانه"> */}
+        <a href="#" className="shrink-0 ml-6">
           <Logo />
         </a>
 
