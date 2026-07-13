@@ -2,6 +2,7 @@ import NavbarWrapper from "./components/layout/NavbarWrapper";
 import HeroSection from "./components/templates/landing/heroSection/HeroSection";
 import OffersSection from "./components/templates/landing/offersSection/OffersSection";
 import PropertySection from "./components/templates/landing/propertySection/PropertySection";
+import VillaRentalSection from "./components/templates/landing/VillaRentalSection/VillaRentalSection";
 export default function HomePage() {
   return (
     <>
@@ -11,6 +12,7 @@ export default function HomePage() {
         <HeroSection />
         <PropertySection />
         <OffersSection />
+        <VillaRentalSection />
       </main>
     </>
   );
