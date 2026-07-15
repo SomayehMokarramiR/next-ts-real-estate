@@ -5,6 +5,7 @@ import PropertySection from "./components/templates/landing/propertySection/Prop
 import VillaRentalSection from "./components/templates/landing/VillaRentalSection/VillaRentalSection";
 import CredibilitySection from "./components/templates/landing/credibilitySection/CredibilitySection";
 import BestSection from "./components/templates/landing/bestSection/BestSection";
+import OurSelectSection from "./components/templates/landing/ourSelectSection/OurSelectSection";
 import Footer from "./components/layout/footer/Footer";
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
         <VillaRentalSection />
         <CredibilitySection />
         <BestSection />
+        <OurSelectSection />
         <Footer />
       </main>
     </>
