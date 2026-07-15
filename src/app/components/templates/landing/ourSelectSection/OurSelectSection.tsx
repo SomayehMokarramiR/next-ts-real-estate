@@ -3,7 +3,7 @@ import { features } from "./constants";
 export default function OurSelectSection() {
   return (
     <section className="w-full py-20">
-      <div className="mx-auto  px-6">
+      <div className="mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-[600px_1fr] gap-0 overflow-hidden rounded-[32px]">
           {/* Right */}
           <div className="relative min-h-[664px]">
