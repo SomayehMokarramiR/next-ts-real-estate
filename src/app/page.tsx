@@ -11,7 +11,7 @@ export default function HomePage() {
     <>
       {/* <NavbarWrapper /> */}
 
-      <main className="container mx-auto p-10">
+      <main className="container mx-auto">
         <HeroSection />
         <PropertySection />
         <OffersSection />

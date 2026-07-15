@@ -9,7 +9,7 @@ export default function OffersSection() {
   const timer = useCountdown(2 * 3600 + 25 * 60 + 20);
 
   return (
-    <section dir="rtl" className="bg-gray-50 py-16 sm:py-20">
+    <section>
       <div className="max-w-7xl mx-auto px-6">
         {/* Header */}
         <div className="mb-10">

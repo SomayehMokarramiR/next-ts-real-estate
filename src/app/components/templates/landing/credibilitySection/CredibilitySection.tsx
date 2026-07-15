@@ -8,13 +8,13 @@ export default function CredibilitySection() {
       className="
         relative
         w-full
-        min-h-[900px]
         overflow-hidden
+        min-h-[900px]
         md:min-h-[650px]
       "
     >
       {/* Background */}
-      <div className="absolute inset-0 -z-10">
+      <div className="absolute inset-0">
         <Image
           src="/images/credibilityBg.png"
           alt=""
@@ -33,7 +33,6 @@ export default function CredibilitySection() {
         className="
           absolute
           inset-0
-          -z-10
         "
         style={{
           backgroundColor: "rgba(10,50,50,0.72)",
