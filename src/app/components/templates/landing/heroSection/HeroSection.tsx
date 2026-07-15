@@ -19,24 +19,8 @@ export default function HeroSection() {
   return (
     <div className="min-h-auto bg-white" dir="rtl">
       <Navbar />
-
-      {/* Hero */}
-      {/* <section className="relative min-h-screen flex flex-col justify-center overflow-hidden"> */}
-      <section
-        className="
-  relative
-  overflow-hidden
-  pt-16
-  "
-      >
-        <div
-          className="
-relative
-min-h-[850px]
-sm:min-h-[780px]
-lg:min-h-[650px]
-"
-        >
+      <section className="relative overflow-hidden pt-16">
+        <div className="relative min-h-[850px] sm:min-h-[780px] lg:min-h[650px]">
           <Image
             src="/images/Home-Header.jpg"
             alt="خانه مدرن"
