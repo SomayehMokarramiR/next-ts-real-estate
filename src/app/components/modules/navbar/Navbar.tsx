@@ -3,7 +3,7 @@
 import Logo from "@/app/components/modules/logo/Logo";
 import { ChevronDown, Moon, Sun, Menu } from "lucide-react";
 import { useState } from "react";
-import { BLUE } from "../../../modules/constants";
+import { BLUE } from "../constants";
 
 export default function Navbar() {
   const [dark, setDark] = useState(false);

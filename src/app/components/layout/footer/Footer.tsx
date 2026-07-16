@@ -1,7 +1,7 @@
 import { FaInstagram, FaLinkedinIn, FaTelegramPlane } from "react-icons/fa";
 import Logo from "../../modules/logo/Logo";
 
-export default function App() {
+export default function Footer() {
   return (
     <footer
       className="w-full bg-[#f2f4f7] border-t border-gray-200 rounded-3xl"
