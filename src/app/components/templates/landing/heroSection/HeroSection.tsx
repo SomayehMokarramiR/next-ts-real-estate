@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import Image from "next/image";
-import Navbar from "./Navbar";
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
 
@@ -18,9 +17,8 @@ export default function HeroSection() {
 
   return (
     <div className="min-h-auto bg-white" dir="rtl">
-      <Navbar />
       <section className="relative overflow-hidden pt-16">
-        <div className="relative min-h-[850px] sm:min-h-[780px] lg:min-h[650px]">
+        <div className="relative min-h-212.5 sm:min-h-[780px] lg:min-h[650px]">
           <Image
             src="/images/Home-Header.jpg"
             alt="خانه مدرن"

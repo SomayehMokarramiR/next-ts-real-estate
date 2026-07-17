@@ -1,13 +1,9 @@
-import Navbar from "../components/modules/navbar/Navbar";
-import Footer from "../components/layout/footer/Footer";
 // import Search from "../components/templates/houseReserve/search/Search";
 import Search from "@/app/components/modules/search/Search";
 import ContentReseve from "../components/templates/houseReserve/contentReseve/ContentReseve";
 function page() {
   return (
     <div>
-      <Navbar />
-
       <main className="pt-20">
         {/* <Search /> */}
 
@@ -56,8 +52,6 @@ function page() {
 
         <ContentReseve />
       </main>
-
-      <Footer />
     </div>
   );
 }
