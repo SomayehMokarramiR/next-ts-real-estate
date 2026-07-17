@@ -1,7 +1,4 @@
-import { Images } from "lucide-react";
-import { MAIN_IMAGE, THUMB_IMAGES } from "./constants";
-
-export default function PhotoGallery() {
+export default function GallerySection() {
   return (
     <section className="w-full">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden rounded-3xl">

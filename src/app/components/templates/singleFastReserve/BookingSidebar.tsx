@@ -1,6 +1,14 @@
 "use client";
 
-import { CalendarDays, Minus, Plus, Users } from "lucide-react";
+import {
+  CalendarDays,
+  ChevronLeft,
+  Home,
+  Minus,
+  Plus,
+  User,
+  Users,
+} from "lucide-react";
 import { useState } from "react";
 
 function formatPrice(n: number) {
@@ -9,106 +17,152 @@ function formatPrice(n: number) {
 
 /* ─── Booking Sidebar ─────────────────────────────────── */
 export default function BookingSidebar() {
-  const [guests, setGuests] = useState(2);
-  const nightlyRate = 4500000;
-  const nights = 3;
-  const discount = 900000;
-  const total = nightlyRate * nights - discount;
-
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden sticky top-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Header */}
-      <div className="bg-blue-600 px-4 py-3">
-        <p className="text-white text-sm font-semibold text-center">
-          رزرو برای همین جا
-        </p>
+      <div className="bg-primary500 px-5 py-3.5 flex items-center justify-center gap-2">
+        <Home className="w-4 h-4 text-white" />
+        <span className="text-white font-semibold text-sm ">
+          رزرو خونه برای
+        </span>
       </div>
 
-      <div className="p-4 space-y-3">
-        {/* Check-in / Check-out */}
-        <div className="grid grid-cols-2 gap-2">
-          <div className="border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-blue-400 transition-colors">
-            <p className="text-[10px] text-gray-400 mb-1">ورود</p>
-            <div className="flex items-center gap-1">
-              <CalendarDays size={13} className="text-blue-500" />
-              <span className="text-xs font-medium text-gray-700">
-                ۱۴۰۳/۰۴/۱۵
-              </span>
-            </div>
+      {/* Host */}
+      <div className="px-5 pt-4 pb-3 border-b border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary500/50 flex items-center justify-center">
+            <User className="w-5 h-5 text-primary700" />
           </div>
-          <div className="border border-gray-200 rounded-xl p-3 cursor-pointer hover:border-blue-400 transition-colors">
-            <p className="text-[10px] text-gray-400 mb-1">خروج</p>
-            <div className="flex items-center gap-1">
-              <CalendarDays size={13} className="text-blue-500" />
-              <span className="text-xs font-medium text-gray-700">
-                ۱۴۰۳/۰۴/۱۸
-              </span>
-            </div>
+
+          <div>
+            <p className="font-semibold text-gray-900 text-sm">
+              امیر محمد خیابانی
+            </p>
+
+            <p className="text-xs text-gray-400 mt-0.5">میزبان تأیید شده</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Date Picker + Guests */}
+      {/* Date Picker + Guests */}
+      <div className="px-5 py-4 space-y-4 border-b border-gray-100">
+        {/* Check in */}
+        <div>
+          <label className="block text-sm font-semibold text-[#1E2022] mb-2">
+            تاریخ ورود
+          </label>
+
+          <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <CalendarDays className="w-5 h-5 text-primary700" />
+
+            <span className="text-sm text-[#8B8D98]">۳ تیر ۱۴۰۴</span>
+          </div>
+        </div>
+
+        {/* Check out */}
+        <div>
+          <label className="block text-sm font-semibold text-[#1E2022] mb-2">
+            تاریخ برگشت
+          </label>
+
+          <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <CalendarDays className="w-5 h-5 text-primary700" />
+
+            <span className="text-sm text-[#8B8D98]">۱۰ تیر ۱۴۰۴</span>
           </div>
         </div>
 
         {/* Guests */}
-        <div className="border border-gray-200 rounded-xl p-3">
-          <p className="text-[10px] text-gray-400 mb-1">مهمان</p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Users size={13} className="text-blue-500" />
-              <span className="text-xs font-medium text-gray-700">
-                {guests} نفر
-              </span>
-            </div>
+        <div>
+          <label className="block text-sm font-semibold text-[#1E2022] mb-2">
+            تعداد مسافران
+          </label>
+
+          <div className="border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3">
+            <User className="w-5 h-5 text-primary700" />
+
+            <span className="text-sm text-[#8B8D98]">
+              تعداد مسافران را وارد کنید
+            </span>
+          </div>
+        </div>
+      </div>
+      {/* Reserved Prices */}
+      <div className="px-5 py-4 border-b border-gray-100">
+        <h3 className="font-bold text-gray-900 text-sm mb-5 text-center">
+          قیمت‌های رزرو شده
+        </h3>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-[#1E2022] font-semibold">۵ شب</span>
+
+            <span className="font-bold text-[#1E2022]">۱۷٬۰۰۰٬۰۰۰ ت</span>
+
+            <span className="font-bold text-[#1E2022]">۱۸٬۰۰۰٬۰۰۰ ت</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-[#1E2022] font-semibold">۳ شب</span>
+
+            <span className="font-bold text-[#1E2022]">۱۷٬۰۰۰٬۰۰۰ ت</span>
+
+            <span className="font-bold text-[#1E2022]">۱۸٬۰۰۰٬۰۰۰ ت</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-[#1E2022] font-semibold">۷ شب</span>
+
+            <span className="font-bold text-[#1E2022]">۱۷٬۰۰۰٬۰۰۰ ت</span>
+
+            <span className="font-bold text-[#1E2022]">۱۸٬۰۰۰٬۰۰۰ ت</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Discount Box */}
+      <div className="px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="bg-red-400 text-white text-xs font-bold rounded-full px-3 py-2 ">
+            15%
+          </div>
+          <div className="flex-1 bg-gray-100 rounded-full px-4 py-3">
             <div className="flex items-center gap-2">
-              <button
-                onClick={() => setGuests((g) => Math.max(1, g - 1))}
-                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-              >
-                <Minus size={11} />
-              </button>
-              <span className="text-xs font-bold text-gray-800 w-4 text-center">
-                {guests}
+              <span className="text-xs text-primary500 line-through">
+                ۲۰٬۰۰۰٬۰۰۰ ت
               </span>
-              <button
-                onClick={() => setGuests((g) => Math.min(10, g + 1))}
-                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
-              >
-                <Plus size={11} />
-              </button>
+
+              <span className="font-bold text-gray-900 text-sm">
+                ۱۷٬۰۰۰٬۰۰۰ ت
+              </span>
             </div>
+
+            {/* <p className="text-xs text-gray-400 mt-1">قیمت بعد از تخفیف</p> */}
           </div>
         </div>
 
-        {/* Price breakdown */}
-        <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-          <div className="flex items-center justify-between text-xs text-gray-600">
-            <span>
-              {formatPrice(nightlyRate)} × {nights} شب
-            </span>
-            <span className="font-medium">
-              {formatPrice(nightlyRate * nights)} تومان
-            </span>
-          </div>
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-red-500 flex items-center gap-1">
-              <span className="bg-red-100 text-red-500 text-[10px] font-bold px-1.5 py-0.5 rounded">
-                تخفیف
-              </span>
-              تخفیف ویژه
-            </span>
-            <span className="text-red-500 font-medium">
-              - {formatPrice(discount)} تومان
-            </span>
-          </div>
-          <div className="border-t border-gray-200 pt-2 flex items-center justify-between">
-            <span className="text-xs font-bold text-gray-800">جمع کل</span>
-            <span className="text-sm font-bold text-blue-600">
-              {formatPrice(total)} تومان
-            </span>
-          </div>
-        </div>
-
-        {/* CTA */}
-        <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3 rounded-xl transition-colors shadow-sm shadow-blue-200">
-          ثبت درخواست رزرو
+        {/* Reserve Button */}
+        <button
+          className="
+            mt-4
+            w-full
+            flex
+            items-center
+            justify-center
+            gap-2
+            bg-primary500
+            hover:bg-primary600
+            text-white
+            rounded-full
+            py-3
+            text-sm
+            font-bold
+            transition
+          "
+        >
+          همین الان رزرو کن
+          <ChevronLeft className="w-4 h-4" />
         </button>
       </div>
     </div>

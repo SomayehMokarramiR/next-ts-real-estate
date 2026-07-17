@@ -18,7 +18,8 @@ export default function RootLayout({
       <body className={vazirmatn.className}>
         <Navbar />
 
-        <main className="pt-20">{children}</main>
+        {/* <main className="pt-20">{children}</main> */}
+        <main>{children}</main>
 
         <Footer />
       </body>

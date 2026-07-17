@@ -52,6 +52,16 @@ export interface Comment {
   replies?: Reply[];
 }
 
+export type Comment2 = {
+  id: number;
+  name: string;
+  handle: string;
+  date: string;
+  text: string;
+  likes: number;
+  liked: boolean;
+};
+
 /* ─── S3 Listing Card ─────────────────────────────────── */
 export interface ListingItem {
   id: number;

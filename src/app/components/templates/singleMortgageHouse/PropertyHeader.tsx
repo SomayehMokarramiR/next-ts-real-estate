@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Breadcrumb from "./Breadcrumb";
 import { Bookmark, MapPin, Share2, Star } from "lucide-react";
-import PhotoGallery from "./PhotoGallery";
+// import PhotoGallery from "./PhotoGallery";
 
 /* ─── Property Header ─────────────────────────────────── */
 export default function PropertyHeader() {
@@ -45,7 +45,7 @@ export default function PropertyHeader() {
           </button>
         </div>
       </div>
-      <PhotoGallery />
+      {/* <PhotoGallery /> */}
     </section>
   );
 }

@@ -2,12 +2,7 @@ import { ChevronLeft } from "lucide-react";
 
 /* ─── Breadcrumb ──────────────────────────────────────── */
 export default function Breadcrumb() {
-  const crumbs = [
-    "خانه",
-    "رهن و اجاره",
-    "رزرو هتل رشت",
-    "رزرو هتل رشت سراوان رایان",
-  ];
+  const crumbs = ["خانه", "رهن و اجاره", "رزرو هتل رشت", "هتل همایون رشت"];
   return (
     <nav className="flex items-center justify-center gap-1 text-xs text-gray-500 flex-wrap">
       {crumbs.map((crumb, i) => (

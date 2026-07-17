@@ -1,0 +1,120 @@
+import { Comment2 } from "../singleFastReserve/types";
+import { ListingItem, Comment } from "./types";
+
+export const BEDROOM_IMAGES = [
+  "https://images.unsplash.com/photo-1633948393301-d43e3ec0e5cd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600",
+  "https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600",
+  "https://images.unsplash.com/photo-1633944095397-878622ebc01c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=600",
+];
+
+export const listingItems: ListingItem[] = [
+  {
+    id: 1,
+    address: "404",
+    beds: 1,
+    guests: 3,
+    baths: 3,
+    area: 3,
+    price: 4500000,
+    rating: 4.5,
+    image: BEDROOM_IMAGES[0],
+  },
+  {
+    id: 2,
+    address: "404",
+    beds: 1,
+    guests: 3,
+    baths: 3,
+    area: 3,
+    price: 4500000,
+    rating: 4.5,
+    image: BEDROOM_IMAGES[1],
+  },
+  {
+    id: 3,
+    address: "404",
+    beds: 1,
+    guests: 3,
+    baths: 3,
+    area: 3,
+    price: 4500000,
+    originalPrice: 5500000,
+    discount: 15,
+    rating: 4.5,
+    image: BEDROOM_IMAGES[2],
+  },
+  {
+    id: 4,
+    address: "404",
+    beds: 1,
+    guests: 3,
+    baths: 3,
+    area: 3,
+    price: 4500000,
+    rating: 4.5,
+    image: BEDROOM_IMAGES[2],
+  },
+  {
+    id: 5,
+    address: "404",
+    beds: 1,
+    guests: 3,
+    baths: 3,
+    area: 3,
+    price: 4500000,
+    originalPrice: 1100000,
+    discount: 10,
+    rating: 4.5,
+    image: BEDROOM_IMAGES[1],
+  },
+];
+
+export const descText = `لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ، و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است، و برای شرایط فعلی تکنولوژی مورد نیاز، و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می‌باشد. کتابهای زیادی در شصت و سه درصد گذشته حال و آینده، شناخت فراوان جامعه و متخصصان را می طلبد، تا با نرم افزارها شناخت بیشتری را برای طراحان رایانه‌ای ایجاد کرد.`;
+
+export const seedComments: Comment2[] = [
+  {
+    id: 1,
+    name: "امیر محمد",
+    handle: "@amiri64",
+    date: "شنبه ۱۵ دی ماه ۱۴۰۳، ساعت ۱۴:۳۰",
+    text: "سلام، ممنون از ارائه این خانه شگفت‌انگیز. هوش مصنوعی برای این منظور عالی هست.\nبرای اجاره بیشتر از ۶ ماه مبلغی تخفیف دارد یا داریم؟ ممنون از لطفتون 🥰",
+    likes: 3,
+    liked: false,
+  },
+  {
+    id: 2,
+    name: "امیر محمد",
+    handle: "@amiri64",
+    date: "دوشنبه ۱۷ دی ماه ۱۴۰۳، ساعت ۱۰:۱۵",
+    text: "سلام، ممنون از ارائه این خانه شگفت‌انگیز. هوش مصنوعی برای این منظور عالی هست.\nبرای اجاره بیشتر از ۶ ماه مبلغی تخفیف دارد یا داریم؟ ممنون از لطفتون 🥰",
+    likes: 5,
+    liked: false,
+  },
+  {
+    id: 3,
+    name: "امیر محمد",
+    handle: "@amiri64",
+    date: "سه‌شنبه ۱۸ دی ماه ۱۴۰۳، ساعت ۰۹:۴۵",
+    text: "سلام، ممنون از ارائه این خانه شگفت‌انگیز. هوش مصنوعی برای این منظور عالی هست.\nبرای اجاره بیشتر از ۶ ماه مبلغی تخفیف دارد یا داریم؟ ممنون از لطفتون 🥰",
+    likes: 2,
+    liked: false,
+  },
+  {
+    id: 4,
+    name: "امیر محمد",
+    handle: "@amiri64",
+    date: "چهارشنبه ۱۹ دی ماه ۱۴۰۳، ساعت ۱۶:۰۰",
+    text: "سلام، ممنون از ارائه این خانه شگفت‌انگیز. هوش مصنوعی برای این منظور عالی هست.\nبرای اجاره بیشتر از ۶ ماه مبلغی تخفیف دارد یا داریم؟ ممنون از لطفتون 🥰",
+    likes: 7,
+    liked: false,
+  },
+  {
+    id: 5,
+    name: "امیر محمد",
+    handle: "@amiri64",
+    date: "پنجشنبه ۲۰ دی ماه ۱۴۰۳، ساعت ۱۱:۳۰",
+    text: "سلام، ممنون از ارائه این خانه شگفت‌انگیز. هوش مصنوعی برای این منظور عالی هست.\nبرای اجاره بیشتر از ۶ ماه مبلغی تخفیف دارد یا داریم؟ ممنون از لطفتون 🥰",
+    likes: 4,
+    liked: false,
+  },
+];
