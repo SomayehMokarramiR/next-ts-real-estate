@@ -1,14 +1,14 @@
-"use client";
+import MainLayout from "../components/layout/MainLayout";
 //
 import MortgageHouse from "../components/templates/mortgageHouse/MortgageHouse";
 
 function page() {
   return (
-    <div>
+    <MainLayout>
       <main className="pt-20">
         <MortgageHouse />
       </main>
-    </div>
+    </MainLayout>
   );
 }
 

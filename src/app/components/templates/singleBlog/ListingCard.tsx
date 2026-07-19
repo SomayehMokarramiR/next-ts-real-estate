@@ -13,10 +13,13 @@ import Card from "./Card";
 
 export default function ListingCard() {
   return (
-    <section className="mb-10" dir="rtl">
-      <div className="mb-5">
-        <button className="flex items-center justify-center w-10 h-8 rounded-full border border-gray-300 bg-white">
-          <ChevronLeft size={16} />
+    <section className="mb-10">
+      <div className="mb-5 flex justify-end">
+        <button className="flex items-center justify-end gap-2 w-auto h-8 rounded-full border border-primary500 bg-white px-3">
+          <span className="primary-font-semibold text-xs text-primary500">
+            مشاهده همه
+          </span>
+          <ChevronLeft size={16} className="text-primary500" />
         </button>
       </div>
 

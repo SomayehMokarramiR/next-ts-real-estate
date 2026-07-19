@@ -1,11 +1,11 @@
 import MainLayout from "../components/layout/MainLayout";
-import SingleMotrgageHouse from "../components/templates/singleMortgageHouse/SingleMortgageHouse";
+import SingleBlog from "../components/templates/singleBlog/SingleBlog";
 
 function page() {
   return (
     <MainLayout>
       <main className="pt-20">
-        <SingleMotrgageHouse />
+        <SingleBlog />
       </main>
     </MainLayout>
   );

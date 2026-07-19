@@ -2,12 +2,14 @@
 
 import { ChevronLeft } from "lucide-react";
 import { listingItems } from "./constants";
-import S3Card from "./S3Card";
 
 import { Swiper, SwiperSlide } from "swiper/react";
-import { FreeMode } from "swiper/modules";
+import { FreeMode, Pagination } from "swiper/modules";
 
 import "swiper/css";
+import "swiper/css/pagination";
+
+import Card from "./S3Card";
 
 export default function S3ListingSection() {
   return (
@@ -19,12 +21,15 @@ export default function S3ListingSection() {
       </div>
 
       <Swiper
-        className="overflow-hidden!"
-        modules={[FreeMode]}
+        className="listing-swiper !pb-10"
+        modules={[FreeMode, Pagination]}
         freeMode={true}
         grabCursor={true}
         spaceBetween={16}
-        slidesPerView={1.2}
+        slidesPerView={1}
+        pagination={{
+          clickable: true,
+        }}
         breakpoints={{
           640: {
             slidesPerView: 2,
@@ -39,7 +44,7 @@ export default function S3ListingSection() {
       >
         {listingItems.map((item) => (
           <SwiperSlide key={item.id}>
-            <S3Card item={item} />
+            <Card item={item} />
           </SwiperSlide>
         ))}
       </Swiper>

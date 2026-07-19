@@ -6,19 +6,22 @@ import VillaRentalSection from "./components/templates/landing/VillaRentalSectio
 import CredibilitySection from "./components/templates/landing/credibilitySection/CredibilitySection";
 import BestSection from "./components/templates/landing/bestSection/BestSection";
 import OurSelectSection from "./components/templates/landing/ourSelectSection/OurSelectSection";
+import MainLayout from "./components/layout/MainLayout";
 
 export default function HomePage() {
   return (
     <>
-      <main className="container mx-auto">
-        <HeroSection />
-        <PropertySection />
-        <OffersSection />
-        <VillaRentalSection />
-        <CredibilitySection />
-        <BestSection />
-        <OurSelectSection />
-      </main>
+      <MainLayout>
+        <main className="container mx-auto">
+          <HeroSection />
+          <PropertySection />
+          <OffersSection />
+          <VillaRentalSection />
+          <CredibilitySection />
+          <BestSection />
+          <OurSelectSection />
+        </main>
+      </MainLayout>
     </>
   );
 }

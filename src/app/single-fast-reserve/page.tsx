@@ -1,14 +1,13 @@
-// "use client";
-
+import MainLayout from "../components/layout/MainLayout";
 import SingleFastReserve from "../components/templates/singleFastReserve/SingleFastReserve";
 
 function page() {
   return (
-    <div>
+    <MainLayout>
       <main className="pt-20">
         <SingleFastReserve />
       </main>
-    </div>
+    </MainLayout>
   );
 }
 

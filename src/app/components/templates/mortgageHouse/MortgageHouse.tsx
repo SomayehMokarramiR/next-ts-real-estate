@@ -26,9 +26,6 @@ export default function MortgageHouse() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
-          {/* <h1 className="text-xl font-bold text-gray-800">
-            آگهی‌های اجاره ملک
-          </h1> */}
           <p className="text-sm text-gray-500 mt-1">
             {`صفحه ${page} از ${TOTAL_PAGES} — نمایش ${display.length} ملک`}
           </p>
