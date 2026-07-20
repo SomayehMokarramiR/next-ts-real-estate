@@ -1,11 +1,11 @@
 import "./globals.css";
 
 import { Vazirmatn } from "next/font/google";
-// import Navbar from "./components/modules/navbar/Navbar";
-// import Footer from "./components/layout/footer/Footer";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
+  variable: "--font-vazirmatn",
+  weight: ["400", "500", "600", "700"],
 });
 
 export default function RootLayout({

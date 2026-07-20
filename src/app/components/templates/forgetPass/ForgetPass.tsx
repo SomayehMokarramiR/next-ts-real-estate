@@ -187,7 +187,7 @@ function ForgotPasswordForm() {
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} dir="rtl" className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email input */}
             <div className="relative">
               <User className="w-4 h-4 text-gray-400 absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none" />

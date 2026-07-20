@@ -4,6 +4,7 @@ import Logo from "@/app/components/modules/logo/Logo";
 import { ChevronDown, Moon, Sun, Menu } from "lucide-react";
 import { useState } from "react";
 import { BLUE } from "../constants";
+import NewsIcon from "./NewsIcon";
 
 export default function Navbar() {
   const [dark, setDark] = useState(false);
@@ -14,7 +15,13 @@ export default function Navbar() {
     { label: "رهن و اجاره", href: "#" },
     { label: "بررسی سریع", href: "#", arrow: true },
     { label: "تماس با ما", href: "#", arrow: true },
-    { label: "مهم‌ترین اخبار", href: "#", highlight: true },
+    // { label: "مهم‌ترین اخبار", href: "#", highlight: true },
+    {
+      label: "مهم‌ترین اخبار",
+      href: "#",
+      highlight: true,
+      icon: true,
+    },
   ];
 
   return (
@@ -44,8 +51,8 @@ export default function Navbar() {
         rounded-full
         p-2
         hidden md:flex
-        items-center gap-6
-        text-sm
+        items-center gap-6 max-[813px]:gap-3
+        text-sm max-[813px]:text-xs
         font-medium
         text-gray-700
         "
@@ -59,11 +66,12 @@ export default function Navbar() {
             transition
             ${
               item.highlight
-                ? "bg-primary500 text-white px-4 py-2 rounded-full"
+                ? "bg-primary500 text-white px-4 py-2 max-[813px]:px-3 max-[813px]:py-1.5 max-[813px]:text-xs rounded-full"
                 : "hover:text-primary600"
             }
             `}
             >
+              {item.icon && <NewsIcon />}
               {item.label}
 
               {item.arrow && <ChevronDown size={14} />}
@@ -72,7 +80,7 @@ export default function Navbar() {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 max-[813px]:gap-1">
           <button
             onClick={() => setDark(!dark)}
             className="
@@ -93,13 +101,17 @@ export default function Navbar() {
 
           <button
             className="
-          hidden sm:block
-          bg-primary500
-          text-white
-          text-xs sm:text-sm
-          px-4 py-2
-          rounded-full
-          "
+hidden sm:block
+bg-primary500
+text-white
+text-xs sm:text-sm
+px-4 py-2
+max-[813px]:px-3
+max-[813px]:py-1.5
+max-[813px]:text-xs
+rounded-full
+whitespace-nowrap
+"
           >
             ورود / ثبت‌نام
           </button>

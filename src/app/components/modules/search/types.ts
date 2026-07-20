@@ -1,5 +1,5 @@
 export type SearchField = {
-  type: "input" | "select";
+  type: "input" | "select" | "button";
 
   label: string;
 

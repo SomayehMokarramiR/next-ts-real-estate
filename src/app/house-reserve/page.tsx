@@ -11,9 +11,7 @@ function page() {
 
           <div>
             <Search
-              resultCount={33}
-              minLabel="حداقل قیمت"
-              maxLabel="حداکثر قیمت"
+              variant="houseReserve"
               fields={[
                 {
                   type: "input",
@@ -23,30 +21,57 @@ function page() {
 
                 {
                   type: "select",
-                  label: "مقصد",
+                  label: "مقصد یا هتل شما",
                   placeholder: "انتخاب شهر",
                   options: ["رشت", "مازندران", "گیلان"],
                 },
 
                 {
                   type: "select",
-                  label: "نوع ملک",
+                  label: "مرتب سازی براساس",
                   placeholder: "انتخاب کنید",
-                  options: ["ویلا", "آپارتمان", "سوئیت"],
+                  options: ["محبوب‌ترین", "ارزان‌ترین"],
                 },
 
                 {
                   type: "select",
-                  label: "امکانات",
+                  label: "امکانات هتل",
                   placeholder: "انتخاب امکانات",
-                  options: ["استخر", "پارکینگ", "حیاط"],
+                  options: ["استخر", "پارکینگ"],
                 },
 
                 {
                   type: "select",
-                  label: "تعداد نفرات",
-                  placeholder: "تعداد",
-                  options: ["2 نفر", "4 نفر", "8 نفر", "12 نفر"],
+                  label: "امتیاز هتل",
+                  placeholder: "انتخاب امتیاز",
+                  options: ["5 ستاره", "4 ستاره"],
+                },
+
+                {
+                  type: "input",
+                  label: "حداقل قیمت",
+                  placeholder: "حداقل قیمت",
+                },
+
+                {
+                  type: "input",
+                  label: "حداکثر قیمت",
+                  placeholder: "حداکثر قیمت",
+                },
+
+                {
+                  type: "button",
+                  label: "اعمال فیلتر",
+                },
+
+                {
+                  type: "button",
+                  label: "حذف فیلتر",
+                },
+
+                {
+                  type: "button",
+                  label: "۳۳ آگهی پیدا شد",
                 },
               ]}
             />

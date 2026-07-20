@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Home, Clock, Tag, Eye } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Home,
+  Clock,
+  Eye,
+  Tag,
+  Calendar,
+  Copy,
+  Share2,
+} from "lucide-react";
 import Navbar from "../../modules/navbar/Navbar";
 import ListingCard from "./ListingCard";
 import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
@@ -90,21 +100,82 @@ function ArticleHero() {
   return (
     <div className="max-w-6xl mx-auto px-4 mb-8" dir="rtl">
       <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-4 leading-relaxed">
-        بهترین قیمت های کاناپه 2024 در سال میلادی جدید ؟
+        بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
       </h1>
-      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-6 pb-4 border-b border-gray-100">
-        <span className="flex items-center gap-1.5">
-          <Clock className="w-4 h-4 text-primary500" />
-          ۱۴۰۳ / ۱۰ / ۰۱
-        </span>
-        <span className="flex items-center gap-1.5">
-          <Eye className="w-4 h-4 text-primary500" />
-          ۱۲۴۵ بازدید
-        </span>
-        <span className="bg-primary500/50 text-primary700 px-3 py-0.5 rounded-full text-xs font-medium flex items-center gap-1">
-          <Tag className="w-3 h-3" />
-          کاناپه
-        </span>
+      <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-100">
+        {/* Right - Meta info */}
+        <div className="flex flex-wrap items-center gap-4 text-sm text-[#80838D]">
+          <span className="flex items-center gap-1.5">
+            <Calendar className="w-4 h-4" />
+            ۱۲ مرداد - ۱۴۰۱ / ۱۲:۳۳
+          </span>
+        </div>
+
+        {/* Left - Actions */}
+        <div className="flex flex-col items-center gap-3">
+          {/* Reading time */}
+          <button
+            className="
+    h-7
+    w-[80px]
+    sm:h-8
+    sm:w-[100px]
+    rounded-full
+    bg-primary500
+    text-white
+    text-[11px]
+    sm:text-xs
+    font-medium
+    flex
+    items-center
+    justify-center
+    gap-1
+  "
+          >
+            <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+            ۳۰ دقیقه
+          </button>
+
+          {/* Copy & Share */}
+          <div className="flex items-center gap-2">
+            {/* Copy */}
+            <button
+              className="
+    w-8
+    h-8
+    sm:w-10
+    sm:h-10
+    rounded-full
+    border
+    border-primary500
+    flex
+    items-center
+    justify-center
+    text-primary500
+  "
+            >
+              <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+
+            {/* Share */}
+            <button
+              className="
+    w-8
+    h-8
+    sm:w-10
+    sm:h-10
+    rounded-full
+    bg-primary500
+    flex
+    items-center
+    justify-center
+    text-white
+  "
+            >
+              <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            </button>
+          </div>
+        </div>
       </div>
       <div className="rounded-2xl overflow-hidden shadow-lg">
         <img
@@ -122,69 +193,48 @@ function ArticleContent() {
     <article className="max-w-6xl mx-auto px-4 mb-12" dir="rtl">
       <div className="prose prose-lg max-w-none">
         <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary500 inline-block">
-            بهترین قیمت کاناپه‌های کاناپه 2024 در سال میلادی جدید؟
+          <h2 className="text-lg lg:text-[24px] font-semibold text-[#80838D] mb-4 pb-2 inline-block">
+            بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
           </h2>
-          <p className="text-gray-600 leading-8 text-sm sm:text-base mb-4">
-            در دنیای امروز، انتخاب کاناپه مناسب برای خانه یکی از مهم‌ترین
-            تصمیمات در دکوراسیون داخلی محسوب می‌شود. کاناپه نه تنها یک قطعه
-            مبلمان است، بلکه قلب اتاق نشیمن شما بوده و بیشترین تأثیر را بر
-            زیبایی و راحتی فضای زندگی شما دارد.
-          </p>
-          <p className="text-gray-600 leading-8 text-sm sm:text-base">
-            با توجه به تنوع گسترده‌ای که در بازار کاناپه‌های ایرانی و خارجی وجود
-            دارد، بسیاری از خریداران دچار سردرگمی می‌شوند. در این مقاله جامع، ما
-            بهترین کاناپه‌های موجود در بازار سال ۲۰۲۴ را بررسی کرده و قیمت‌های
-            رقابتی آن‌ها را با هم مقایسه می‌کنیم.
+          <p className="text-[#80838D] leading-9 text-sm sm:text-base mb-4">
+            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
+            استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در
+            ستون و سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی
+            نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و
+            متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم
+            ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
+            طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
+            سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم
+            از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه
+            روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم ایپسوم متن
+            ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
+            گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان
+            که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت
+            چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و
+            مجله در ستون و سطرآنچنان که لازم است .
           </p>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-primary500 inline-block">
-            بهترین قیمت کاناپه‌های 2024 در سال میلادی جدید؟
+          <h2 className="text-lg lg:text-[24px] font-semibold text-[#80838D] mb-4 pb-2 inline-block">
+            بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
           </h2>
-          <p className="text-gray-600 leading-8 text-sm sm:text-base mb-4">
-            بازار کاناپه در سال ۲۰۲۴ شاهد تحولات چشمگیری بوده است. برندهای معتبر
-            بین‌المللی مدل‌های جدیدی را با قیمت‌های مناسب‌تر وارد بازار
-            کرده‌اند. از طرفی تولیدکنندگان داخلی نیز با بهره‌گیری از فناوری‌های
-            نوین، محصولاتی با کیفیت بالا و قیمت رقابتی ارائه می‌دهند.
-          </p>
-          <p className="text-gray-600 leading-8 text-sm sm:text-base mb-4">
-            معیارهای انتخاب یک کاناپه خوب شامل: کیفیت فوم، متریال روکش، استحکام
-            قاب چوبی، راحتی نشستن و البته قیمت مناسب می‌شود. در ادامه با بهترین
-            گزینه‌های موجود در هر رده قیمتی آشنا خواهید شد.
-          </p>
-
-          <div className="bg-primary500/50 border border-primary500rounded-xl p-5 my-6">
-            <h3 className="font-bold text-primary700 mb-3 text-base">
-              نکات کلیدی انتخاب کاناپه:
-            </h3>
-            <ul className="space-y-2 text-sm text-primary700">
-              <li className="flex items-start gap-2">
-                <span className="text-primary500 mt-0.5">●</span>
-                ابعاد اتاق نشیمن خود را قبل از خرید دقیقاً اندازه‌گیری کنید
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary500 mt-0.5">●</span>
-                جنس روکش را با توجه به سبک زندگی و تعداد اعضای خانواده انتخاب
-                کنید
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary500 mt-0.5">●</span>
-                به ضمانت نامه و خدمات پس از فروش توجه ویژه داشته باشید
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary500 mt-0.5">●</span>
-                رنگ و طرح کاناپه باید با سایر المان‌های دکوراسیون هماهنگ باشد
-              </li>
-            </ul>
-          </div>
-
-          <p className="text-gray-600 leading-8 text-sm sm:text-base">
-            در نهایت، بهترین کاناپه آن است که هم با بودجه شما سازگار باشد و هم
-            کیفیت و زیبایی مورد انتظار را داشته باشد. توصیه می‌کنیم قبل از خرید
-            حتماً کاناپه را به صورت حضوری امتحان کنید و از راحتی آن اطمینان حاصل
-            نمایید.
+          <p className="text-[#80838D] leading-9 text-sm sm:text-base mb-4">
+            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
+            استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در
+            ستون و سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی
+            نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و
+            متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم
+            ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
+            طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
+            سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم
+            از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه
+            روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم ایپسوم متن
+            ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
+            گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان
+            که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت
+            چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و
+            مجله در ستون و سطرآنچنان که لازم است .
           </p>
         </section>
       </div>

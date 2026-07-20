@@ -123,7 +123,7 @@
   --color-primary500: #1e40af;
   --color-primary600: #1b3a9f;
   --color-primary700: #152d7c;
-  --color-secondary: #64748b;
+  /* --color-secondary: #64748b; */
   --color-orange: #ff220c;
   --color-app-bg: #ffffff;
   --color-dark-them1: #353535;
@@ -138,10 +138,10 @@
   --color-black: #000000;
   --color-white: #fffffa;
 
-  --primary-font: "vazirmatn", Arial, Helvetica, sans-serif;
+  /* --primary-font: "vazirmatn", Arial, Helvetica, sans-serif;
   --primary-font-bold: "vazirmatn Bold", Arial, Helvetica, sans-serif;
   --primary-font-semibold: "vazirmatn SemiBold", Arial, Helvetica, sans-serif;
-  --primary-font-md: "vazirmatn Medium", Arial, Helvetica, sans-serif;
+  --primary-font-md: "vazirmatn Medium", Arial, Helvetica, sans-serif; */
 }
 
 @layer base {
@@ -171,9 +171,9 @@
     padding: 0;
     margin: 0;
   }
-  body {
+  /* body {
     font-family: var(--primary-font);
-  }
+  } */
 
   h1 {
     font-size: var(--text-2xl);
@@ -216,4 +216,30 @@
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
   }
+}
+
+.login-swiper .swiper-pagination {
+  bottom: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-swiper .swiper-pagination-bullet {
+  width: 10px;
+  height: 10px;
+  background-color: #ffffff !important;
+  opacity: 0.7 !important;
+  border-radius: 9999px;
+  transition: all 0.3s ease;
+  margin: 0 !important;
+}
+
+.login-swiper .swiper-pagination-bullet-active {
+  width: 28px !important;
+  height: 10px !important;
+  background-color: #1e40af !important;
+  opacity: 1 !important;
+  border-radius: 9999px;
 }
