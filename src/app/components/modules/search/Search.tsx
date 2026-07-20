@@ -13,22 +13,43 @@ export default function Search({ fields, variant = "default" }: Props) {
     const isSearch = index === 0;
 
     // BUTTON
-
     if (field.type === "button") {
       return (
         <div
           key={index}
-          className="
+          className={`
             flex
             items-end
             shrink-0
-            w-[136px]
-          "
+
+            ${
+              variant === "houseReserve"
+                ? `
+                  w-full
+                  min-[640px]:w-[calc(50%-8px)]
+                  min-[988px]:w-[calc(50%-8px)]
+                  min-[1148px]:w-[136px]
+                `
+                : ""
+            }
+
+            ${
+              variant === "mortgage"
+                ? `
+                  w-full
+                  min-[640px]:w-[calc(50%-8px)]
+                  min-[992px]:w-[136px]
+                `
+                : ""
+            }
+
+            ${variant === "default" ? "w-[136px]" : ""}
+          `}
         >
           <button
             className={`
               h-10
-              w-[136px]
+              w-full
               rounded-full
               text-xs
               font-medium
@@ -50,7 +71,6 @@ export default function Search({ fields, variant = "default" }: Props) {
     }
 
     // INPUT
-
     if (field.type === "input") {
       return (
         <div
@@ -61,28 +81,31 @@ export default function Search({ fields, variant = "default" }: Props) {
             gap-1
             shrink-0
 
-
             ${
-              variant === "mortgage"
+              variant === "houseReserve"
                 ? `
-                  ${isSearch ? "w-[378px]" : "w-[180px]"}
+                  w-full
+                  min-[640px]:w-[calc(50%-8px)]
+                  min-[988px]:w-[calc(50%-8px)]
+                  min-[1148px]:w-[195px]
+                  min-[1280px]:w-[208px]
                 `
                 : ""
             }
 
 
             ${
-              variant === "houseReserve"
+              variant === "mortgage"
                 ? `
                   w-full
-                  lg:w-[208px]
+                  min-[640px]:w-[calc(50%-8px)]
+                  min-[992px]:${isSearch ? "w-[300px]" : "w-[180px]"}
                 `
                 : ""
             }
 
 
             ${variant === "default" ? "w-full" : ""}
-
           `}
         >
           <label
@@ -115,29 +138,37 @@ export default function Search({ fields, variant = "default" }: Props) {
     }
 
     // SELECT
-
     return (
       <div
         key={index}
         className={`
           shrink-0
 
-
-          ${variant === "mortgage" ? "w-[180px]" : ""}
-
-
           ${
             variant === "houseReserve"
               ? `
                 w-full
-                lg:w-[208px]
+                min-[640px]:w-[calc(50%-8px)]
+                min-[988px]:w-[calc(50%-8px)]
+                min-[1148px]:w-[195px]
+                min-[1280px]:w-[208px]
+              `
+              : ""
+          }
+
+
+          ${
+            variant === "mortgage"
+              ? `
+                w-full
+                min-[640px]:w-[calc(50%-8px)]
+                min-[992px]:w-[160px]
               `
               : ""
           }
 
 
           ${variant === "default" ? "w-full" : ""}
-
         `}
       >
         <SelectField
@@ -150,44 +181,14 @@ export default function Search({ fields, variant = "default" }: Props) {
   };
 
   // ==========================
-  // MORTGAGE
+  // MORTGAGE بدون تغییر
   // ==========================
 
   if (variant === "mortgage") {
     return (
       <div className="bg-white p-4 sm:p-6">
-        <div
-          className="
-            flex
-            flex-col
-            gap-4
-          "
-        >
-          {/* ROW 1 */}
-
-          <div
-            className="
-              flex
-              flex-wrap
-              gap-4
-              items-end
-            "
-          >
-            {fields.slice(0, 4).map(renderField)}
-          </div>
-
-          {/* ROW 2 */}
-
-          <div
-            className="
-              flex
-              flex-wrap
-              gap-4
-              items-end
-            "
-          >
-            {fields.slice(4).map(renderField)}
-          </div>
+        <div className="flex flex-wrap gap-4 items-end">
+          {fields.map(renderField)}
         </div>
       </div>
     );
@@ -202,13 +203,13 @@ export default function Search({ fields, variant = "default" }: Props) {
       <div className="bg-white p-4 sm:p-6">
         <div
           className="
-            grid
-            grid-cols-1
-            min-[640px]:grid-cols-2
-            lg:flex
-            lg:flex-wrap
+            flex
+            flex-wrap
             gap-4
             items-end
+
+            max-[987px]:grid
+            max-[987px]:grid-cols-2
           "
         >
           {fields.map(renderField)}
@@ -223,15 +224,7 @@ export default function Search({ fields, variant = "default" }: Props) {
 
   return (
     <div className="bg-white p-4 sm:p-6">
-      <div
-        className="
-          flex
-          flex-wrap
-          gap-4
-        "
-      >
-        {fields.map(renderField)}
-      </div>
+      <div className="flex flex-wrap gap-4">{fields.map(renderField)}</div>
     </div>
   );
 }

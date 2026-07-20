@@ -15,14 +15,16 @@ export default function Breadcrumb() {
         <span key={crumb} className="flex items-center gap-1">
           {i !== crumbs.length - 1 ? (
             <>
-              <button className="hover:text-blue-600 transition-colors">
+              <button className="hover:text-blue-600 transition-colors max-[450px]:text-[11px]">
                 {crumb}
               </button>
 
               <ChevronLeft size={12} className="text-gray-300 flex-shrink-0" />
             </>
           ) : (
-            <span className="font-medium text-primary500">{crumb}</span>
+            <span className="font-medium text-primary500 max-[450px]:text-[11px]">
+              {crumb}
+            </span>
           )}
         </span>
       ))}
