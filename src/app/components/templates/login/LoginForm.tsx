@@ -20,17 +20,65 @@ export default function LoginForm() {
   return (
     <div className="flex flex-col gap-4">
       {/* OAuth buttons */}
+      {/* OAuth buttons */}
       <div className="flex gap-3">
         <button
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          className="
+      flex-1
+      flex
+      items-center
+      justify-center
+      gap-2
+      py-2.5
+      px-4
+      border
+      border-gray-200
+      dark:border-[#444]
+      rounded-full
+      text-sm
+      font-medium
+      text-gray-700
+      dark:text-white
+      bg-white
+      dark:bg-[#353535]
+      hover:bg-gray-50
+      dark:hover:bg-[#404040]
+      active:bg-gray-100
+      dark:active:bg-[#454545]
+      transition-colors
+    "
         >
           <GithubIcon />
           Github
         </button>
+
         <button
           type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 border border-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+          className="
+      flex-1
+      flex
+      items-center
+      justify-center
+      gap-2
+      py-2.5
+      px-4
+      border
+      border-gray-200
+      dark:border-[#444]
+      rounded-full
+      text-sm
+      font-medium
+      text-gray-700
+      dark:text-white
+      bg-white
+      dark:bg-[#353535]
+      hover:bg-gray-50
+      dark:hover:bg-[#404040]
+      active:bg-gray-100
+      dark:active:bg-[#454545]
+      transition-colors
+    "
         >
           <GoogleIcon />
           Google
@@ -40,7 +88,7 @@ export default function LoginForm() {
       {/* Divider */}
       <div className="flex items-center gap-3">
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="text-xs text-gray-400 whitespace-nowrap">
+        <span className="text-xs text-gray-400 dark:text-white whitespace-nowrap">
           یا میتوانید
         </span>
         <div className="flex-1 h-px bg-gray-200" />
@@ -56,7 +104,7 @@ export default function LoginForm() {
             placeholder="ایمیل خود را وارد کنید"
             required
             dir="rtl"
-            className="w-full border border-gray-200 bg-white rounded-full py-3 pr-11 pl-4 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-primary500 focus:ring-2 focus:ring-primary500/20 transition-all"
+            className="w-full border border-gray-200 dark:border-[#353535] bg-white dark:bg-[#353535] rounded-full py-3 pr-11 pl-4 text-sm text-gray-700 placeholder-gray-400 dark:placeholder-gray-200  focus:outline-none focus:border-primary500 focus:ring-2 focus:ring-primary500/20 transition-all"
           />
 
           <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">

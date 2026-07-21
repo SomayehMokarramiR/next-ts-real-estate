@@ -4,18 +4,15 @@ import Logo from "../../modules/logo/Logo";
 export default function Footer() {
   return (
     <footer
-      className="w-full bg-[#f2f4f7] border-t border-gray-200 rounded-3xl"
-      dir="rtl"
+      className="
+        w-full
+        bg-footer-background
+        border-t
+        border-border
+        rounded-3xl
+      "
     >
-      <div
-        className="
-          mx-auto
-          px-4
-          lg:px-[68.5px]
-          py-12
-        "
-      >
-        {/* Main Footer */}
+      <div className="mx-auto px-4 lg:px-[68.5px] py-12">
         <div
           className="
             flex
@@ -43,7 +40,7 @@ export default function Footer() {
 
             <p
               className="
-                text-gray-500
+                text-footer-text
                 text-xs
                 leading-6
                 max-w-[450px]
@@ -55,32 +52,44 @@ export default function Footer() {
               یادماندنی داشته باشید.
             </p>
 
-            {/* Social Icons */}
+            {/* Social */}
             <div className="flex items-center gap-4 mt-2">
               <a
                 href="#"
-                className="text-gray-500 hover:text-blue-600 transition"
+                className="
+                  text-footer-text
+                  hover:text-primary500
+                  transition
+                "
               >
                 <FaTelegramPlane size={20} />
               </a>
 
               <a
                 href="#"
-                className="text-gray-500 hover:text-pink-500 transition"
+                className="
+                  text-footer-text
+                  hover:text-primary500
+                  transition
+                "
               >
                 <FaInstagram size={20} />
               </a>
 
               <a
                 href="#"
-                className="text-gray-500 hover:text-blue-400 transition"
+                className="
+                  text-footer-text
+                  hover:text-primary500
+                  transition
+                "
               >
                 <FaLinkedinIn size={20} />
               </a>
             </div>
           </div>
 
-          {/* Links Section */}
+          {/* Links */}
           <div
             className="
               w-full
@@ -91,79 +100,41 @@ export default function Footer() {
               gap-8
             "
           >
-            {/* رزرو */}
-            <div>
-              <h4 className="text-primary500 font-bold text-sm mb-5">
-                نحوه رزرو اقامتگاه
-              </h4>
+            <FooterColumn
+              title="نحوه رزرو اقامتگاه"
+              items={[
+                "راهنمای رزرو اقامتگاه",
+                "شیوه پرداخت",
+                "لغو رزرو اقامتگاه",
+              ]}
+            />
 
-              <ul className="flex flex-col gap-3">
-                {[
-                  "راهنمای رزرو اقامتگاه",
-                  "شیوه پرداخت",
-                  "لغو رزرو اقامتگاه",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      text-gray-500
-                      text-xs
-                    "
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
+            <FooterColumn
+              title="خدمات مشتریان"
+              items={[
+                "پرسش های متداول مهمان",
+                "پرسش های متداول میزبان",
+                "چطور اقامتگاه ثبت کنم ؟",
+                "حریم شخصی کاربران",
+              ]}
+            />
 
-                    <a href="#" className="hover:text-blue-500 transition">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* خدمات مشتریان */}
-            <div>
-              <h4 className="text-primary500 font-bold text-sm mb-5">
-                خدمات مشتریان
-              </h4>
-
-              <ul className="flex flex-col gap-3">
-                {[
-                  "پرسش های متداول مهمان",
-                  "پرسش های متداول میزبان",
-                  "چطور اقامتگاه ثبت کنم ؟",
-                  "حریم شخصی کاربران",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="
-                      flex
-                      items-center
-                      gap-2
-                      text-gray-500
-                      text-xs
-                    "
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-400" />
-
-                    <a href="#" className="hover:text-blue-500 transition">
-                      {item}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* ارتباط */}
             <div>
               <h4 className="text-primary500 font-bold text-sm mb-5">
                 راه ارتباطی با ما
               </h4>
 
-              <div className="flex flex-col gap-3 text-gray-500 text-xs">
+              <div
+                className="
+                  flex
+                  flex-col
+                  gap-3
+                  text-footer-text
+                  text-xs
+                "
+              >
                 <p>09229167194 - 09854161231</p>
+
                 <p>Delta@gmail.com</p>
               </div>
             </div>
@@ -172,11 +143,66 @@ export default function Footer() {
       </div>
 
       {/* Bottom */}
-      <div className="border-t border-gray-200 py-4">
-        <p className="text-center text-gray-400 text-xs">
+
+      <div
+        className="
+          border-t
+          border-border
+          py-4
+        "
+      >
+        <p
+          className="
+            text-center
+            text-footer-text
+            text-xs
+          "
+        >
           تمام حقوق مادی و معنوی این اثر برای شما محفوظ است .
         </p>
       </div>
     </footer>
+  );
+}
+
+function FooterColumn({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div>
+      <h4 className="text-primary500 font-bold text-sm mb-5">{title}</h4>
+
+      <ul className="flex flex-col gap-3">
+        {items.map((item) => (
+          <li
+            key={item}
+            className="
+              flex
+              items-center
+              gap-2
+              text-footer-text
+              text-xs
+            "
+          >
+            <span
+              className="
+                w-1.5
+                h-1.5
+                rounded-full
+                bg-primary500
+              "
+            />
+
+            <a
+              href="#"
+              className="
+                hover:text-primary500
+                transition
+              "
+            >
+              {item}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

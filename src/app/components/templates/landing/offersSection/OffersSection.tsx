@@ -10,7 +10,7 @@ export default function OffersSection() {
 
   return (
     <section>
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 py-8 bg-white dark:bg-[#272727]">
         {/* Header */}
         <div className="mb-10">
           {/* Eyebrow row */}
@@ -25,7 +25,7 @@ export default function OffersSection() {
           </div>
 
           {/* Title */}
-          <h2 className="text-gray-900 text-2xl sm:text-3xl md:text-4xl font-extrabold text-center font-primary-font-semibold">
+          <h2 className="text-gray-900 dark:text-white text-2xl sm:text-3xl md:text-4xl font-extrabold text-center font-primary-font-semibold">
             تخفیفات ویژه برای شروع تابستان
           </h2>
         </div>

@@ -17,11 +17,8 @@ export default function ForgotPasswordForm() {
       {/* Logo */}
       <Logo />
 
-      <div className="w-full max-w-sm">
-        <h1
-          className="text-xl font-bold text-gray-900 text-center mb-8"
-          dir="rtl"
-        >
+      <div className="w-full max-w-sm mt-8">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white text-center mb-8">
           فراموشی رمز عبور
         </h1>
 
@@ -38,7 +35,7 @@ export default function ForgotPasswordForm() {
             </p>
             <button
               onClick={() => setSent(false)}
-              className="text-sm text-blue-600 hover:underline flex items-center gap-1 mx-auto"
+              className="text-sm text-primay500 hover:underline flex items-center gap-1 mx-auto"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               بازگشت
@@ -56,7 +53,7 @@ export default function ForgotPasswordForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-[321px] h-12 border border-[#CDCED6] bg-white rounded-full pr-11 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary500 focus:border-primary500 transition-all"
+                className="w-[321px] h-12 border border-[#CDCED6] dark:border-[#353535] bg-white dark:bg-[#353535] rounded-full pr-11 px-4 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary500 focus:border-primary500 transition-all"
               />
             </div>
 

@@ -7,7 +7,7 @@ export default function PropertyCard({
   prop: (typeof PROPERTIES)[0];
 }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
+    <div className="bg-white dark:bg-[#272727]  rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
       {/* Image */}
       <div className="relative overflow-hidden">
         <img
@@ -17,7 +17,7 @@ export default function PropertyCard({
         />
         {/* Badges on image */}
         <div className="absolute top-3 right-3 flex gap-1.5" dir="rtl">
-          <span className="bg-white/90 backdrop-blur-sm text-gray-700 text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 shadow-sm">
+          <span className="bg-white/90  backdrop-blur-sm text-gray-700 text-xs px-2.5 py-1 rounded-full font-medium flex items-center gap-1 shadow-sm">
             <Clock className="w-3 h-3 text-primary500" />
             {prop.minutes} دقیقه
           </span>
@@ -43,11 +43,11 @@ export default function PropertyCard({
           <span>{prop.date}</span>
         </div>
 
-        <h3 className="font-bold text-gray-900 text-sm leading-6 mb-2 line-clamp-1">
+        <h3 className="font-bold text-gray-900 dark:text-white text-sm leading-6 mb-2 line-clamp-1">
           {prop.title}
         </h3>
 
-        <p className="text-gray-500 text-xs leading-5 mb-4 line-clamp-3 flex-1">
+        <p className="text-gray-500 dark:text-[#CDCED6] text-xs leading-5 mb-4 line-clamp-3 flex-1">
           {prop.description}
         </p>
 

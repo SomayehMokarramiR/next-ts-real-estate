@@ -2,7 +2,7 @@ import { Home, ChevronLeft } from "lucide-react";
 export default function Breadcrumb() {
   return (
     <nav
-      className="flex items-center justify-center gap-1.5 text-sm text-gray-500 mb-8"
+      className="flex items-center justify-center gap-1.5 text-sm text-gray-500 dark:text-white mb-8"
       aria-label="مسیر صفحه"
     >
       <a

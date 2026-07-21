@@ -11,7 +11,7 @@ export default function AuthLayout({
         <Navbar />
       </div>
 
-      <main>{children}</main>
+      <main className="bg-background  text-text-body">{children}</main>
     </>
   );
 }

@@ -9,7 +9,9 @@ export default function MainLayout({
   return (
     <>
       <Navbar />
-      {children}
+
+      <main className=" bg-background text-text-body">{children}</main>
+
       <Footer />
     </>
   );

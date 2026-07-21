@@ -16,12 +16,12 @@ export default function Pagination({
       dir="rtl"
     >
       <button
-        onClick={() => onChange(current - 1)}
-        disabled={current === 1}
-        className="flex items-center gap-1 px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-primay500/50 hover:border-primay700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        onClick={() => onChange(current + 1)}
+        disabled={current === total}
+        className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 dark:text-white hover:bg-primay500/50 hover:border-primay700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
+        بعدی
         <ChevronRight className="w-4 h-4" />
-        قبلی
       </button>
 
       <div className="flex items-center gap-1">
@@ -41,12 +41,12 @@ export default function Pagination({
       </div>
 
       <button
-        onClick={() => onChange(current + 1)}
-        disabled={current === total}
-        className="flex items-center gap-1 px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-600 hover:bg-primay500/50 hover:border-primay700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        onClick={() => onChange(current - 1)}
+        disabled={current === 1}
+        className="flex items-center gap-1 px-3 py-2  text-sm text-gray-600 dark:text-white hover:bg-primay500/50 hover:border-primay700/50 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
       >
-        بعدی
         <ChevronLeft className="w-4 h-4" />
+        قبلی
       </button>
     </div>
   );

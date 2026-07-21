@@ -15,12 +15,12 @@ export default function ContactUs() {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 items-start">
           {/* Right – text content */}
           <div className="flex-1 order-1 lg:order-1">
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-snug mb-5">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white leading-snug mb-5">
               بیش از یک مشاور املاک؛
               <br />
               <span className="text-primary500">شریک آرامش و سرمایه شما</span>
             </h1>
-            <p className="text-gray-500 text-sm sm:text-base leading-8">
+            <p className="text-gray-500 dark:text-white text-sm sm:text-base leading-8">
               با تخصص، شفافیت و تعهد، رویای ملک ایده‌آل را به واقعیت تبدیل
               می‌کنیم. از مشاوره تا کلید، همراه شما هستیم.
             </p>
@@ -46,7 +46,7 @@ export default function ContactUs() {
       </section>
 
       {/* ── Divider ── */}
-      <div className="w-full h-px bg-gray-200" />
+      {/* <div className="w-full h-px bg-gray-200" /> */}
 
       {/* ── Bottom section ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -62,7 +62,7 @@ export default function ContactUs() {
           </div>
 
           {/* Left – contact form */}
-          <div className="w-full lg:w-[45%] order-1 lg:order-1 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="w-full lg:w-[45%] order-1 lg:order-1 bg-white dark:border-[#353535] dark:bg-[#272727] rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
             <ContactForm />
           </div>
         </div>

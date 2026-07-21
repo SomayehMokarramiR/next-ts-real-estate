@@ -31,14 +31,18 @@ export default function PasswordField({
         className="
           w-full
           border border-gray-200
+          dark:border-[#353535]
           bg-white
+          dark:bg-[#353535]
           rounded-full
           py-3
           pr-11
           pl-4
           text-sm
           text-gray-700
+          dark:text-white
           placeholder-gray-400
+          dark:placeholder-gray-200
           focus:outline-none
           focus:border-primary500
           focus:ring-2

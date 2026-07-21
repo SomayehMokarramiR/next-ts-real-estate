@@ -10,7 +10,7 @@ export default function Breadcrumb() {
   ];
 
   return (
-    <nav className="flex items-center justify-center gap-1 text-xs text-gray-500 flex-wrap">
+    <nav className="flex items-center justify-center gap-1 text-xs text-gray-500 dark:text-white flex-wrap">
       {crumbs.map((crumb, i) => (
         <span key={crumb} className="flex items-center gap-1">
           {i !== crumbs.length - 1 ? (

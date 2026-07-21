@@ -4,15 +4,15 @@ export default function VillaRentalSection() {
   return (
     <div
       dir="rtl"
-      className=" bg-white flex items-center justify-center px-4 py-16"
+      className=" bg-white dark:bg-[#272727] flex items-center justify-center px-4 py-16"
     >
       <div className="w-full max-w-5xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <p className="text-blue-500 text-sm font-medium mb-2">
+          <p className="text-primary500 text-sm font-medium mb-2">
             ویلا را با ما انتخاب کنید
           </p>
-          <h2 className="text-3xl font-bold text-gray-900">
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
             اجاره ویلا در محبوب ترین مقاصد ایران
           </h2>
         </div>
@@ -58,6 +58,7 @@ export default function VillaRentalSection() {
         gap-2
 
         bg-white/90
+        dark:bg-[#353535]
         backdrop-blur-sm
 
         rounded-full
@@ -77,6 +78,7 @@ export default function VillaRentalSection() {
                 <span
                   className="
           text-gray-800
+          dark:text-white
           text-xs
           font-medium
 
@@ -91,7 +93,7 @@ export default function VillaRentalSection() {
 
                 <span
                   className="
-          bg-blue-500
+          bg-primary500
           text-white
 
           text-xs

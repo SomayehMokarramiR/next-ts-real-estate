@@ -56,12 +56,9 @@ export default function Search({ fields, variant = "default" }: Props) {
               flex
               items-center
               justify-center
+              text-white
 
-              ${
-                field.label.includes("حذف")
-                  ? "bg-[#FF220C] text-white"
-                  : "bg-primary500 text-white"
-              }
+              ${field.label.includes("حذف") ? "bg-[#FF220C]" : "bg-primary500"}
             `}
           >
             {field.label}
@@ -93,7 +90,6 @@ export default function Search({ fields, variant = "default" }: Props) {
                 : ""
             }
 
-
             ${
               variant === "mortgage"
                 ? `
@@ -104,7 +100,6 @@ export default function Search({ fields, variant = "default" }: Props) {
                 : ""
             }
 
-
             ${variant === "default" ? "w-full" : ""}
           `}
         >
@@ -113,6 +108,7 @@ export default function Search({ fields, variant = "default" }: Props) {
               text-sm
               font-medium
               text-gray-700
+              dark:text-white
               text-right
             "
           >
@@ -127,10 +123,15 @@ export default function Search({ fields, variant = "default" }: Props) {
               w-full
               rounded-full
               bg-[#F0F0F3]
+              dark:bg-[#353535]
               px-4
               text-sm
               outline-none
               text-right
+              text-gray-900
+              dark:text-white
+              placeholder:text-gray-400
+              dark:placeholder:text-gray-300
             "
           />
         </div>
@@ -156,7 +157,6 @@ export default function Search({ fields, variant = "default" }: Props) {
               : ""
           }
 
-
           ${
             variant === "mortgage"
               ? `
@@ -166,7 +166,6 @@ export default function Search({ fields, variant = "default" }: Props) {
               `
               : ""
           }
-
 
           ${variant === "default" ? "w-full" : ""}
         `}
@@ -181,12 +180,12 @@ export default function Search({ fields, variant = "default" }: Props) {
   };
 
   // ==========================
-  // MORTGAGE بدون تغییر
+  // MORTGAGE
   // ==========================
 
   if (variant === "mortgage") {
     return (
-      <div className="bg-white p-4 sm:p-6">
+      <div className="bg-white dark:bg-background p-4 sm:p-6">
         <div className="flex flex-wrap gap-4 items-end">
           {fields.map(renderField)}
         </div>
@@ -200,7 +199,7 @@ export default function Search({ fields, variant = "default" }: Props) {
 
   if (variant === "houseReserve") {
     return (
-      <div className="bg-white p-4 sm:p-6">
+      <div className="bg-white dark:bg-background p-4 sm:p-6">
         <div
           className="
             flex
@@ -223,7 +222,7 @@ export default function Search({ fields, variant = "default" }: Props) {
   // ==========================
 
   return (
-    <div className="bg-white p-4 sm:p-6">
+    <div className="bg-white dark:bg-[#127127127] p-4 sm:p-6">
       <div className="flex flex-wrap gap-4">{fields.map(renderField)}</div>
     </div>
   );

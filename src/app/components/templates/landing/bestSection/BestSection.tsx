@@ -3,18 +3,14 @@ import { properties } from "./constants";
 
 export default function BestSection() {
   return (
-    <div
-      className="bg-white flex items-center justify-center py-14 px-4"
-      style={{ fontFamily: "'Vazirmatn', sans-serif" }}
-      dir="rtl"
-    >
+    <div className="bg-white dark:bg-[#272727] flex items-center justify-center py-14 px-4">
       <div className="w-full max-w-5xl">
         {/* ── Section header ── */}
         <div className="text-center mb-8">
           <p className="text-sm font-medium mb-1 text-primary500">
             همه جا ما با شما هستیم
           </p>
-          <h2 className="text-gray-900 font-extrabold text-[28px] md:text-3xl">
+          <h2 className="text-gray-900 dark:text-white font-extrabold text-[28px] md:text-3xl">
             بهترین اقامتگاه ها برای شما
           </h2>
         </div>

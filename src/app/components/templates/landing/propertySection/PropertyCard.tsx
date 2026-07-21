@@ -11,7 +11,7 @@ export default function PropertyCard({
   return (
     <div className="relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] lg:w-[220px] rounded-2xl overflow-hidden group cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300">
       {/* Image */}
-      <div className="h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-200">
+      <div className="h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-200 ">
         <img
           src={property.img}
           alt={property.alt}
@@ -20,8 +20,8 @@ export default function PropertyCard({
       </div>
 
       {/* Bottom label */}
-      <div className="absolute bottom-[26px] left-5 right-5 bg-white rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
-        <span className="text-gray-800 text-sm font-semibold">
+      <div className="absolute bottom-[26px] left-5 right-5 bg-white dark:bg-[#353535] rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
+        <span className="text-gray-800 dark:text-white text-sm font-semibold">
           {property.label}
         </span>
 
@@ -35,6 +35,7 @@ export default function PropertyCard({
             justify-center
             shrink-0
             bg-[#FFFFFA]
+            
             border
             border-primary500
             text-primary500

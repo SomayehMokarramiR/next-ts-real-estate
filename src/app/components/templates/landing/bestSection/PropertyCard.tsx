@@ -4,7 +4,7 @@ import { properties } from "./constants";
 export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
   return (
     <div
-      className="bg-white rounded-2xl overflow-hidden flex flex-col"
+      className="bg-white  rounded-2xl overflow-hidden flex flex-col"
       style={{ boxShadow: "0 2px 20px rgba(0,0,0,0.09)" }}
     >
       {/* ── Image block ── */}
@@ -36,19 +36,19 @@ export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
           <p className="text-white text-[11px] leading-none truncate">
             {p.address}
           </p>
-          <MapPin size={11} className="text-white flex-shrink-0" />
+          <MapPin size={11} className="text-white shrink-0" />
         </div>
       </div>
 
       {/* ── Body ── */}
-      <div className="px-4 pt-3 pb-4 flex flex-col gap-3" dir="rtl">
+      <div className="px-4 pt-3 pb-4 flex flex-col gap-3 bg-white dark:bg-[#353535] dark:border-[#353535]">
         {/* Title */}
-        <h3 className="text-gray-900 font-bold text-[15px] text-right">
+        <h3 className="text-gray-900 dark:text-white font-bold text-[15px] text-right">
           {p.title}
         </h3>
 
         {/* Amenities — RTL: خواب | حمام | نفر | پارکینگ */}
-        <div className="flex items-center justify-end gap-2 text-gray-500 text-[11px]">
+        <div className="flex items-center justify-end gap-2 text-gray-500 dark:text-white text-[11px]">
           <span className="flex items-center gap-[3px]">
             <Bed size={12} className="text-gray-400" />
             <span>{p.beds} خواب</span>
@@ -71,7 +71,7 @@ export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-100" />
+        <div className="border-t border-gray-100 " />
 
         {/* Price row */}
         <div
@@ -81,6 +81,7 @@ export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
     items-center
     justify-between
     bg-[#EDEDED]
+    dark:bg-[#353535]
     rounded-xl
     px-3
     sm:px-5
@@ -95,6 +96,7 @@ export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
       text-[11px]
       py-3
       text-[#8B8D98]
+      dark:text-white
       whitespace-nowrap
       shrink-0
     "
@@ -115,6 +117,7 @@ export default function PropertyCard({ p }: { p: (typeof properties)[0] }) {
             <span
               className="
         text-gray-800
+        dark:text-white
         font-bold
         text-sm
         whitespace-nowrap

@@ -43,6 +43,8 @@ export default function Login() {
         {/* Right - Form */}
         <div
           className="
+            bg-white
+            dark:bg-[#272727]
             w-full
             md:w-[45%]
             flex
@@ -63,6 +65,7 @@ export default function Login() {
               font-semibold
               text-center
               text-[#1a1a2e]
+              dark:text-white
               mb-5
               mt-8
             "
@@ -75,6 +78,7 @@ export default function Login() {
             className="
               flex
               bg-[#f0f2f5]
+              dark:bg-[#353535]
               rounded-full
               p-1
               mb-6
@@ -97,7 +101,9 @@ export default function Login() {
                 sm:text-sm
                 font-medium
                 text-gray-500
+                dark:text-white
                 hover:text-gray-700
+                dark:hover:text-gray-300
                 transition-all
               "
             >

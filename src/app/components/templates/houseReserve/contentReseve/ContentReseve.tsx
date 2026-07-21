@@ -31,7 +31,6 @@ export default function ContentReseve() {
         flex
     flex-col
     min-[1200px]:flex-row
-    bg-gray-50
     overflow-hidden
     py-6
     lg:py-12
@@ -60,29 +59,34 @@ export default function ContentReseve() {
             key={p.id}
             onMouseEnter={() => setActivePin(p.id)}
             className={`
-              bg-white
+            bg-white dark:bg-[#272727]
               rounded-2xl
               border
               overflow-hidden
               flex
-              flex-col
+              flex-row
               cursor-pointer
-              transition-all
+             transition-all
+              h-auto
+              min-h-[200px]
+              min-[1200px]:h-[200px]
+              min-w-0
 
-              ${
-                activePin === p.id
-                  ? "border-blue-400 shadow-md"
-                  : "border-gray-100 shadow-sm hover:shadow-md"
-              }
-            `}
+  ${
+    activePin === p.id
+      ? "border-primary500 dark:border-primary600 shadow-md"
+      : "border-gray-100 shadow-sm hover:shadow-md dark:border-[#353535]"
+  }
+`}
           >
             {/* IMAGE */}
 
             <div
               className="
-                w-full
-                h-[180px]
-                shrink-0
+               w-[150px]
+    lg:w-[180px]
+    h-full
+    shrink-0
               "
             >
               <img
@@ -101,7 +105,9 @@ export default function ContentReseve() {
 
             <div
               className="
+                overflow-hidden
                 flex-1
+                min-w-0
                 p-3
                 lg:p-4
                 flex
@@ -138,6 +144,7 @@ export default function ContentReseve() {
                   text-base
                   font-bold
                   text-gray-900
+                  dark:text-white
                 "
               >
                 {p.title}
@@ -151,6 +158,7 @@ export default function ContentReseve() {
                   items-center
                   gap-1.5
                   text-gray-400
+                  dark:text-white
                 "
               >
                 <MapPin size={13} />
@@ -165,9 +173,10 @@ export default function ContentReseve() {
                   flex
                   flex-wrap
                   items-center
-                  gap-3
+                  gap-2
                   text-xs
                   text-gray-500
+                  dark:text-white
                 "
               >
                 <span className="flex items-center gap-1">
@@ -200,38 +209,52 @@ export default function ContentReseve() {
               <div className="border-t border-dashed border-gray-100" />
 
               {/* PRICE */}
+              {/* PRICE */}
 
               <div
                 className="
-                  flex
-                  items-center
-                  justify-between
-                  gap-3
-                  flex-wrap
-                "
+    flex
+    items-center
+    justify-between
+    gap-2
+    min-w-0
+    max-[1100px]:min-[701px]:flex-col
+    max-[1100px]:min-[701px]:items-stretch
+  "
               >
+                {/* PRICE BOX */}
+
                 <div
                   className="
-                    flex
-                    items-center
-                    gap-2
-                    bg-[#EDEDED]
-                    rounded-full
-                    px-3
-                    py-1.5
-                    whitespace-nowrap
-                  "
+      flex
+      items-center
+      justify-center
+      gap-1.5
+      bg-[#EDEDED]
+      dark:bg-[#353535]
+      rounded-full
+      px-2
+      h-[38px]
+      min-w-0
+      w-full
+      overflow-hidden
+      min-[1101px]:flex-1
+    "
                 >
                   {p.discount && (
                     <span
                       className="
-                        bg-red-500
-                        text-white
-                        text-[10px]
-                        px-1.5
-                        py-0.5
-                        rounded
-                      "
+          bg-red-500
+          text-white
+          text-[10px]
+          w-[28px]
+          h-[18px]
+          flex
+          items-center
+          justify-center
+          rounded
+          shrink-0
+        "
                     >
                       ٪{p.discount}
                     </span>
@@ -240,10 +263,12 @@ export default function ContentReseve() {
                   {p.originalPrice && (
                     <span
                       className="
-                        text-gray-400
-                        text-xs
-                        line-through
-                      "
+          text-gray-400
+          dark:text-white
+          text-[11px]
+          line-through
+          shrink-0
+        "
                     >
                       {formatPrice(p.originalPrice)}
                     </span>
@@ -251,34 +276,46 @@ export default function ContentReseve() {
 
                   <span
                     className="
-                      font-bold
-                      text-sm
-                      text-gray-900
-                    "
+        font-bold
+        text-sm
+        text-gray-900
+        dark:text-white
+        whitespace-nowrap
+        shrink-0
+        max-[800px]:text-xs
+      "
                   >
                     {formatPrice(p.price)}
                   </span>
 
                   <span
                     className="
-                      text-gray-400
-                      text-xs
-                    "
+        text-gray-400
+        text-[11px]
+        whitespace-nowrap
+        shrink-0
+        max-[800px]:text-[10px]
+      "
                   >
                     تومان / {p.type === "monthly" ? "ماه" : "شب"}
                   </span>
                 </div>
 
+                {/* LINK */}
+
                 <Link
                   href={`/properties/${p.id}`}
                   className="
-                    flex
-                    items-center
-                    gap-1
-                    text-xs
-                    text-primary500
-                    whitespace-nowrap
-                  "
+      flex
+      items-center
+      justify-end
+      gap-1
+      text-xs
+      text-primary500
+      whitespace-nowrap
+      shrink-0
+      max-[1100px]:min-[701px]:w-full
+    "
                 >
                   {p.type === "monthly" ? "اجاره ماهیانه" : "مشاهده جزئیات"}
 

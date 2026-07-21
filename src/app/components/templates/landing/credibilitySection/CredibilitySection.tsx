@@ -8,6 +8,7 @@ export default function CredibilitySection() {
       className="
         relative
         w-full
+        bg-white dark:bg-[#272727]
         overflow-hidden
         min-h-[900px]
         md:min-h-[650px]

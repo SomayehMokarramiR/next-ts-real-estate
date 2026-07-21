@@ -5,7 +5,7 @@ export default function OfferCard({ offer }: { offer: (typeof OFFERS)[0] }) {
   const fmt = (n: number) => n.toLocaleString("fa-IR");
 
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+    <div className="bg-white dark:bg-[#272727] rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
       {/* Image */}
       <div className="relative h-52 bg-gray-200 shrink-0">
         <img
@@ -15,12 +15,12 @@ export default function OfferCard({ offer }: { offer: (typeof OFFERS)[0] }) {
         />
 
         {/* Discount badge — top right */}
-        <div className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+        <div className="absolute top-3 right-3 bg-red-500 text-white  text-xs font-bold px-2.5 py-1 rounded-full shadow">
           %{offer.discount}
         </div>
 
         {/* Rating badge — next to discount */}
-        <div className="absolute top-3 right-14 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
+        <div className="absolute top-3 right-14  bg-primary600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
           <Star size={11} fill="white" strokeWidth={0} />
           {offer.rating}
         </div>
@@ -39,12 +39,12 @@ export default function OfferCard({ offer }: { offer: (typeof OFFERS)[0] }) {
       {/* Body */}
       <div className="p-4 flex flex-col gap-3 flex-1">
         {/* Title */}
-        <h3 className="text-gray-900 text-base font-bold text-right leading-snug">
+        <h3 className="text-gray-900 dark:text-white text-base font-bold text-right leading-snug">
           {offer.title}
         </h3>
 
         {/* Features row */}
-        <div className="flex items-center justify-end gap-4 text-gray-500 text-xs border-t border-gray-100 pt-3">
+        <div className="flex items-center justify-end gap-4 text-gray-500 dark:text-white text-xs border-t border-gray-100 pt-3">
           <span className="flex items-center gap-1">
             <span>{offer.parking} پارکینگ</span>
             <Car size={14} className="text-gray-400" />
@@ -68,22 +68,27 @@ export default function OfferCard({ offer }: { offer: (typeof OFFERS)[0] }) {
           className="
     flex
     items-center
-    justify-end
+    justify-between
     gap-2
     flex-wrap
     bg-[#EDEDED]
+    dark:bg-[#353535]
     rounded-full
     px-3
     py-1.5
   "
         >
-          <span className="text-red-500 line-through text-xs font-medium">
-            {fmt(offer.originalPrice)} تومان
-          </span>
-          <span className="text-gray-900 font-bold text-sm">
-            {fmt(offer.price)} تومان
-          </span>
-          <span className="text-gray-400 text-xs">/ هر شب</span>
+          <div>
+            <span className="text-red-500 line-through text-xs font-medium">
+              {fmt(offer.originalPrice)} تومان
+            </span>
+          </div>
+          <div>
+            <span className="text-gray-900 dark:text-white font-bold text-sm">
+              {fmt(offer.price)} تومان
+            </span>
+            <span className="text-gray-400 text-xs">/ هر شب</span>
+          </div>
         </div>
       </div>
     </div>

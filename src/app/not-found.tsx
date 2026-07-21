@@ -38,7 +38,7 @@ export default function NotFound() {
               font-black
               leading-none
               tracking-tight
-              text-primary500
+              text-primary500 
             "
           >
             404
@@ -49,7 +49,7 @@ export default function NotFound() {
               text-lg
               sm:text-xl
               font-bold
-              text-gray-900
+              text-gray-900 dark:text-white
             "
           >
             صفحه مورد نظر یافت نشد
@@ -113,7 +113,7 @@ export default function NotFound() {
             xmlns="http://www.w3.org/2000/svg"
             className="
               w-full
-              h-full
+              h-full                
             "
           >
             {/* LEFT LINE */}
@@ -140,7 +140,7 @@ export default function NotFound() {
                 C 900 60,940 140,1020 100
                 C 1100 60,1140 140,1210 100
               "
-              stroke="#1a1a2e"
+              stroke="#15153e"
               strokeWidth="2.5"
               fill="none"
               strokeLinecap="round"
