@@ -7,7 +7,7 @@ export default function Avatar({
   size?: "sm" | "md";
 }) {
   const colors = [
-    "bg-blue-500",
+    "bg-[#1e40af]",
     "bg-emerald-500",
     "bg-violet-500",
     "bg-rose-500",

@@ -47,8 +47,8 @@ export default function CommentsSection2() {
       {comments[0] && <CommentCard comment={comments[0]} onLike={handleLike} />}
 
       {/* Comment input */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-4 sm:px-5 sm:py-5">
-        <p className="font-bold text-gray-800 text-sm sm:text-base mb-3">
+      <div className="bg-white dark:bg-[#272727] rounded-2xl border border-gray-100  dark:border-[#272727] shadow-sm px-4 py-4 sm:px-5 sm:py-5">
+        <p className="font-bold text-gray-800 dark:text-white text-sm sm:text-base mb-3">
           نظر خود را وارد کنید
         </p>
         <div className="flex gap-3 items-start">
@@ -59,13 +59,13 @@ export default function CommentsSection2() {
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="نظر شما..."
               rows={3}
-              className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition-all leading-7"
+              className="w-full resize-none rounded-xl border border-gray-200 dark:border-[#353535]  bg-gray-50 dark:bg-[#353535] px-4 py-3 text-sm text-gray-800  dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-300 transition-all leading-7"
             />
             <div className="flex justify-end mt-2">
               <button
                 onClick={handleSubmit}
                 disabled={!newComment.trim()}
-                className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all"
+                className="flex items-center gap-2 bg-primary500 hover:bg-primary700  disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all"
               >
                 <Send className="w-4 h-4" />
                 ارسال
@@ -85,7 +85,7 @@ export default function CommentsSection2() {
         <div className="flex justify-center py-4">
           <button
             onClick={() => setShowAll(true)}
-            className="flex items-center gap-2 border border-gray-300 text-gray-600 hover:border-indigo-400 hover:text-indigo-600 text-sm font-semibold px-8 py-2.5 rounded-full transition-all bg-white shadow-sm"
+            className="flex items-center gap-2 border border-gray-300 dark:border-primary500 text-gray-600 dark:text-primary500 hover:border-primary600 hover:text-primary700 text-sm font-semibold px-8 py-2.5 rounded-full transition-all bg-white dark:bg-[#272727] shadow-sm"
           >
             بیشتر بخوانید
             <ChevronDown className="w-4 h-4" />

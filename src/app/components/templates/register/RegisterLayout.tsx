@@ -45,6 +45,7 @@ export default function RegisterLayout({
         w-full
         max-w-5xl
         bg-white
+        dark:bg-[#272727]
         rounded-2xl
         shadow-2xl
         overflow-hidden
@@ -78,6 +79,7 @@ export default function RegisterLayout({
             font-semibold
             text-center
             text-[#1a1a2e]
+            dark:text-white
             mb-6
             mt-8
             "
@@ -91,6 +93,7 @@ export default function RegisterLayout({
             className="
             flex
             bg-[#f0f2f5]
+            dark:bg-[#353535]
             rounded-full
             p-1
             mb-7
@@ -152,16 +155,14 @@ export default function RegisterLayout({
               font-medium
               whitespace-nowrap
               transition-all
-
               text-sm
-
               min-[760px]:max-[872px]:text-xs
               min-[760px]:max-[872px]:gap-1
 
               ${
                 activeTab === "login"
-                  ? "bg-[#2A52BE] text-white"
-                  : "text-gray-500 hover:text-gray-700"
+                  ? "bg-[#2A52BE] dark:bg-white text-white"
+                  : "text-gray-500 dark:text-white hover:text-gray-700 dark:hover:text-gray-400"
               }
               `}
             >

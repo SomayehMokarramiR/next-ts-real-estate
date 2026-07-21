@@ -11,11 +11,11 @@ export default function DescriptionSection() {
   const full = `${short} هتل همایون رشت با بیش از دو دهه سابقه، یکی از شناخته‌شده‌ترین مراکز اقامتی استان گیلان محسوب می‌شود. اتاق‌های مجهز و تمیز، صبحانه رایگان، پارکینگ اختصاصی و خدمات ۲۴ ساعته از جمله ویژگی‌های برجسته این هتل هستند. موقعیت مرکزی هتل در قلب شهر رشت، دسترسی به تمامی جاذبه‌های دیدنی این شهر زیبا را برای مهمانان آسان می‌کند.`;
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-5">
-      <h2 className="text-base font-bold text-gray-900 mb-3">
+    <div className="bg-white dark:bg-[#272727]  rounded-2xl border border-gray-200 dark:border-[#272727]  p-5">
+      <h2 className="text-base font-bold text-gray-900 dark:text-white mb-3">
         چرا هتل همایون رو انتخاب کنیم؟
       </h2>
-      <p className="text-sm text-gray-600 leading-7">
+      <p className="text-sm text-gray-600 dark:text-[#CDCED6] leading-7">
         {expanded ? full : short}
       </p>
       <button
@@ -38,7 +38,7 @@ export default function DescriptionSection() {
         />
       </div>
 
-      <p className="text-sm text-gray-600 leading-7 mt-4">
+      <p className="text-sm text-gray-600 dark:text-[#CDCED6] leading-7 mt-4">
         این ملک در موقعیتی استثنایی قرار داشته و از امکانات رفاهی کامل برخوردار
         است. با دسترسی سریع به مراکز درمانی، آموزشی و تجاری، یک انتخاب هوشمندانه
         برای سکونت یا سرمایه‌گذاری به شمار می‌رود.

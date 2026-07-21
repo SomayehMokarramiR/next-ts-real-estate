@@ -7,7 +7,7 @@ function formatPrice(n: number) {
 
 export default function PropertyCard({ property }: { property: Property }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200 flex flex-col">
+    <div className="bg-white dark:bg-[#272727] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#272727] hover:shadow-md transition-shadow duration-200 flex flex-col">
       {/* Image */}
       <div className="relative overflow-hidden">
         <img
@@ -39,55 +39,29 @@ export default function PropertyCard({ property }: { property: Property }) {
 
       {/* Content */}
       <div className="p-3 flex flex-col flex-1 gap-2">
-        <h3 className="text-sm font-semibold text-gray-800 leading-snug line-clamp-1">
+        <h3 className="text-sm font-semibold text-gray-800 dark:text-white leading-snug line-clamp-1">
           {property.title}
         </h3>
 
         {/* Features */}
-        <div className="flex items-center gap-3 text-xs text-gray-500">
+        <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-white">
           <span className="flex items-center gap-1">
-            <BedDouble size={13} className="text-gray-400" />
+            <BedDouble size={13} className="text-gray-400 dark:text-white" />
             {property.beds} خواب
           </span>
           <span className="flex items-center gap-1">
-            <Bath size={13} className="text-gray-400" />
+            <Bath size={13} className="text-gray-400 dark:text-white" />
             {property.baths} سرویس
           </span>
           <span className="flex items-center gap-1">
-            <Maximize2 size={13} className="text-gray-400" />
+            <Maximize2 size={13} className="text-gray-400 dark:text-white" />
             {property.area} متر
           </span>
           <span className="flex items-center gap-1">
-            <Car size={13} className="text-gray-400" />
+            <Car size={13} className="text-gray-400 dark:text-white" />
             {property.parking} پارکینگ
           </span>
         </div>
-
-        {/* Price */}
-        {/* <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-blue-600">
-                {formatPrice(property.price)}
-              </span>
-              <span className="text-xs text-gray-400">تومان</span>
-              {property.discountPrice && (
-                <span className="text-xs text-gray-400 line-through">
-                  {formatPrice(property.discountPrice)}
-                </span>
-              )}
-            </div>
-            {property.discountPrice && (
-              <span className="inline-block bg-red-100 text-red-600 text-[10px] font-bold px-1.5 py-0.5 rounded mt-0.5">
-                تخفیف
-              </span>
-            )}
-          </div>
-          <button className="text-xs bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium px-3 py-1.5 rounded-lg transition-colors">
-            {property.priceType === "monthly" ? "اجاره ماهانه" : "بر شب"}
-          </button>
-        </div> */}
-
         {/* Price */}
         <div
           className="
@@ -96,6 +70,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           justify-between
           flex-nowrap
           bg-[#EDEDED]
+          dark:bg-[#353535]
           rounded-xl
           px-3
           sm:px-5
@@ -104,7 +79,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           gap-2
           "
         >
-          <span className="text-[11px] py-3 text-[#8B8D98] whitespace-nowrap">
+          <span className="text-[11px] py-3 text-[#8B8D98] dark:text-white whitespace-nowrap">
             اجاره ماهیانه
           </span>
 
@@ -120,11 +95,15 @@ export default function PropertyCard({ property }: { property: Property }) {
                 <span className="text-sm font-bold text-blue-600">
                   {formatPrice(property.price)}
                 </span>
-                <span className="text-xs text-black">تومان</span>
+                <span className="text-xs text-black dark:text-white ">
+                  تومان
+                </span>
               </div>
             </div>
 
-            <span className="text-[11px] text-gray-400">/هر شب</span>
+            <span className="text-[11px] text-gray-400 dark:text-white ">
+              /هر شب
+            </span>
           </div>
         </div>
       </div>

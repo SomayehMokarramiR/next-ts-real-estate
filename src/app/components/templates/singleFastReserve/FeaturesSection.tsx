@@ -302,7 +302,7 @@ export default function FeaturesSection() {
               className={[
                 "flex flex-col items-center justify-center gap-1.5 rounded-xl border px-1.5 py-3 sm:py-4 transition-all duration-200 cursor-pointer text-center",
                 isActive
-                  ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200"
+                  ? "bg-primary500 border-primary600 text-white shadow-md shadow-indigo-200"
                   : "bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50",
               ].join(" ")}
             >

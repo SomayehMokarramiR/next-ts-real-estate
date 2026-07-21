@@ -98,7 +98,7 @@ export default function MortgageHouse() {
         <Search fields={searchFields} variant="mortgage" />
 
         <div className="mb-6 mt-8">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-white">
             {`صفحه ${page} از ${TOTAL_PAGES} — نمایش ${properties.length} ملک`}
           </p>
         </div>

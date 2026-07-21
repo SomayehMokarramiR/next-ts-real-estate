@@ -9,22 +9,24 @@ export default function CommentCard({
   onLike: (id: number) => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 px-4 py-4 sm:px-5 sm:py-5 shadow-sm">
+    <div className="bg-white dark:bg-[#272727] rounded-2xl border border-gray-100 dark:border-[#272727] px-4 py-4 sm:px-5 sm:py-5 shadow-sm">
       <div className="flex items-start gap-3">
         <Avatar name={comment.name} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-gray-900 text-sm sm:text-base leading-none">
+            <span className="font-bold text-gray-900 dark:text-white  text-sm sm:text-base leading-none">
               {comment.name}
             </span>
-            <span className="text-gray-400 text-xs">{comment.handle}</span>
+            <span className="text-gray-400 dark:text-[#B5B5B5] text-xs">
+              {comment.handle}
+            </span>
           </div>
-          <p className="text-gray-400 text-[11px] sm:text-xs mt-1">
+          <p className="text-gray-400 dark:text-[#B5B5B5]  text-[11px] sm:text-xs mt-1">
             {comment.date}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-gray-700 text-sm sm:text-base leading-7 whitespace-pre-line pr-[52px] sm:pr-[56px]">
+      <p className="mt-3 text-gray-700 dark:text-[#909090] text-sm sm:text-base leading-7 whitespace-pre-line pr-[52px] sm:pr-[56px]">
         {comment.text}
       </p>
       <div className="flex justify-end mt-3">

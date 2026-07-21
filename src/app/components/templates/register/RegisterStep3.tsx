@@ -47,14 +47,18 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           w-full
           border
           border-gray-200
+          dark:border-[#353535]
           bg-white
+          dark:bg-[#353535]
           rounded-full
           py-3
           pr-11
           pl-4
           text-sm
-          text-gray-700
+          ext-gray-700
+          dark:text-gray-300
           placeholder-gray-400
+          dark:placeholder-gray-200
           outline-none
           focus:border-[#2A52BE]
           focus:ring-2
@@ -71,6 +75,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           top-1/2
           -translate-y-1/2
           text-gray-400
+          dark:text-gray-200
           pointer-events-none
           "
         />
@@ -91,14 +96,18 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           w-full
           border
           border-gray-200
+          dark:border-[#353535]
           bg-white
+          dark:bg-[#353535]
           rounded-full
           py-3
           pr-11
           pl-4
           text-sm
-          text-gray-700
+          ext-gray-700
+          dark:text-gray-300
           placeholder-gray-400
+          dark:placeholder-gray-200
           outline-none
           focus:border-[#2A52BE]
           focus:ring-2
@@ -135,14 +144,18 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           w-full
           border
           border-gray-200
+          dark:border-[#353535]
           bg-white
+          dark:bg-[#353535]
           rounded-full
           py-3
           pr-11
           pl-4
           text-sm
           text-gray-700
+          dark:text-gray-300
           placeholder-gray-400
+          dark:placeholder-gray-200
           outline-none
           focus:border-[#2A52BE]
           focus:ring-2
@@ -159,6 +172,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           top-1/2
           -translate-y-1/2
           text-gray-400
+          dark:text-gray-200
           pointer-events-none
           "
         />
@@ -214,6 +228,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         w-full
         text-sm
         text-gray-500
+        dark:text-white
         hover:text-[#2A52BE]
         transition
         "

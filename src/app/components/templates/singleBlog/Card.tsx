@@ -3,7 +3,7 @@ import { ListingItem } from "./types";
 
 export default function Card({ item }: { item: ListingItem }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+    <div className="bg-white dark:bg-[#272727] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
       {/* Image area */}
       <div className="relative">
         <img
@@ -41,21 +41,21 @@ export default function Card({ item }: { item: ListingItem }) {
       {/* Card body */}
       <div className="px-3 pt-3 pb-3 space-y-2.5">
         {/* Feature row */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-white">
           <span className="flex items-center gap-1">
-            <Home size={13} className="text-gray-400" />
+            <Home size={13} className="text-gray-400 dark:text-white" />
             {item.beds}
           </span>
           <span className="flex items-center gap-1">
-            <UserRound size={13} className="text-gray-400" />
+            <UserRound size={13} className="text-gray-400 dark:text-white" />
             {item.guests}
           </span>
           <span className="flex items-center gap-1">
-            <ShowerHead size={13} className="text-gray-400" />
+            <ShowerHead size={13} className="text-gray-400 dark:text-white" />
             {item.baths}
           </span>
           <span className="flex items-center gap-1">
-            <Ruler size={13} className="text-gray-400" />
+            <Ruler size={13} className="text-gray-400 dark:text-white" />
             {item.area}
           </span>
         </div>
@@ -83,6 +83,7 @@ export default function Card({ item }: { item: ListingItem }) {
           justify-between
           flex-nowrap
           bg-[#EDEDED]
+          dark:bg-[#353535]
           rounded-xl
           px-3
           sm:px-5
@@ -91,7 +92,7 @@ export default function Card({ item }: { item: ListingItem }) {
           gap-2
           "
         >
-          <span className="text-[11px] py-3 text-[#8B8D98] whitespace-nowrap">
+          <span className="text-[11px] py-3 text-[#8B8D98] dark:text-white whitespace-nowrap">
             اجاره ماهیانه
           </span>
 
@@ -112,11 +113,15 @@ export default function Card({ item }: { item: ListingItem }) {
                       ).toLocaleString("fa-IR")
                     : item.price.toLocaleString("fa-IR")}
                 </span>
-                <span className="text-xs text-black">تومان</span>
+                <span className="text-xs text-black dark:text-white">
+                  تومان
+                </span>
               </div>
             </div>
 
-            <span className="text-[11px] text-gray-400">/هر شب</span>
+            <span className="text-[11px] text-gray-400 dark:text-white">
+              /هر شب
+            </span>
           </div>
         </div>
       </div>

@@ -42,14 +42,18 @@ export default function RegisterStep1({ onNext }: Props) {
           w-full
           border
           border-gray-200
+          dark:border-[#353535]
           bg-white
+          dark:bg-[#353535]
           rounded-full
           py-3
           pr-11
           pl-4
           text-sm
           text-gray-700
+          dark:text-white
           placeholder-gray-400
+          dark:placeholder-gray-200
           outline-none
           focus:border-[#2A52BE]
           focus:ring-2
@@ -66,6 +70,7 @@ export default function RegisterStep1({ onNext }: Props) {
           top-1/2
           -translate-y-1/2
           text-gray-400
+          dark:text-white
           pointer-events-none
           "
         />

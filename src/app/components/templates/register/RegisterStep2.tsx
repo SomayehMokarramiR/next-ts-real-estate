@@ -179,6 +179,7 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
         text-center
         text-sm
         text-gray-500
+        dark:text-white
         "
       >
         {canResend ? (
@@ -199,6 +200,7 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
               className="
             font-medium
             text-gray-700
+      dark:text-white
             tabular-nums
             "
             >
@@ -237,6 +239,7 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
         gap-1
         text-sm
         text-gray-500
+        dark:text-white
         hover:text-[#2A52BE]
         transition
         self-end
