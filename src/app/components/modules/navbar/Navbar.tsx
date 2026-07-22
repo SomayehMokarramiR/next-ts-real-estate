@@ -9,14 +9,33 @@ import NewsIcon from "./NewsIcon";
 export default function Navbar() {
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (dark) {
+    setMounted(true);
+
+    const savedTheme = window.localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      setDark(true);
       document.documentElement.classList.add("dark");
     } else {
+      setDark(false);
       document.documentElement.classList.remove("dark");
     }
-  }, [dark]);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (dark) {
+      document.documentElement.classList.add("dark");
+      window.localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      window.localStorage.setItem("theme", "light");
+    }
+  }, [dark, mounted]);
 
   const navLinks = [
     { label: "خانه", href: "#" },
@@ -34,7 +53,11 @@ export default function Navbar() {
   return (
     <nav
       className="
-      fixed top-0 left-0 right-0 z-[9999]
+      fixed
+      top-0
+      left-0
+      right-0
+      z-[9999]
       bg-background
       backdrop-blur-md
       shadow-sm
@@ -42,21 +65,27 @@ export default function Navbar() {
     >
       <div
         className="
-        max-w-7xl mx-auto
-        px-4 sm:px-6
+        max-w-7xl
+        mx-auto
+        px-4
+        sm:px-6
         h-16
-        flex items-center justify-between
+        flex
+        items-center
+        justify-between
         "
       >
         <Logo />
 
         {/* Desktop Menu */}
+
         <div
           className="
           bg-navbar-background
           rounded-full
           p-2
-          hidden md:flex
+          hidden
+          md:flex
           items-center
           gap-6
           max-[813px]:gap-3
@@ -71,7 +100,9 @@ export default function Navbar() {
               key={item.label}
               href={item.href}
               className={`
-              flex items-center gap-1
+              flex
+              items-center
+              gap-1
               transition
 
               ${
@@ -91,8 +122,10 @@ export default function Navbar() {
         </div>
 
         {/* Actions */}
+
         <div className="flex items-center gap-2">
-          {/* Theme Button */}
+          {/* Theme */}
+
           <button
             onClick={() => setDark((prev) => !prev)}
             className="
@@ -107,7 +140,7 @@ export default function Navbar() {
               backgroundColor: BLUE,
             }}
           >
-            {dark ? (
+            {mounted && dark ? (
               <Sun size={15} className="text-white" />
             ) : (
               <Moon size={15} className="text-white" />
@@ -115,9 +148,11 @@ export default function Navbar() {
           </button>
 
           {/* Login */}
+
           <button
             className="
-            hidden sm:block
+            hidden
+            sm:block
             bg-primary500
             text-white
             text-xs
@@ -131,8 +166,9 @@ export default function Navbar() {
           </button>
 
           {/* Mobile Menu */}
+
           <button
-            onClick={() => setOpen(!open)}
+            onClick={() => setOpen((prev) => !prev)}
             className="
             md:hidden
             w-9
@@ -150,6 +186,7 @@ export default function Navbar() {
       </div>
 
       {/* Mobile Menu */}
+
       {open && (
         <div
           className="
