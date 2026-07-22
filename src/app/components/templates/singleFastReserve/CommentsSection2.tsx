@@ -65,7 +65,7 @@ export default function CommentsSection2() {
               <button
                 onClick={handleSubmit}
                 disabled={!newComment.trim()}
-                className="flex items-center gap-2 bg-primary500 hover:bg-primary700  disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all"
+                className="flex items-center gap-2 bg-primary500 dark:bg-primary600 hover:bg-primary700  disabled:bg-gray-200 dark:disabled:bg-[#353535]  disabled:text-gray-400 text-white text-sm font-semibold px-5 py-2 rounded-xl transition-all"
               >
                 <Send className="w-4 h-4" />
                 ارسال

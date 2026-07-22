@@ -9,22 +9,24 @@ export default function CommentCard({
   onLike: (id: number) => void;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 px-4 py-4 sm:px-5 sm:py-5 shadow-sm">
+    <div className="bg-white dark:bg-[#353535] rounded-2xl border border-gray-100 dark:border-[#353535]  px-4 py-4 sm:px-5 sm:py-5 shadow-sm">
       <div className="flex items-start gap-3">
         <Avatar name={comment.name} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-bold text-gray-900 text-sm sm:text-base leading-none">
+            <span className="font-bold text-gray-900 dark:text-white text-sm sm:text-base leading-none">
               {comment.name}
             </span>
-            <span className="text-gray-400 text-xs">{comment.handle}</span>
+            <span className="text-gray-400 dark:text-gray-100  text-xs">
+              {comment.handle}
+            </span>
           </div>
-          <p className="text-gray-400 text-[11px] sm:text-xs mt-1">
+          <p className="text-gray-400 dark:text-gray-100   text-[11px] sm:text-xs mt-1">
             {comment.date}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-gray-700 text-sm sm:text-base leading-7 whitespace-pre-line pr-[52px] sm:pr-[56px]">
+      <p className="mt-3 text-gray-700 dark:text-[#909090] text-sm sm:text-base leading-7 whitespace-pre-line pr-[52px] sm:pr-[56px]">
         {comment.text}
       </p>
       <div className="flex justify-end mt-3">
@@ -34,7 +36,7 @@ export default function CommentCard({
             "flex items-center gap-1.5 text-xs sm:text-sm rounded-full px-3 py-1.5 transition-all duration-200",
             comment.liked
               ? "text-primary500 bg-rose-50"
-              : "text-gray-400 hover:text-primary700 hover:bg-rose-50",
+              : "text-gray-400 dark:text-gray-100   hover:text-primary700 hover:bg-rose-50",
           ].join(" ")}
         >
           <Heart

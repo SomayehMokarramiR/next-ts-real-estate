@@ -18,7 +18,7 @@ export default function PropertyCard({ property }: { property: Property }) {
         <span className="absolute top-2 right-2 bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
           {property.type}
         </span>
-        <span className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
+        <span className="absolute top-2 left-2 bg-primary500 backdrop-blur-sm text-gray-800 text-xs font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
           <Star size={11} className="text-amber-400 fill-amber-400" />
           {property.rating}
         </span>

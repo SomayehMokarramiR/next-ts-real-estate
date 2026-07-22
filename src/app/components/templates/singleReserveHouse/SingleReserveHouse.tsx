@@ -46,9 +46,11 @@ export default function SingleReserveHouse() {
             <div
               className="
                 bg-white
+                dark:bg-[#272727]
                 rounded-2xl
                 border
                 border-gray-200
+                dark:border-[#272727]
                 shadow-sm
                 p-5
               "

@@ -47,7 +47,7 @@ export default function PassengerForm({
 
         {/* جنسیت */}
         <div>
-          <label className="block text-xs text-gray-500 mb-1.5 font-medium">
+          <label className="block text-xs text-gray-500 dark:text-white mb-1.5 font-medium">
             جنسیت شما
           </label>
 
@@ -58,12 +58,15 @@ export default function PassengerForm({
               w-full
               border
               border-gray-200
+              dark:border-[#353535]
              rounded-full
               px-3
               py-2.5
               text-sm
               text-gray-700
+              dark:text-gray-200
               bg-gray-50
+              dark:bg-[#353535]
               focus:outline-none
             "
           >
@@ -128,8 +131,12 @@ export default function PassengerForm({
                 w-full
                 border
                 border-gray-200
+                dark:border-[#353535]
                 hover:bg-gray-50
+                dark:hover:bg-[#272727]
+                dark:bg-[#353535]   
                 text-gray-600
+                dark:text-gray-100
                 text-xs
                 font-medium
                rounded-full
@@ -153,9 +160,11 @@ export default function PassengerForm({
           <div
             className="
               bg-white
+              dark:bg-[#272727]
               rounded-2xl
               border
               border-gray-200
+              dark:border-[#353535]
               shadow-sm
               p-5
               mt-6
@@ -166,6 +175,7 @@ export default function PassengerForm({
               className="
                 font-bold
                 text-gray-900
+                dark:text-white
                 text-base
                 mb-5
                 flex
@@ -173,7 +183,7 @@ export default function PassengerForm({
                 gap-2
               "
             >
-              <Ticket className="w-4 h-4 text-primary500" />
+              <Ticket className="w-4 h-4 text-primary500 dark:text-gray-300" />
               ارسال بلیط به دیگران
             </h2>
 
@@ -223,6 +233,7 @@ export default function PassengerForm({
               pt-6
               border-t
               border-gray-200
+              dark:border-[#353535]
             "
           >
             <div
@@ -234,13 +245,17 @@ export default function PassengerForm({
               dir="rtl"
             >
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">قیمت کل</span>
+                <span className="text-xs text-gray-400 dark:text-white">
+                  قیمت کل
+                </span>
 
-                <span className="font-bold text-gray-900 text-lg">
+                <span className="font-bold text-gray-900 dark:text-gray-400 text-lg">
                   ۱۱,۵۰۰,۰۰۰
                 </span>
 
-                <span className="text-xs text-gray-500">تومان</span>
+                <span className="text-xs text-gray-500 dark:text-white">
+                  تومان
+                </span>
               </div>
 
               <button

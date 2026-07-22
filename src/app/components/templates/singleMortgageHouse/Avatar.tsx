@@ -1,3 +1,4 @@
+/* ─── Avatar ──────────────────────────────────────────── */
 export default function Avatar({
   name,
   size = "md",
@@ -5,18 +6,20 @@ export default function Avatar({
   name: string;
   size?: "sm" | "md";
 }) {
-  const initials = name
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .slice(0, 2);
-  const sz =
-    size === "sm" ? "w-9 h-9 text-xs" : "w-10 h-10 sm:w-11 sm:h-11 text-sm";
+  const colors = [
+    "bg-[#3361f8]",
+    "bg-emerald-500",
+    "bg-violet-500",
+    "bg-rose-500",
+    "bg-amber-500",
+  ];
+  const color = colors[name.charCodeAt(0) % colors.length];
+  const sz = size === "sm" ? "w-7 h-7 text-xs" : "w-9 h-9 text-sm";
   return (
     <div
-      className={`${sz} rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center flex-shrink-0 text-white font-bold select-none shadow-sm`}
+      className={`${sz} ${color} rounded-full flex items-center justify-center text-white font-bold flex-shrink-0`}
     >
-      {initials}
+      {name[0]}
     </div>
   );
 }

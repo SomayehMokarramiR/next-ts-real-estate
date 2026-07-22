@@ -291,7 +291,7 @@ const features = [
 export default function FeaturesSection() {
   const [activeId, setActiveId] = useState("units");
   return (
-    <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+    <section className="bg-white dark:bg-[#272727] rounded-2xl border border-gray-100 dark:border-[#353535] shadow-sm p-4 sm:p-6">
       <div
         className=" grid 
     grid-cols-2 
@@ -311,20 +311,22 @@ export default function FeaturesSection() {
               className={[
                 "flex flex-col items-center justify-center gap-1.5 rounded-xl border px-1.5 py-3 sm:py-4 transition-all duration-200 cursor-pointer text-center",
                 isActive
-                  ? "bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50",
+                  ? "bg-primary600 border-primary600 text-white shadow-md shadow-[#3361f8]"
+                  : "bg-white dark:bg-[#353535] border-gray-200 dark:border-[#353535] text-gray-700 hover:border-[#3361f8] hover:bg-[#3361f8]/40",
               ].join(" ")}
             >
-              <span className={isActive ? "text-white" : "text-indigo-500"}>
+              <span className={isActive ? "text-white" : "text-[#335be2]"}>
                 {f.icon}
               </span>
-              <span className="font-bold text-[10px] sm:text-xs leading-tight">
+              <span className="font-bold text-[10px] sm:text-xs leading-tight dark:text-white">
                 {f.title}
               </span>
               <span
                 className={[
                   "text-[9px] sm:text-[11px] leading-tight",
-                  isActive ? "text-indigo-100" : "text-gray-400",
+                  isActive
+                    ? "text-indigo-100 dark:text-gray-50"
+                    : "text-gray-400",
                 ].join(" ")}
               >
                 {f.value}
@@ -334,7 +336,7 @@ export default function FeaturesSection() {
         })}
       </div>
       <div className="flex justify-start mt-5">
-        <button className="border border-gray-300 text-gray-600 text-xs sm:text-sm rounded-full px-5 py-2 hover:border-indigo-400 hover:text-indigo-600 transition-colors">
+        <button className="border border-gray-300 dark:border-white text-gray-600 dark:text-white text-xs sm:text-sm rounded-full px-5 py-2 hover:border-primary500 hover:text-primary600 transition-colors">
           نظرات کاربران
         </button>
       </div>

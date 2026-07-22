@@ -15,7 +15,7 @@ export default function ListingCard() {
   return (
     <section className="mb-10" dir="rtl">
       <div className="mb-5">
-        <button className="flex items-center justify-center w-10 h-8 rounded-full border border-gray-300 bg-white">
+        <button className="flex items-center justify-center w-10 h-8 rounded-full border border-gray-300 dark:border-[#353535] bg-white dark:bg-[#272727]">
           <ChevronLeft size={16} />
         </button>
       </div>

@@ -1,16 +1,8 @@
-
-
-
-import {
-  MapPin,
-  Star,
-  CalendarDays,
-  Pencil,
-} from "lucide-react";
+import { MapPin, Star, CalendarDays, Pencil } from "lucide-react";
 
 export default function PropertyCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+    <div className="bg-white dark:bg-[#272727] rounded-2xl border border-gray-200 dark:border-[#353535] overflow-hidden shadow-sm">
       {/* Image */}
       <div className="relative">
         <img
@@ -38,21 +30,25 @@ export default function PropertyCard() {
 
       {/* Details */}
       <div className="p-4">
-        <h2 className="font-bold text-gray-900 text-base mb-3 leading-6">
+        <h2 className="font-bold text-gray-900 dark:text-white text-base mb-3 leading-6">
           خانه ویلایی با پارکینگ اختصاصی
         </h2>
 
         <div className="space-y-2 text-sm mb-4">
-          <div className="flex items-center justify-between text-gray-600">
-            <span className="text-gray-400 text-xs">تاریخ ورود به هتل</span>
-            <span className="flex items-center gap-1.5 font-medium">
+          <div className="flex items-center justify-between text-gray-600 dark:text-gray-100">
+            <span className="text-gray-400 dark:text-gray-100 text-xs">
+              تاریخ ورود به هتل
+            </span>
+            <span className="flex items-center gap-1.5 font-medium dark:text-gray-100">
               <CalendarDays className="w-3.5 h-3.5 text-primary500" />
               ۱۴۰۴/۰۶/۱۶
             </span>
           </div>
           <div className="flex items-center justify-between text-gray-600">
-            <span className="text-gray-400 text-xs">تاریخ خروج از هتل</span>
-            <span className="flex items-center gap-1.5 font-medium">
+            <span className="text-gray-400 dark:text-gray-100  text-xs">
+              تاریخ خروج از هتل
+            </span>
+            <span className="flex items-center gap-1.5 font-medium dark:text-gray-100">
               <CalendarDays className="w-3.5 h-3.5 text-primary500" />
               ۱۴۰۵/۰۴/۳
             </span>
@@ -60,17 +56,20 @@ export default function PropertyCard() {
         </div>
 
         {/* Price */}
-        <div className="bg-[#EDEDED] border border-amber-100 rounded-full px-3 py-2.5 mb-4 flex items-center justify-between">
+        <div className="bg-[#EDEDED] dark:bg-[#353535] border border-amber-100 dark:border-[#353535] rounded-full px-3 py-2.5 mb-4 flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <span className="bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
               %۱۵
             </span>
-            <span className="text-xs text-gray-400 line-through">
+            <span className="text-xs text-gray-400 dark:text-gray-100 line-through">
               ۵,۵۰۰,۰۰۰
             </span>
           </div>
-          <span className="font-bold text-primary600 text-base">
-            ۴,۵۰۰,۰۰۰ <span className="text-xs font-normal">تومان</span>
+          <span className="font-bold text-primary600 dark:text-[#3361f8]  text-base">
+            ۴,۵۰۰,۰۰۰{" "}
+            <span className="text-xs font-normal dark:text-gray-100">
+              تومان
+            </span>
           </span>
         </div>
 

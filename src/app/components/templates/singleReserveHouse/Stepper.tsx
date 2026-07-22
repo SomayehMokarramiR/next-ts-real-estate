@@ -2,7 +2,10 @@ import { ChevronLeft } from "lucide-react";
 import { STEPS } from "./constants";
 export default function Stepper({ active }: { active: number }) {
   return (
-    <div className="bg-white border-b border-gray-200" dir="rtl">
+    <div
+      className="bg-white dark:bg-[#272727] border-b border-gray-200 dark:border-[#353535]"
+      dir="rtl"
+    >
       <div className="max-w-6xl mx-auto px-4">
         <div
           className="
@@ -10,6 +13,7 @@ export default function Stepper({ active }: { active: number }) {
             items-center
             gap-2
             bg-[#EDEDED]
+            dark:bg-[#353535]
             rounded-full
             p-1
             mb-5
@@ -49,7 +53,7 @@ export default function Stepper({ active }: { active: number }) {
                         ? "bg-primary500 text-white"
                         : isSecond
                           ? "bg-white border border-primary500 text-primary500"
-                          : "text-gray-400"
+                          : "text-gray-400 dark:text-gray-100"
                     }
 
 
@@ -92,6 +96,7 @@ export default function Stepper({ active }: { active: number }) {
                       w-4
                       h-4
                       text-gray-300
+                      dark:text-gray-100
                       shrink-0
                       mx-1
                     "

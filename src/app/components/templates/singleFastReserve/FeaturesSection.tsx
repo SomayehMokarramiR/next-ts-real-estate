@@ -291,7 +291,7 @@ const features = [
 export default function FeaturesSection() {
   const [activeId, setActiveId] = useState("units");
   return (
-    <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6">
+    <section className="bg-white dark:bg-[#272727] rounded-2xl border border-gray-100 dark:border-[#272727] shadow-sm p-4 sm:p-6">
       <div className="grid grid-cols-2 gap-2 sm:gap-3">
         {features.map((f) => {
           const isActive = f.id === activeId;
@@ -303,7 +303,7 @@ export default function FeaturesSection() {
                 "flex flex-col items-center justify-center gap-1.5 rounded-xl border px-1.5 py-3 sm:py-4 transition-all duration-200 cursor-pointer text-center",
                 isActive
                   ? "bg-primary500 border-primary600 text-white shadow-md shadow-indigo-200"
-                  : "bg-white border-gray-200 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50",
+                  : "bg-white dark:bg-[#353535] border-gray-200 dark:border-[#353535] text-gray-700 dark:text-white dark:hover:border-primary500 hover:border-indigo-300  hover:bg-indigo-50 dark:hover:bg-primary500/30",
               ].join(" ")}
             >
               <span className={isActive ? "text-white" : "text-indigo-500"}>
@@ -315,7 +315,9 @@ export default function FeaturesSection() {
               <span
                 className={[
                   "text-[9px] sm:text-[11px] leading-tight",
-                  isActive ? "text-indigo-100" : "text-gray-400",
+                  isActive
+                    ? "text-indigo-100 dark:text-white"
+                    : "text-gray-400 dark:text-gray-100",
                 ].join(" ")}
               >
                 {f.value}
