@@ -15,9 +15,13 @@ type NavLink = {
 };
 
 export default function Navbar() {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+
+    return localStorage.getItem("theme") === "dark";
+  });
+
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
 
   const navLinks: NavLink[] = [
     { label: "خانه", href: "#" },
@@ -33,31 +37,16 @@ export default function Navbar() {
   ];
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      setDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setDark(false);
-      document.documentElement.classList.remove("dark");
-    }
-
-    setMounted(true);
-  }, []);
-
-  // تغییر تم
-  useEffect(() => {
-    if (!mounted) return;
+    const html = document.documentElement;
 
     if (dark) {
-      document.documentElement.classList.add("dark");
+      html.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
-      document.documentElement.classList.remove("dark");
+      html.classList.remove("dark");
       localStorage.setItem("theme", "light");
     }
-  }, [dark, mounted]);
+  }, [dark]);
 
   return (
     <nav
@@ -155,12 +144,11 @@ export default function Navbar() {
               backgroundColor: BLUE,
             }}
           >
-            {mounted &&
-              (dark ? (
-                <Sun size={15} className="text-white" />
-              ) : (
-                <Moon size={15} className="text-white" />
-              ))}
+            {dark ? (
+              <Sun size={15} className="text-white" />
+            ) : (
+              <Moon size={15} className="text-white" />
+            )}
           </button>
 
           {/* Login */}
