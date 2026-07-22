@@ -1,7 +1,18 @@
 "use client";
 
 import Logo from "@/app/components/modules/logo/Logo";
-import { ChevronDown, Moon, Sun, Menu } from "lucide-react";
+import {
+  ChevronDown,
+  Moon,
+  Sun,
+  Menu,
+  User,
+  Heart,
+  FileText,
+  Settings,
+  LogOut,
+} from "lucide-react";
+
 import { useEffect, useState } from "react";
 import { BLUE } from "../constants";
 import NewsIcon from "./NewsIcon";
@@ -14,7 +25,61 @@ type NavLink = {
   icon?: boolean;
 };
 
+const avatarUrl =
+  "https://api.dicebear.com/7.x/adventurer/svg?seed=amirMohammad";
+
+const userMenu = [
+  {
+    label: "پروفایل من",
+    icon: User,
+  },
+  {
+    label: "علاقه‌مندی‌ها",
+    icon: Heart,
+  },
+  {
+    label: "رزروهای من",
+    icon: FileText,
+  },
+  {
+    label: "تنظیمات",
+    icon: Settings,
+  },
+  {
+    label: "خروج از حساب",
+    icon: LogOut,
+  },
+];
+
+function Avatar() {
+  return (
+    <div
+      className="
+      w-9
+      h-9
+      rounded-full
+      overflow-hidden
+      ring-2
+      ring-white
+      "
+    >
+      <img
+        src={avatarUrl}
+        alt="avatar"
+        className="
+        w-full
+        h-full
+        object-cover
+        "
+      />
+    </div>
+  );
+}
+
 export default function Navbar() {
+  // فعلا دستی
+  const isLoggedIn = true;
+
   const [dark, setDark] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
 
@@ -22,6 +87,8 @@ export default function Navbar() {
   });
 
   const [open, setOpen] = useState(false);
+
+  const [userOpen, setUserOpen] = useState(false);
 
   const navLinks: NavLink[] = [
     { label: "خانه", href: "#" },
@@ -41,9 +108,11 @@ export default function Navbar() {
 
     if (dark) {
       html.classList.add("dark");
+
       localStorage.setItem("theme", "dark");
     } else {
       html.classList.remove("dark");
+
       localStorage.setItem("theme", "light");
     }
   }, [dark]);
@@ -151,23 +220,120 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* Login */}
+          {/* Auth */}
 
-          <button
-            className="
-            hidden
-            sm:block
-            bg-primary500
-            text-white
-            text-xs
-            sm:text-sm
-            px-4
-            py-2
-            rounded-full
-            "
-          >
-            ورود / ثبت‌نام
-          </button>
+          {isLoggedIn ? (
+            <div
+              className="
+                relative
+                "
+            >
+              <button
+                onClick={() => setUserOpen((prev) => !prev)}
+                className="
+                  flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-gray-200
+                  dark:border-[#353535]
+                  px-2
+                  py-1
+                  "
+              >
+                <Avatar />
+
+                <div
+                  className="
+                    hidden
+                    sm:flex
+                    flex-col
+                    text-right
+                    "
+                >
+                  <span
+                    className="
+                      text-xs
+                      font-semibold
+                      dark:text-white
+                      "
+                  >
+                    امیر محمد
+                  </span>
+
+                  <span
+                    className="
+                      text-[11px]
+                      text-gray-400
+                      "
+                  >
+                    09373808890
+                  </span>
+                </div>
+
+                <ChevronDown size={14} className="text-gray-400" />
+              </button>
+
+              {userOpen && (
+                <div
+                  className="
+                      absolute
+                      left-0
+                      top-12
+                      w-52
+                      bg-white
+                      dark:bg-[#272727]
+                      border
+                      border-gray-200
+                      dark:border-[#353535]
+                      rounded-2xl
+                      shadow-lg
+                      p-2
+                      "
+                >
+                  {userMenu.map(({ label, icon: Icon }) => (
+                    <button
+                      key={label}
+                      className="
+                              w-full
+                              flex
+                              items-center
+                              gap-3
+                              px-3
+                              py-2
+                              rounded-xl
+                              text-sm
+                              hover:bg-gray-100
+                              dark:hover:bg-[#353535]
+                              dark:text-white
+                              "
+                    >
+                      <Icon size={16} />
+
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="
+                hidden
+                sm:block
+                bg-primary500
+                text-white
+                text-xs
+                sm:text-sm
+                px-4
+                py-2
+                rounded-full
+                "
+            >
+              ورود / ثبت‌نام
+            </button>
+          )}
 
           {/* Mobile Menu */}
 
@@ -194,24 +360,24 @@ export default function Navbar() {
       {open && (
         <div
           className="
-          md:hidden
-          bg-background
-          text-foreground
-          px-5
-          py-4
-          space-y-3
-          shadow-md
-          "
+            md:hidden
+            bg-background
+            text-foreground
+            px-5
+            py-4
+            space-y-3
+            shadow-md
+            "
         >
           {navLinks.map((item) => (
             <a
               key={item.label}
               href={item.href}
               className="
-              block
-              text-sm
-              hover:text-primary500
-              "
+                  block
+                  text-sm
+                  hover:text-primary500
+                  "
             >
               {item.label}
             </a>
