@@ -6,38 +6,20 @@ import { useEffect, useState } from "react";
 import { BLUE } from "../constants";
 import NewsIcon from "./NewsIcon";
 
+type NavLink = {
+  label: string;
+  href: string;
+  arrow?: boolean;
+  highlight?: boolean;
+  icon?: boolean;
+};
+
 export default function Navbar() {
   const [dark, setDark] = useState(false);
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-
-    const savedTheme = window.localStorage.getItem("theme");
-
-    if (savedTheme === "dark") {
-      setDark(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setDark(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    if (dark) {
-      document.documentElement.classList.add("dark");
-      window.localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      window.localStorage.setItem("theme", "light");
-    }
-  }, [dark, mounted]);
-
-  const navLinks = [
+  const navLinks: NavLink[] = [
     { label: "خانه", href: "#" },
     { label: "رهن و اجاره", href: "#" },
     { label: "بررسی سریع", href: "#", arrow: true },
@@ -49,6 +31,33 @@ export default function Navbar() {
       icon: true,
     },
   ];
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    if (savedTheme === "dark") {
+      setDark(true);
+      document.documentElement.classList.add("dark");
+    } else {
+      setDark(false);
+      document.documentElement.classList.remove("dark");
+    }
+
+    setMounted(true);
+  }, []);
+
+  // تغییر تم
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (dark) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [dark, mounted]);
 
   return (
     <nav
@@ -123,7 +132,13 @@ export default function Navbar() {
 
         {/* Actions */}
 
-        <div className="flex items-center gap-2">
+        <div
+          className="
+          flex
+          items-center
+          gap-2
+          "
+        >
           {/* Theme */}
 
           <button
@@ -140,11 +155,12 @@ export default function Navbar() {
               backgroundColor: BLUE,
             }}
           >
-            {mounted && dark ? (
-              <Sun size={15} className="text-white" />
-            ) : (
-              <Moon size={15} className="text-white" />
-            )}
+            {mounted &&
+              (dark ? (
+                <Sun size={15} className="text-white" />
+              ) : (
+                <Moon size={15} className="text-white" />
+              ))}
           </button>
 
           {/* Login */}
