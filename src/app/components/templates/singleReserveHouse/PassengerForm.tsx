@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, UserPlus, Users, Ticket } from "lucide-react";
+import { UserPlus, Users, Ticket } from "lucide-react";
+
 import Field from "./Field";
 import { Passenger } from "./types";
+
 export default function PassengerForm({
   passenger,
   index,
@@ -21,16 +23,36 @@ export default function PassengerForm({
   return (
     <div className="mb-2 pb-6">
       {/* عنوان مسافرهای بعدی */}
+
       {index > 0 && (
-        <div className="flex items-center gap-2 mb-4 mt-4" dir="rtl">
+        <div
+          className="
+          flex
+          items-center
+          gap-2
+          mb-4
+          mt-4
+          "
+          dir="rtl"
+        >
           <div className="h-px flex-1 bg-gray-100" />
+
           <span className="text-xs text-gray-400">مسافر {index + 1}</span>
+
           <div className="h-px flex-1 bg-gray-100" />
         </div>
       )}
 
       {/* اطلاعات مسافر */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+      <div
+        className="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        gap-3
+        "
+      >
         <Field
           label="نام"
           placeholder="نام"
@@ -46,8 +68,18 @@ export default function PassengerForm({
         />
 
         {/* جنسیت */}
+
         <div>
-          <label className="block text-xs text-gray-500 dark:text-white mb-1.5 font-medium">
+          <label
+            className="
+            block
+            text-xs
+            text-gray-500
+            dark:text-white
+            mb-1.5
+            font-medium
+            "
+          >
             جنسیت شما
           </label>
 
@@ -55,19 +87,19 @@ export default function PassengerForm({
             value={passenger.gender}
             onChange={(e) => onChange("gender", e.target.value)}
             className="
-              w-full
-              border
-              border-gray-200
-              dark:border-[#353535]
-             rounded-full
-              px-3
-              py-2.5
-              text-sm
-              text-gray-700
-              dark:text-gray-200
-              bg-gray-50
-              dark:bg-[#353535]
-              focus:outline-none
+            w-full
+            border
+            border-gray-200
+            dark:border-[#353535]
+            rounded-full
+            px-3
+            py-2.5
+            text-sm
+            text-gray-700
+            dark:text-gray-200
+            bg-gray-50
+            dark:bg-[#353535]
+            focus:outline-none
             "
           >
             <option value="">انتخاب کنید</option>
@@ -85,7 +117,6 @@ export default function PassengerForm({
           onChange={(v) => onChange("nationalId", v)}
         />
 
-        {/* تاریخ تولد */}
         <Field
           label="تاریخ تولد"
           placeholder="1370/01/01"
@@ -94,31 +125,32 @@ export default function PassengerForm({
         />
 
         {/* دکمه های مسافر */}
+
         {index === 0 && (
           <div
             className="
-              grid
-              grid-cols-2
-              gap-2
-              items-end
+            grid
+            grid-cols-2
+            gap-2
+            items-end
             "
           >
             <button
               onClick={onAddPassenger}
               className="
-                h-[42px]
-                w-full
-                bg-primary500
-                hover:bg-primary700
-                text-white
-                text-xs
-                font-medium
-               rounded-full
-                flex
-                items-center
-                justify-center
-                gap-1
-                whitespace-nowrap
+              h-[42px]
+              w-full
+              bg-primary500
+              hover:bg-primary700
+              text-white
+              text-xs
+              font-medium
+              rounded-full
+              flex
+              items-center
+              justify-center
+              gap-1
+              whitespace-nowrap
               "
             >
               <UserPlus className="w-3.5 h-3.5" />
@@ -127,24 +159,22 @@ export default function PassengerForm({
 
             <button
               className="
-                h-[42px]
-                w-full
-                border
-                border-gray-200
-                dark:border-[#353535]
-                hover:bg-gray-50
-                dark:hover:bg-[#272727]
-                dark:bg-[#353535]   
-                text-gray-600
-                dark:text-gray-100
-                text-xs
-                font-medium
-               rounded-full
-                flex
-                items-center
-                justify-center
-                gap-1
-                whitespace-nowrap
+              h-[42px]
+              w-full
+              border
+              border-gray-200
+              dark:border-[#353535]
+              dark:bg-[#353535]
+              text-gray-600
+              dark:text-gray-100
+              text-xs
+              font-medium
+              rounded-full
+              flex
+              items-center
+              justify-center
+              gap-1
+              whitespace-nowrap
               "
             >
               <Users className="w-3.5 h-3.5" />
@@ -155,130 +185,89 @@ export default function PassengerForm({
       </div>
 
       {/* ارسال بلیط */}
+
       {index === 0 && (
-        <>
-          <div
+        <div
+          className="
+          bg-white
+          dark:bg-[#272727]
+          rounded-2xl
+          border
+          border-gray-200
+          dark:border-[#353535]
+          shadow-sm
+          p-5
+          mt-6
+          "
+          dir="rtl"
+        >
+          <h2
             className="
-              bg-white
-              dark:bg-[#272727]
-              rounded-2xl
-              border
-              border-gray-200
-              dark:border-[#353535]
-              shadow-sm
-              p-5
-              mt-6
-            "
-            dir="rtl"
-          >
-            <h2
-              className="
-                font-bold
-                text-gray-900
-                dark:text-white
-                text-base
-                mb-5
-                flex
-                items-center
-                gap-2
-              "
-            >
-              <Ticket className="w-4 h-4 text-primary500 dark:text-gray-300" />
-              ارسال بلیط به دیگران
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-              <Field
-                label="شماره تلفن"
-                placeholder="09xx xxx xxxx"
-                value={phone}
-                onChange={setPhone}
-              />
-
-              <Field
-                label="ایمیل"
-                placeholder="example@email.com"
-                value={email}
-                onChange={setEmail}
-              />
-            </div>
-
-            <button
-              className="
-                   h-[42px]
-    w-full
-    sm:w-auto
-    px-5
-    bg-primary500
-    hover:bg-primary700
-    text-white
-    text-xs
-    font-medium
-   rounded-full
-    flex
-    items-center
-    justify-center
-    gap-1
-    transition-colors
-              "
-            >
-              ثبت اطلاعات
-            </button>
-          </div>
-
-          {/* تایید و ادامه فرآیند */}
-          <div
-            className="
-              mt-6
-              pt-6
-              border-t
-              border-gray-200
-              dark:border-[#353535]
+            font-bold
+            text-gray-900
+            dark:text-white
+            text-base
+            mb-5
+            flex
+            items-center
+            gap-2
             "
           >
-            <div
+            <Ticket
               className="
-                flex
-                items-center
-                justify-between
+              w-4
+              h-4
+              text-primary500
               "
-              dir="rtl"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400 dark:text-white">
-                  قیمت کل
-                </span>
+            />
+            ارسال بلیط به دیگران
+          </h2>
 
-                <span className="font-bold text-gray-900 dark:text-gray-400 text-lg">
-                  ۱۱,۵۰۰,۰۰۰
-                </span>
+          <div
+            className="
+            grid
+            grid-cols-1
+            sm:grid-cols-2
+            gap-3
+            mb-5
+            "
+          >
+            <Field
+              label="شماره تلفن"
+              placeholder="09xx xxx xxxx"
+              value={phone}
+              onChange={setPhone}
+            />
 
-                <span className="text-xs text-gray-500 dark:text-white">
-                  تومان
-                </span>
-              </div>
-
-              <button
-                className="
-                  bg-primary500
-                  hover:bg-primary600
-                  text-white
-                  text-sm
-                  font-medium
-                  px-6
-                  py-3
-                 rounded-full
-                  flex
-                  items-center
-                  gap-2
-                "
-              >
-                تایید و ادامه فرایند
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-            </div>
+            <Field
+              label="ایمیل"
+              placeholder="example@email.com"
+              value={email}
+              onChange={setEmail}
+            />
           </div>
-        </>
+
+          <button
+            className="
+            h-[42px]
+            w-full
+            sm:w-auto
+            px-5
+            bg-primary500
+            hover:bg-primary700
+            text-white
+            text-xs
+            font-medium
+            rounded-full
+            flex
+            items-center
+            justify-center
+            gap-1
+            "
+          >
+            ثبت اطلاعات
+          </button>
+        </div>
       )}
     </div>
   );

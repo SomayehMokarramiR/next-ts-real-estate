@@ -1,14 +1,12 @@
 import MainLayout from "../components/layout/MainLayout";
-import SingleReserveHouse from "../components/templates/singleReserveHouse/SingleReserveHouse";
+import ReserveWizard from "../components/templates/singleReserveHouse/ReserveWizard";
 
-function page() {
+export default function page() {
   return (
     <MainLayout>
       <main className="pt-20">
-        <SingleReserveHouse />
+        <ReserveWizard />
       </main>
     </MainLayout>
   );
 }
-
-export default page;

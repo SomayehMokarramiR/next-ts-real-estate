@@ -1,105 +1,113 @@
-import { ChevronLeft } from "lucide-react";
+import { Check } from "lucide-react";
 import { STEPS } from "./constants";
+
 export default function Stepper({ active }: { active: number }) {
   return (
-    <div
-      className="bg-white dark:bg-[#272727] border-b border-gray-200 dark:border-[#353535]"
-      dir="rtl"
-    >
-      <div className="max-w-6xl mx-auto px-4">
-        <div
-          className="
-            flex
-            items-center
-            gap-2
-            bg-[#EDEDED]
-            dark:bg-[#353535]
-            rounded-full
-            p-1
-            mb-5
-            overflow-x-auto
-            scrollbar-hide
-          "
-        >
+    <div className="w-full" dir="rtl">
+      <div
+        className="
+        bg-[#EDEDED]
+        dark:bg-[#353535]
+        rounded-2xl
+        p-3
+        overflow-hidden
+        "
+      >
+        <div className="flex items-center w-full">
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
 
-            const isFirst = step.id === 1;
-            const isSecond = step.id === 2;
+            const isActive = step.id === active;
+            const isDone = step.id < active;
 
             return (
               <div
                 key={step.id}
                 className="
-                  flex
-                  items-center
-                  shrink-0
+                flex
+                items-center
+                flex-1
+                min-w-0
                 "
               >
+                {/* Step */}
                 <div
-                  className={`
+                  className="
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  flex-1
+                  min-w-0
+                  "
+                >
+                  <div
+                    className={`
+                    rounded-full
                     flex
                     items-center
                     justify-center
-                    rounded-full
-                    font-medium
-                    transition-all
-                    whitespace-nowrap
                     shrink-0
+
+                    w-8
+                    h-8
+
+                    sm:w-9
+                    sm:h-9
+
+                    md:w-10
+                    md:h-10
 
 
                     ${
-                      isFirst
+                      isActive
                         ? "bg-primary500 text-white"
-                        : isSecond
-                          ? "bg-white border border-primary500 text-primary500"
-                          : "text-gray-400 dark:text-gray-100"
+                        : isDone
+                          ? "bg-blue-200 text-primary500"
+                          : "bg-gray-100 text-gray-400"
                     }
+                    `}
+                  >
+                    {isDone ? <Check size={16} /> : <Icon size={16} />}
+                  </div>
 
-
-                    /* mobile */
-                    w-9
-                    h-9
-                    text-xs
-
-
-                    /* tablet و دسکتاپ */
-                    md:w-auto
-                    md:h-11
-                    md:px-5
-                    md:text-sm
-                    md:gap-2
-                  `}
-                >
-                  <Icon
-                    className="
-                      w-4
-                      h-4
-                      shrink-0
-                    "
-                  />
-
-                  {/* فقط دسکتاپ */}
                   <span
-                    className="
-                      hidden
-                      md:inline
-                    "
+                    className={`
+                    mt-2
+                    text-center
+                    whitespace-nowrap
+
+                    text-[10px]
+
+                    sm:text-xs
+
+                    md:text-sm
+
+                    lg:text-[14px]
+
+
+                    ${
+                      isActive || isDone
+                        ? "text-primary500 dark:text-white"
+                        : "text-gray-400 dark:text-gray-200"
+                    }
+                    `}
                   >
                     {step.label}
                   </span>
                 </div>
 
-                {idx < STEPS.length - 1 && (
-                  <ChevronLeft
-                    className="
-                      w-4
-                      h-4
-                      text-gray-300
-                      dark:text-gray-100
-                      shrink-0
+                {/* Line */}
+                {idx !== STEPS.length - 1 && (
+                  <div
+                    className={`
+                      h-[2px]
+                      flex-1
                       mx-1
-                    "
+                      sm:mx-2
+
+                      ${step.id < active ? "bg-blue-300" : "bg-gray-300"}
+                      `}
                   />
                 )}
               </div>
