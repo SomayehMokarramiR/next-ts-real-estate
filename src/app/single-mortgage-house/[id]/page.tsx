@@ -1,5 +1,5 @@
-import MainLayout from "../components/layout/MainLayout";
-import SingleMotrgageHouse from "../components/templates/singleMortgageHouse/SingleMortgageHouse";
+import MainLayout from "../../components/layout/MainLayout";
+import SingleMotrgageHouse from "../../components/templates/singleMortgageHouse/SingleMortgageHouse";
 
 function page() {
   return (

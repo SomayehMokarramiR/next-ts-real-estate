@@ -18,7 +18,7 @@ export default function ReserveWizard() {
   };
 
   return (
-    <>
+    <div className="min-h-[650px]">
       {step === 1 && <SingleReserveHouse onNext={nextStep} />}
 
       {step === 2 && (
@@ -26,6 +26,6 @@ export default function ReserveWizard() {
       )}
 
       {step === 3 && <SingleReserveHouse3 prevStep={prevStep} />}
-    </>
+    </div>
   );
 }

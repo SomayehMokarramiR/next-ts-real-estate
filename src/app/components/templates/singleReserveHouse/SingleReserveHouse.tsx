@@ -57,6 +57,7 @@ export default function SingleReserveHouse({ onNext }: Props) {
               dark:border-[#353535]
               shadow-sm
               p-5
+            
               "
             >
               <h2

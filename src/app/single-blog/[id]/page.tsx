@@ -1,5 +1,5 @@
-import MainLayout from "../components/layout/MainLayout";
-import SingleBlog from "../components/templates/singleBlog/SingleBlog";
+import MainLayout from "../../components/layout/MainLayout";
+import SingleBlog from "../../components/templates/singleBlog/SingleBlog";
 
 function page() {
   return (

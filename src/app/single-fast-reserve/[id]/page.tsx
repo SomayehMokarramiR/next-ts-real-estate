@@ -1,5 +1,5 @@
-import MainLayout from "../components/layout/MainLayout";
-import SingleFastReserve from "../components/templates/singleFastReserve/SingleFastReserve";
+import MainLayout from "../../components/layout/MainLayout";
+import SingleFastReserve from "../../components/templates/singleFastReserve/SingleFastReserve";
 
 function page() {
   return (
