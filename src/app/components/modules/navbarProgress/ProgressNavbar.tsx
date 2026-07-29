@@ -14,8 +14,9 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
 import NewsIcon from "./NewsIcon";
 import { BLUE } from "./constants";
@@ -26,7 +27,6 @@ import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
 type Props = {
   dark: boolean;
   setDark: Dispatch<SetStateAction<boolean>>;
-  progress: number;
 };
 
 type NavLink = {
@@ -88,9 +88,42 @@ function Avatar() {
   );
 }
 
-export default function ProgressNavbar({ dark, setDark, progress }: Props) {
+export default function ProgressNavbar({ dark, setDark }: Props) {
+  const { progress } = useReserveProgress();
+  const [isDark, setIsDark] = useState(false);
+
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+
+    const darkMode = savedTheme === "dark";
+
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+
+    setDark(darkMode);
+    setIsDark(darkMode);
+  }, [setDark]);
+
+  const toggleTheme = () => {
+    const nextTheme = !isDark;
+
+    setIsDark(nextTheme);
+    setDark(nextTheme);
+
+    if (nextTheme) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
@@ -154,7 +187,11 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
         justify-between
         "
       >
+        {/* Logo */}
+
         <Logo />
+
+        {/* Menu */}
 
         <div
           className="
@@ -198,6 +235,8 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
           ))}
         </div>
 
+        {/* Actions */}
+
         <div
           className="
           flex
@@ -208,7 +247,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
           {/* Dark Mode */}
 
           <button
-            onClick={() => setDark((prev) => !prev)}
+            onClick={toggleTheme}
             className="
             w-9
             h-9
@@ -221,7 +260,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
               backgroundColor: BLUE,
             }}
           >
-            {dark ? (
+            {isDark ? (
               <Sun size={15} className="text-white" />
             ) : (
               <Moon size={15} className="text-white" />
@@ -336,6 +375,8 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
             </button>
           )}
 
+          {/* Mobile */}
+
           <button
             onClick={() => setOpen((prev) => !prev)}
             className="
@@ -365,13 +406,13 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
       >
         <div
           className="
-          absolute
-          right-0
-          h-full
-          bg-primary500
-          transition-all
-          duration-500
-          "
+  absolute
+  right-0
+  h-full
+  bg-primary500
+  transition-all
+  duration-500
+  "
           style={{
             width: `${progress}%`,
           }}
