@@ -1,23 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import RegisterLayout from "./RegisterLayout";
+import RegisterContainer from "./RegisterContainer";
 import RegisterStep1 from "./RegisterStep1";
 import RegisterStep2 from "./RegisterStep2";
 import RegisterStep3 from "./RegisterStep3";
 
+import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
+
 export default function RegisterForm() {
-  const [step, setStep] = useState(1);
+  const { step, setStep } = useRegisterProgress();
+
+  const nextStep = () => {
+    setStep((prev) => prev + 1);
+  };
+
+  const prevStep = () => {
+    setStep((prev) => prev - 1);
+  };
 
   return (
-    <RegisterLayout>
-      {step === 1 && <RegisterStep1 onNext={() => setStep(2)} />}
+    <RegisterContainer>
+      {step === 1 && <RegisterStep1 onNext={nextStep} />}
 
-      {step === 2 && (
-        <RegisterStep2 onNext={() => setStep(3)} onBack={() => setStep(1)} />
-      )}
+      {step === 2 && <RegisterStep2 onNext={nextStep} onBack={prevStep} />}
 
-      {step === 3 && <RegisterStep3 onBack={() => setStep(2)} />}
-    </RegisterLayout>
+      {step === 3 && <RegisterStep3 onBack={prevStep} />}
+    </RegisterContainer>
   );
 }

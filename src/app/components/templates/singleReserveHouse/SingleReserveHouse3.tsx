@@ -24,11 +24,11 @@ const passenger = {
   nationalCode: "208148****151",
 };
 
-export default function SingleReserveHouse3({
-  prevStep,
-}: {
+type Props = {
   prevStep: () => void;
-}) {
+};
+
+export default function SingleReserveHouse3({ prevStep }: Props) {
   const [discountCode, setDiscountCode] = useState("");
 
   const { step, setProgress } = useReserveProgress();
@@ -39,15 +39,7 @@ export default function SingleReserveHouse3({
         <Breadcrumb />
       </div>
 
-      <div
-        className="
-        max-w-6xl
-        mx-auto
-        w-full
-        px-4
-        py-6
-        "
-      >
+      <div className="max-w-6xl mx-auto w-full px-4 py-6">
         <div
           className="
           flex
@@ -59,12 +51,7 @@ export default function SingleReserveHouse3({
         >
           {/* RIGHT */}
 
-          <div
-            className="
-            w-full
-            lg:flex-1
-            "
-          >
+          <div className="w-full lg:flex-1">
             <Stepper active={step} />
 
             <div
@@ -85,6 +72,8 @@ export default function SingleReserveHouse3({
                 gap-5
                 "
               >
+                {/* RESERVE INFO */}
+
                 <div
                   className="
                   bg-[#F0F0F3]
@@ -138,11 +127,13 @@ export default function SingleReserveHouse3({
                   >
                     <span className="text-gray-400">مبلغ نهایی</span>
 
-                    <span className="text-primary500 font-bold">
+                    <span className="font-bold text-primary500">
                       11,500,000 تومان
                     </span>
                   </div>
                 </div>
+
+                {/* PAYMENT */}
 
                 <div
                   className="
@@ -245,14 +236,7 @@ export default function SingleReserveHouse3({
 
               {/* CONTACT */}
 
-              <div
-                className="
-                mt-5
-                flex
-                flex-col
-                gap-4
-                "
-              >
+              <div className="mt-5">
                 <div
                   className="
                   flex
@@ -263,12 +247,12 @@ export default function SingleReserveHouse3({
                   dark:text-white
                   "
                 >
-                  <span className="flex gap-2 items-center">
+                  <span className="flex items-center gap-2">
                     <Phone size={15} />
                     09229167194
                   </span>
 
-                  <span className="flex gap-2 items-center">
+                  <span className="flex items-center gap-2">
                     <Mail size={15} />
                     example@gmail.com
                   </span>
@@ -287,30 +271,34 @@ export default function SingleReserveHouse3({
                 "
               >
                 <button
+                  type="button"
                   onClick={() => {
-                    setProgress((prev) => Math.max(prev - 33.33, 0));
+                    setProgress(66.66);
+
                     prevStep();
                   }}
                   className="
-  w-full
-  sm:w-1/2
-  h-11
-  rounded-full
-  border
-  border-gray-300
-  dark:border-[#555]
-  flex
-  items-center
-  justify-center
-  gap-2
-  text-sm
-  "
+                  w-full
+                  sm:w-1/2
+                  h-11
+                  rounded-full
+                  border
+                  border-gray-300
+                  dark:border-[#555]
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  text-sm
+                  dark:text-white
+                  "
                 >
                   <ChevronRight size={16} />
                   مرحله قبل
                 </button>
 
                 <button
+                  type="button"
                   onClick={() => {
                     setProgress(100);
                   }}
@@ -379,6 +367,7 @@ export default function SingleReserveHouse3({
                 px-4
                 py-2
                 dark:bg-[#353535]
+                dark:text-white
                 "
               />
 

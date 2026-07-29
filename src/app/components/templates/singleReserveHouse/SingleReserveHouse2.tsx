@@ -13,13 +13,12 @@ import PassengerForm from "./PassengerForm";
 import { Passenger } from "./types";
 import { emptyPassenger } from "./constants";
 
-export default function SingleReserveHouse2({
-  nextStep,
-  prevStep,
-}: {
+type Props = {
   nextStep: () => void;
   prevStep: () => void;
-}) {
+};
+
+export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
   const { step, setProgress } = useReserveProgress();
 
   const [passengers, setPassengers] = useState<Passenger[]>([emptyPassenger()]);
@@ -131,37 +130,41 @@ export default function SingleReserveHouse2({
                 {/* BACK */}
 
                 <button
+                  type="button"
                   onClick={() => {
-                    setProgress((prev) => Math.max(prev - 33.33, 0));
+                    setProgress(33.33);
+
                     prevStep();
                   }}
                   className="
-  w-full
-  sm:w-1/2
-  h-11
-  rounded-full
-  border
-  border-gray-300
-  dark:border-[#555]
-  flex
-  items-center
-  justify-center
-  gap-2
-  text-sm
-  "
+                  w-full
+                  sm:w-1/2
+                  h-11
+                  rounded-full
+                  border
+                  border-gray-300
+                  dark:border-[#555]
+                  flex
+                  items-center
+                  justify-center
+                  gap-2
+                  text-sm
+                  dark:text-white
+                  "
                 >
                   <ChevronRight size={16} />
                   مرحله قبل
                 </button>
+
                 {/* NEXT */}
 
                 <button
+                  type="button"
                   onClick={() => {
                     setProgress(66.66);
 
                     nextStep();
                   }}
-                  type="button"
                   className="
                   flex-1
                   h-11
@@ -195,7 +198,7 @@ export default function SingleReserveHouse2({
             className="
             w-full
             md:w-[35%]
-            lg:w-[40%
+            lg:w-[40%]
             shrink-0
             "
           >

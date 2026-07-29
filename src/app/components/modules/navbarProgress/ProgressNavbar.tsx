@@ -16,7 +16,6 @@ import {
 
 import { useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
 import NewsIcon from "./NewsIcon";
 import { BLUE } from "./constants";
@@ -27,6 +26,7 @@ import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
 type Props = {
   dark: boolean;
   setDark: Dispatch<SetStateAction<boolean>>;
+  progress: number;
 };
 
 type NavLink = {
@@ -88,9 +88,7 @@ function Avatar() {
   );
 }
 
-export default function ProgressNavbar({ dark, setDark }: Props) {
-  const { progress } = useReserveProgress();
-
+export default function ProgressNavbar({ dark, setDark, progress }: Props) {
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
@@ -156,11 +154,7 @@ export default function ProgressNavbar({ dark, setDark }: Props) {
         justify-between
         "
       >
-        {/* Logo */}
-
         <Logo />
-
-        {/* Menu */}
 
         <div
           className="
@@ -203,8 +197,6 @@ export default function ProgressNavbar({ dark, setDark }: Props) {
             </a>
           ))}
         </div>
-
-        {/* Actions */}
 
         <div
           className="
@@ -344,8 +336,6 @@ export default function ProgressNavbar({ dark, setDark }: Props) {
             </button>
           )}
 
-          {/* Mobile */}
-
           <button
             onClick={() => setOpen((prev) => !prev)}
             className="
@@ -375,13 +365,13 @@ export default function ProgressNavbar({ dark, setDark }: Props) {
       >
         <div
           className="
-  absolute
-  right-0
-  h-full
-  bg-primary500
-  transition-all
-  duration-500
-  "
+          absolute
+          right-0
+          h-full
+          bg-primary500
+          transition-all
+          duration-500
+          "
           style={{
             width: `${progress}%`,
           }}

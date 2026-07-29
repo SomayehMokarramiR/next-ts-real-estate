@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChevronLeft } from "lucide-react";
 
+import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
+
 const OTP_LENGTH = 5;
 const RESEND_SECONDS = 90;
 
@@ -12,9 +14,12 @@ type RegisterStep2Props = {
 };
 
 export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
+  const { setProgress } = useRegisterProgress();
+
   const [otp, setOtp] = useState<string[]>(Array(OTP_LENGTH).fill(""));
 
   const [seconds, setSeconds] = useState(RESEND_SECONDS);
+
   const [error, setError] = useState("");
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -35,7 +40,9 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
     if (!canResend) return;
 
     setSeconds(RESEND_SECONDS);
+
     setOtp(Array(OTP_LENGTH).fill(""));
+
     setError("");
 
     inputRefs.current[0]?.focus();
@@ -108,13 +115,30 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
 
     setError("");
 
-    // اینجا بعدا API تایید OTP قرار می‌گیرد
+    // مرحله 2 به 3
+
+    setProgress(66.66);
 
     onNext();
   };
 
+  const handleBack = () => {
+    // مرحله 2 به 1
+
+    setProgress(0);
+
+    onBack();
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="
+      flex
+      flex-col
+      gap-4
+      "
+    >
       <div
         dir="ltr"
         onPaste={handlePaste}
@@ -165,10 +189,10 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
       {error && (
         <p
           className="
-        text-xs
-        text-red-500
-        text-center
-        "
+          text-xs
+          text-red-500
+          text-center
+          "
         >
           {error}
         </p>
@@ -198,11 +222,11 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
           <span>
             <span
               className="
-            font-medium
-            text-gray-700
-      dark:text-white
-            tabular-nums
-            "
+              font-medium
+              text-gray-700
+              dark:text-white
+              tabular-nums
+              "
             >
               {formatTime(seconds)}
             </span>{" "}
@@ -231,7 +255,7 @@ export default function RegisterStep2({ onNext, onBack }: RegisterStep2Props) {
 
       <button
         type="button"
-        onClick={onBack}
+        onClick={handleBack}
         className="
         flex
         items-center

@@ -10,15 +10,15 @@ export default function ReserveWizard() {
   const { step, setStep } = useReserveProgress();
 
   const nextStep = () => {
-    setStep((prev) => prev + 1);
+    setStep((prev) => Math.min(prev + 1, 3));
   };
 
   const prevStep = () => {
-    setStep((prev) => prev - 1);
+    setStep((prev) => Math.max(prev - 1, 1));
   };
 
   return (
-    <div className="min-h-[650px]">
+    <div>
       {step === 1 && <SingleReserveHouse onNext={nextStep} />}
 
       {step === 2 && (

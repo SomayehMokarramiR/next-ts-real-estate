@@ -3,14 +3,19 @@
 import { useState } from "react";
 import { ChevronLeft, User, Mail } from "lucide-react";
 
+import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
+
 type RegisterStep3Props = {
   onBack: () => void;
 };
 
 export default function RegisterStep3({ onBack }: RegisterStep3Props) {
+  const { setProgress } = useRegisterProgress();
+
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+
   const [error, setError] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -18,6 +23,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
 
     if (!firstName.trim() || !lastName.trim()) {
       setError("لطفا نام و نام خانوادگی را وارد کنید");
+
       return;
     }
 
@@ -28,11 +34,30 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
       lastName,
       email,
     });
+
+    // تکمیل ثبت نام
+    setProgress(100);
+  };
+
+  const handleBack = () => {
+    // برگشت به مرحله 2
+
+    setProgress(33.33);
+
+    onBack();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <form
+      onSubmit={handleSubmit}
+      className="
+      flex
+      flex-col
+      gap-3
+      "
+    >
       {/* First Name */}
+
       <div className="relative">
         <input
           type="text"
@@ -55,7 +80,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           pr-11
           pl-4
           text-sm
-          ext-gray-700
+          text-gray-700
           dark:text-gray-300
           placeholder-gray-400
           dark:placeholder-gray-200
@@ -82,6 +107,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
       </div>
 
       {/* Last Name */}
+
       <div className="relative">
         <input
           type="text"
@@ -104,7 +130,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           pr-11
           pl-4
           text-sm
-          ext-gray-700
+          text-gray-700
           dark:text-gray-300
           placeholder-gray-400
           dark:placeholder-gray-200
@@ -130,6 +156,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
       </div>
 
       {/* Email */}
+
       <div className="relative">
         <input
           type="email"
@@ -178,8 +205,6 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         />
       </div>
 
-      {/* Error */}
-
       {error && (
         <p
           className="
@@ -192,8 +217,6 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           {error}
         </p>
       )}
-
-      {/* Submit */}
 
       <button
         type="submit"
@@ -215,11 +238,9 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         تکمیل ثبت نام
       </button>
 
-      {/* Back */}
-
       <button
         type="button"
-        onClick={onBack}
+        onClick={handleBack}
         className="
         flex
         items-center

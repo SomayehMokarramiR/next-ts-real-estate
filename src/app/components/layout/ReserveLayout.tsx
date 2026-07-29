@@ -1,54 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-import ReserveProgressWrapper from "./ReserveProgressWrapper";
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 import ProgressNavbar from "../modules/navbarProgress/ProgressNavbar";
-import Footer from "./footer/Footer";
 
-type Props = {
+export default function ReserveLayout({
+  children,
+}: {
   children: React.ReactNode;
-};
-
-export default function ReserveLayout({ children }: Props) {
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") {
-      return false;
-    }
-
-    return window.localStorage.getItem("theme") === "dark";
-  });
-
-  useEffect(() => {
-    const html = document.documentElement;
-
-    if (dark) {
-      html.classList.add("dark");
-
-      localStorage.setItem("theme", "dark");
-    } else {
-      html.classList.remove("dark");
-
-      localStorage.setItem("theme", "light");
-    }
-  }, [dark]);
+}) {
+  const { progress } = useReserveProgress();
 
   return (
-    <ReserveProgressWrapper>
-      <div
-        className="
-        flex
-        flex-col
-        bg-background
-        text-foreground
-        "
-      >
-        <ProgressNavbar dark={dark} setDark={setDark} />
+    <>
+      <ProgressNavbar dark={false} setDark={() => {}} progress={progress} />
 
-        <main className="flex-1">{children}</main>
-
-        <Footer />
-      </div>
-    </ReserveProgressWrapper>
+      <main>{children}</main>
+    </>
   );
 }

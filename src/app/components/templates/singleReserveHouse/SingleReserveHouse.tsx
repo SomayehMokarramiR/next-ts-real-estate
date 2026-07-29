@@ -137,11 +137,11 @@ export default function SingleReserveHouse({ onNext }: Props) {
               </div>
 
               <button
+                type="button"
                 onClick={() => {
                   setProgress(33.33);
                   onNext();
                 }}
-                type="button"
                 className="
                 mt-6
                 w-full

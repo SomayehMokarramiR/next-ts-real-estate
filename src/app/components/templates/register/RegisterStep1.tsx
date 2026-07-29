@@ -3,11 +3,15 @@
 import { useState } from "react";
 import { Mail } from "lucide-react";
 
+import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
+
 type Props = {
   onNext: () => void;
 };
 
 export default function RegisterStep1({ onNext }: Props) {
+  const { setProgress } = useRegisterProgress();
+
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
@@ -16,16 +20,27 @@ export default function RegisterStep1({ onNext }: Props) {
 
     if (!email.trim()) {
       setError("لطفا ایمیل خود را وارد کنید");
+
       return;
     }
 
     setError("");
 
+    // مرحله 1 به 2
+    setProgress(33.33);
+
     onNext();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form
+      onSubmit={handleSubmit}
+      className="
+      flex
+      flex-col
+      gap-4
+      "
+    >
       {/* Email */}
 
       <div className="relative">

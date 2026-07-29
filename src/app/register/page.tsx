@@ -1,13 +1,13 @@
-import AuthLayout from "../components/layout/AuthLayout";
+import RegisterLayout from "../components/layout/RegisterLayout";
 import RegisterForm from "../components/templates/register/RegisterForm";
 
 function Page() {
   return (
-    <AuthLayout>
+    <RegisterLayout>
       <div className="pt-20">
         <RegisterForm />
       </div>
-    </AuthLayout>
+    </RegisterLayout>
   );
 }
 

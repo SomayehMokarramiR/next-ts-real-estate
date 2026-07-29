@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 
-type ReserveProgressContextType = {
+type ReserveContextType = {
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
 
@@ -10,9 +10,7 @@ type ReserveProgressContextType = {
   setProgress: React.Dispatch<React.SetStateAction<number>>;
 };
 
-const ReserveProgressContext = createContext<
-  ReserveProgressContextType | undefined
->(undefined);
+const ReserveProgressContext = createContext<ReserveContextType | null>(null);
 
 export function ReserveProgressProvider({ children }: { children: ReactNode }) {
   const [step, setStep] = useState(1);
@@ -24,7 +22,6 @@ export function ReserveProgressProvider({ children }: { children: ReactNode }) {
       value={{
         step,
         setStep,
-
         progress,
         setProgress,
       }}
