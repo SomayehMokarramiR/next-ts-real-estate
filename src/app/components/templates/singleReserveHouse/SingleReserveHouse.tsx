@@ -6,11 +6,15 @@ import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
 
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
+
 type Props = {
   onNext: () => void;
 };
 
 export default function SingleReserveHouse({ onNext }: Props) {
+  const { step, setProgress } = useReserveProgress();
+
   return (
     <div className="flex flex-col">
       <div className="py-12">
@@ -25,7 +29,6 @@ export default function SingleReserveHouse({ onNext }: Props) {
         px-4
         "
       >
-        {/* Main layout */}
         <div
           className="
           flex
@@ -36,15 +39,15 @@ export default function SingleReserveHouse({ onNext }: Props) {
           "
         >
           {/* RIGHT CONTENT */}
+
           <div
             className="
             w-full
             md:flex-1
             "
           >
-            {/* Stepper داخل ستون اصلی */}
             <div className="mb-6">
-              <Stepper active={1} />
+              <Stepper active={step} />
             </div>
 
             <div
@@ -57,7 +60,6 @@ export default function SingleReserveHouse({ onNext }: Props) {
               dark:border-[#353535]
               shadow-sm
               p-5
-            
               "
             >
               <h2
@@ -135,7 +137,10 @@ export default function SingleReserveHouse({ onNext }: Props) {
               </div>
 
               <button
-                onClick={onNext}
+                onClick={() => {
+                  setProgress(33.33);
+                  onNext();
+                }}
                 type="button"
                 className="
                 mt-6
@@ -161,6 +166,7 @@ export default function SingleReserveHouse({ onNext }: Props) {
           </div>
 
           {/* LEFT PROPERTY */}
+
           <div
             className="
             w-full

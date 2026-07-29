@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+
 import {
   Phone,
   Mail,
@@ -13,6 +14,8 @@ import {
 import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
+
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
 const passenger = {
   ageGroup: "میانسال",
@@ -27,6 +30,8 @@ export default function SingleReserveHouse3({
   prevStep: () => void;
 }) {
   const [discountCode, setDiscountCode] = useState("");
+
+  const { step, setProgress } = useReserveProgress();
 
   return (
     <div className="flex flex-col">
@@ -60,8 +65,7 @@ export default function SingleReserveHouse3({
             lg:flex-1
             "
           >
-            {/* Stepper فقط اینجا */}
-            <Stepper active={3} />
+            <Stepper active={step} />
 
             <div
               className="
@@ -81,8 +85,6 @@ export default function SingleReserveHouse3({
                 gap-5
                 "
               >
-                {/* تایید اطلاعات */}
-
                 <div
                   className="
                   bg-[#F0F0F3]
@@ -142,8 +144,6 @@ export default function SingleReserveHouse3({
                   </div>
                 </div>
 
-                {/* خلاصه پرداخت */}
-
                 <div
                   className="
                   bg-white
@@ -180,7 +180,7 @@ export default function SingleReserveHouse3({
                 </div>
               </div>
 
-              {/* مشخصات مسافر */}
+              {/* PASSENGER */}
 
               <div
                 className="
@@ -243,7 +243,7 @@ export default function SingleReserveHouse3({
                 </button>
               </div>
 
-              {/* تماس */}
+              {/* CONTACT */}
 
               <div
                 className="
@@ -287,27 +287,33 @@ export default function SingleReserveHouse3({
                 "
               >
                 <button
-                  onClick={prevStep}
+                  onClick={() => {
+                    setProgress((prev) => Math.max(prev - 33.33, 0));
+                    prevStep();
+                  }}
                   className="
-                  w-full
-                  sm:w-1/2
-                  h-11
-                  rounded-full
-                  border
-                  border-gray-300
-                  dark:border-[#555]
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  text-sm
-                  "
+  w-full
+  sm:w-1/2
+  h-11
+  rounded-full
+  border
+  border-gray-300
+  dark:border-[#555]
+  flex
+  items-center
+  justify-center
+  gap-2
+  text-sm
+  "
                 >
                   <ChevronRight size={16} />
                   مرحله قبل
                 </button>
 
                 <button
+                  onClick={() => {
+                    setProgress(100);
+                  }}
                   className="
                   w-full
                   sm:w-1/2

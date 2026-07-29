@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-
 import SingleReserveHouse from "./SingleReserveHouse";
 import SingleReserveHouse2 from "./SingleReserveHouse2";
 import SingleReserveHouse3 from "./SingleReserveHouse3";
 
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
+
 export default function ReserveWizard() {
-  const [step, setStep] = useState(1);
+  const { step, setStep } = useReserveProgress();
 
   const nextStep = () => {
     setStep((prev) => prev + 1);

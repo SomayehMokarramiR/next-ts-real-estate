@@ -7,6 +7,8 @@ import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
 
+import { useReserveProgress } from "@/app/context/ReserveProgressContext";
+
 import PassengerForm from "./PassengerForm";
 import { Passenger } from "./types";
 import { emptyPassenger } from "./constants";
@@ -18,7 +20,7 @@ export default function SingleReserveHouse2({
   nextStep: () => void;
   prevStep: () => void;
 }) {
-  const activeStep = 2;
+  const { step, setProgress } = useReserveProgress();
 
   const [passengers, setPassengers] = useState<Passenger[]>([emptyPassenger()]);
 
@@ -76,8 +78,7 @@ export default function SingleReserveHouse2({
             md:flex-1
             "
           >
-            {/* Stepper فقط بالای باکس سمت راست */}
-            <Stepper active={activeStep} />
+            <Stepper active={step} />
 
             <div
               className="
@@ -120,8 +121,6 @@ export default function SingleReserveHouse2({
                 />
               ))}
 
-              {/* ACTION BUTTONS */}
-
               <div
                 className="
                 mt-6
@@ -129,41 +128,42 @@ export default function SingleReserveHouse2({
                 gap-3
                 "
               >
-                {/* PREVIOUS */}
+                {/* BACK */}
 
                 <button
-                  onClick={prevStep}
-                  type="button"
+                  onClick={() => {
+                    setProgress((prev) => Math.max(prev - 33.33, 0));
+                    prevStep();
+                  }}
                   className="
-                  flex-1
-                  min-w-0
-                  h-11
-                  rounded-full
-                  border
-                  border-gray-300
-                  dark:border-[#555]
-                  text-xs
-                  min-[410px]:text-sm
-                  whitespace-nowrap
-                  flex
-                  items-center
-                  justify-center
-                  gap-1
-                  "
+  w-full
+  sm:w-1/2
+  h-11
+  rounded-full
+  border
+  border-gray-300
+  dark:border-[#555]
+  flex
+  items-center
+  justify-center
+  gap-2
+  text-sm
+  "
                 >
-                  <ChevronRight size={16} className="shrink-0" />
-
-                  <span>مرحله قبل</span>
+                  <ChevronRight size={16} />
+                  مرحله قبل
                 </button>
-
                 {/* NEXT */}
 
                 <button
-                  onClick={nextStep}
+                  onClick={() => {
+                    setProgress(66.66);
+
+                    nextStep();
+                  }}
                   type="button"
                   className="
                   flex-1
-                  min-w-0
                   h-11
                   rounded-full
                   bg-primary500
@@ -171,7 +171,6 @@ export default function SingleReserveHouse2({
                   font-semibold
                   text-xs
                   min-[410px]:text-sm
-                  whitespace-nowrap
                   flex
                   items-center
                   justify-center
@@ -184,7 +183,7 @@ export default function SingleReserveHouse2({
 
                   <span className="inline min-[410px]:hidden">ادامه</span>
 
-                  <ChevronLeft size={16} className="shrink-0" />
+                  <ChevronLeft size={16} />
                 </button>
               </div>
             </div>
@@ -196,7 +195,7 @@ export default function SingleReserveHouse2({
             className="
             w-full
             md:w-[35%]
-            lg:w-[40%]
+            lg:w-[40%
             shrink-0
             "
           >
