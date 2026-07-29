@@ -27,6 +27,7 @@ import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
 type Props = {
   dark: boolean;
   setDark: Dispatch<SetStateAction<boolean>>;
+  progress: number;
 };
 
 type NavLink = {
@@ -88,35 +89,24 @@ function Avatar() {
   );
 }
 
-export default function ProgressNavbar({ dark, setDark }: Props) {
-  const { progress } = useReserveProgress();
-  const [isDark, setIsDark] = useState(false);
-
+export default function ProgressNavbar({ dark, setDark, progress }: Props) {
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-
-    const darkMode = savedTheme === "dark";
-
-    if (darkMode) {
+    if (dark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-
-    setDark(darkMode);
-    setIsDark(darkMode);
-  }, [setDark]);
+  }, [dark]);
 
   const toggleTheme = () => {
-    const nextTheme = !isDark;
+    const newTheme = !dark;
 
-    setIsDark(nextTheme);
-    setDark(nextTheme);
+    setDark(newTheme);
 
-    if (nextTheme) {
+    if (newTheme) {
       document.documentElement.classList.add("dark");
       localStorage.setItem("theme", "dark");
     } else {
@@ -260,7 +250,7 @@ export default function ProgressNavbar({ dark, setDark }: Props) {
               backgroundColor: BLUE,
             }}
           >
-            {isDark ? (
+            {dark ? (
               <Sun size={15} className="text-white" />
             ) : (
               <Moon size={15} className="text-white" />

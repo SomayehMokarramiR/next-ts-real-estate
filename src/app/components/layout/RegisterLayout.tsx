@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import ProgressNavbar from "../modules/navbarProgress/ProgressNavbar";
 import Footer from "./footer/Footer";
@@ -15,9 +15,21 @@ type Props = {
 };
 
 function RegisterLayoutContent({ children }: Props) {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+
+    return localStorage.getItem("theme") === "dark";
+  });
 
   const { progress } = useRegisterProgress();
+
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [dark]);
 
   return (
     <div
