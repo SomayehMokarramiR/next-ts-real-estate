@@ -34,7 +34,7 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
   const { step, setProgress } = useReserveProgress();
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col pb-14">
       <div className="py-12">
         <Breadcrumb />
       </div>

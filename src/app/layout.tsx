@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import { Vazirmatn } from "next/font/google";
+import Providers from "./providers";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -16,13 +17,10 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body className={vazirmatn.className}>
-        {/* <div className="relative z-[9999]">
-          <Navbar />
-        </div> */}
-        {/* <main className="pt-20">{children}</main> */}
-        <main>{children}</main>
-
-        {/* <Footer /> */}
+        <main>
+          {" "}
+          <Providers>{children} </Providers>
+        </main>
       </body>
     </html>
   );

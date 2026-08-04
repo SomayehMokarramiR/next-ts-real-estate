@@ -16,6 +16,9 @@ import {
 import { useEffect, useState } from "react";
 import { BLUE } from "../constants";
 import NewsIcon from "./NewsIcon";
+import { useMe, useLogout } from "@/hooks/useAuth";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 type NavLink = {
   label: string;
@@ -77,8 +80,24 @@ function Avatar() {
 }
 
 export default function Navbar() {
-  // فعلا دستی
-  const isLoggedIn = true;
+  const router = useRouter();
+  const { data, isLoading } = useMe();
+  const logoutMutation = useLogout();
+
+  const isLoggedIn = Boolean(data?.success && data?.user);
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        Swal.fire({
+          icon: "success",
+          title: "خروج موفق",
+          text: "با موفقیت از حساب کاربری خارج شدید",
+          confirmButtonText: "باشه",
+        });
+      },
+    });
+  };
 
   const [dark, setDark] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -259,7 +278,7 @@ export default function Navbar() {
                       dark:text-white
                       "
                   >
-                    امیر محمد
+                    {data?.user?.name}
                   </span>
 
                   <span
@@ -295,6 +314,9 @@ export default function Navbar() {
                   {userMenu.map(({ label, icon: Icon }) => (
                     <button
                       key={label}
+                      onClick={
+                        label === "خروج از حساب" ? handleLogout : undefined
+                      }
                       className="
                               w-full
                               flex
@@ -319,19 +341,20 @@ export default function Navbar() {
             </div>
           ) : (
             <button
+              onClick={() => router.push("/login")}
               className="
-                hidden
-                sm:block
-                bg-primary500
-                text-white
-                text-xs
-                sm:text-sm
-                px-4
-                py-2
-                rounded-full
-                "
+    hidden
+    sm:block
+    bg-primary500
+    text-white
+    text-xs
+    sm:text-sm
+    px-4
+    py-2
+    rounded-full
+    "
             >
-              ورود / ثبت‌نام
+              ورود / ثبت‌ نام
             </button>
           )}
 

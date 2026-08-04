@@ -16,13 +16,15 @@ import {
 
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, SetStateAction } from "react";
-import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
 import NewsIcon from "./NewsIcon";
 import { BLUE } from "./constants";
 
 import { useClickOutside } from "./hooks/useClickOutside";
 import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
+import { useMe, useLogout } from "@/hooks/useAuth";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 type Props = {
   dark: boolean;
@@ -90,8 +92,29 @@ function Avatar() {
 }
 
 export default function ProgressNavbar({ dark, setDark, progress }: Props) {
+  const router = useRouter();
+
+  const { data } = useMe();
+  const logoutMutation = useLogout();
+
+  const isLoggedIn = Boolean(data?.success && data?.user);
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        setUserOpen(false);
+
+        Swal.fire({
+          icon: "success",
+          title: "خروج موفق",
+          text: "با موفقیت از حساب کاربری خارج شدید",
+          confirmButtonText: "باشه",
+        });
+      },
+    });
+  };
 
   useEffect(() => {
     if (dark) {
@@ -123,8 +146,6 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
   });
 
   useLockBodyScroll(open);
-
-  const isLoggedIn = true;
 
   const navLinks: NavLink[] = [
     {
@@ -292,7 +313,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
                     dark:text-white
                     "
                   >
-                    امیر محمد
+                    {data?.user?.name}
                   </span>
 
                   <span
@@ -328,6 +349,9 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
                   {userMenu.map(({ label, icon: Icon }) => (
                     <button
                       key={label}
+                      onClick={
+                        label === "خروج از حساب" ? handleLogout : undefined
+                      }
                       className="
                         w-full
                         flex
@@ -352,6 +376,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
             </div>
           ) : (
             <button
+              onClick={() => router.push("/login")}
               className="
               bg-primary500
               text-white

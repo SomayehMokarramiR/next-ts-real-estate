@@ -57,7 +57,7 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
         w-full
         px-4
         py-6
-        pb-28
+        pb-20
         "
       >
         <div
