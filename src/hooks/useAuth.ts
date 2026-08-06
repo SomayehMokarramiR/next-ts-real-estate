@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { login, register, getMe, logout } from "@/services/auth";
+import { login, register, getMe, logout, verifyEmail } from "@/services/auth";
 
 export function useMe() {
   return useQuery({
@@ -19,11 +19,9 @@ export function useLogin() {
   return useMutation({
     mutationFn: login,
 
-    onSuccess: (data) => {
-      // ذخیره اطلاعات کاربر در cache
-      queryClient.setQueryData(["me"], {
-        success: true,
-        user: data.user,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
       });
     },
   });
@@ -35,6 +33,12 @@ export function useRegister() {
   });
 }
 
+export function useVerifyEmail() {
+  return useMutation({
+    mutationFn: verifyEmail,
+  });
+}
+
 export function useLogout() {
   const queryClient = useQueryClient();
 
@@ -42,8 +46,11 @@ export function useLogout() {
     mutationFn: logout,
 
     onSuccess: () => {
-      // حذف اطلاعات کاربر
       queryClient.removeQueries({
+        queryKey: ["me"],
+      });
+
+      queryClient.invalidateQueries({
         queryKey: ["me"],
       });
     },

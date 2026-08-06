@@ -1,51 +1,179 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronLeft, User, Mail } from "lucide-react";
+import { CheckCircle2, ChevronLeft, Lock, Phone } from "lucide-react";
 
 import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
 
 type RegisterStep3Props = {
   onBack: () => void;
+  userId: string | number;
 };
 
-export default function RegisterStep3({ onBack }: RegisterStep3Props) {
+export default function RegisterStep3({ onBack, userId }: RegisterStep3Props) {
   const { setProgress } = useRegisterProgress();
 
-  const [firstName, setFirstName] = useState("");
+  const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
 
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [completed, setCompleted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!firstName.trim() || !lastName.trim()) {
-      setError("لطفا نام و نام خانوادگی را وارد کنید");
+    if (!name.trim()) {
+      setError("لطفا نام خود را وارد کنید");
+      return;
+    }
 
+    if (!lastName.trim()) {
+      setError("لطفا نام خانوادگی خود را وارد کنید");
+      return;
+    }
+
+    if (!password.trim()) {
+      setError("لطفا رمز عبور خود را وارد کنید");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("رمز عبور باید حداقل ۶ کاراکتر باشد");
+      return;
+    }
+
+    if (!phoneNumber.trim()) {
+      setError("لطفا شماره موبایل خود را وارد کنید");
+      return;
+    }
+
+    if (phoneNumber.length !== 11) {
+      setError("شماره موبایل باید ۱۱ رقم باشد");
+      return;
+    }
+
+    if (!userId) {
+      setError("اطلاعات ثبت‌نام پیدا نشد. لطفا دوباره شروع کنید");
       return;
     }
 
     setError("");
+    setLoading(true);
 
-    console.log({
-      firstName,
-      lastName,
-      email,
-    });
+    try {
+      const response = await fetch("/api/auth/complete-registration", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          userId,
+          name: name.trim(),
+          lastName: lastName.trim(),
+          password,
+          phoneNumber,
+        }),
+      });
 
-    // تکمیل ثبت نام
-    setProgress(100);
+      const responseText = await response.text();
+
+      console.log("COMPLETE REGISTER STATUS:", response.status);
+      console.log("COMPLETE REGISTER RAW RESPONSE:", responseText);
+
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error("پاسخ دریافتی از سرور معتبر نیست");
+      }
+
+      console.log("COMPLETE REGISTER RESPONSE:", data);
+
+      if (!response.ok || !data?.success) {
+        setError(data?.message || "تکمیل ثبت‌نام انجام نشد");
+        return;
+      }
+
+      setProgress(100);
+      setCompleted(true);
+
+      console.log("REGISTER COMPLETED:", data);
+    } catch (error) {
+      console.error("COMPLETE REGISTER ERROR:", error);
+
+      setError(
+        error instanceof Error
+          ? error.message
+          : "خطایی در تکمیل ثبت‌نام رخ داد",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBack = () => {
-    // برگشت به مرحله 2
+    if (loading || completed) return;
 
-    setProgress(33.33);
-
+    setProgress(66.66);
     onBack();
   };
+
+  if (completed) {
+    return (
+      <div
+        className="
+        flex
+        flex-col
+        items-center
+        justify-center
+        text-center
+        gap-5
+        py-8
+        "
+      >
+        <CheckCircle2 size={64} className="text-green-500" />
+
+        <div className="space-y-2">
+          <h2
+            className="
+            text-xl
+            font-semibold
+            text-[#1a1a2e]
+            dark:text-white
+            "
+          >
+            ثبت‌نام با موفقیت انجام شد
+          </h2>
+
+          <p
+            className="
+            text-sm
+            text-gray-500
+            dark:text-gray-300
+            "
+          >
+            حساب کاربری شما با موفقیت ایجاد شد.
+          </p>
+
+          <p
+            className="
+            text-xs
+            text-gray-400
+            dark:text-gray-400
+            pt-2
+            "
+          >
+            برای ورود، از تب «ورود» در بالای صفحه استفاده کنید.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <form
@@ -56,68 +184,94 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
       gap-3
       "
     >
-      {/* First Name */}
+      {/* Name */}
 
-      <div className="relative">
-        <input
-          type="text"
-          value={firstName}
-          onChange={(e) => {
-            setFirstName(e.target.value);
-            setError("");
-          }}
-          placeholder="نام خود را وارد کنید"
-          dir="rtl"
-          className="
-          w-full
-          border
-          border-gray-200
-          dark:border-[#353535]
-          bg-white
-          dark:bg-[#353535]
-          rounded-full
-          py-3
-          pr-11
-          pl-4
-          text-sm
-          text-gray-700
-          dark:text-gray-300
-          placeholder-gray-400
-          dark:placeholder-gray-200
-          outline-none
-          focus:border-[#2A52BE]
-          focus:ring-2
-          focus:ring-[#2A52BE]/20
-          transition-all
-          "
-        />
-
-        <User
-          size={17}
-          className="
-          absolute
-          right-4
-          top-1/2
-          -translate-y-1/2
-          text-gray-400
-          dark:text-gray-200
-          pointer-events-none
-          "
-        />
-      </div>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => {
+          setName(e.target.value);
+          setError("");
+        }}
+        placeholder="نام خود را وارد کنید"
+        dir="rtl"
+        disabled={loading}
+        autoComplete="given-name"
+        className="
+        w-full
+        border
+        border-gray-200
+        dark:border-[#353535]
+        bg-white
+        dark:bg-[#353535]
+        rounded-full
+        py-3
+        px-4
+        text-sm
+        text-gray-700
+        dark:text-gray-300
+        placeholder-gray-400
+        dark:placeholder-gray-200
+        outline-none
+        focus:border-[#2A52BE]
+        focus:ring-2
+        focus:ring-[#2A52BE]/20
+        transition-all
+        disabled:opacity-60
+        "
+      />
 
       {/* Last Name */}
 
+      <input
+        type="text"
+        value={lastName}
+        onChange={(e) => {
+          setLastName(e.target.value);
+          setError("");
+        }}
+        placeholder="نام خانوادگی خود را وارد کنید"
+        dir="rtl"
+        disabled={loading}
+        autoComplete="family-name"
+        className="
+        w-full
+        border
+        border-gray-200
+        dark:border-[#353535]
+        bg-white
+        dark:bg-[#353535]
+        rounded-full
+        py-3
+        px-4
+        text-sm
+        text-gray-700
+        dark:text-gray-300
+        placeholder-gray-400
+        dark:placeholder-gray-200
+        outline-none
+        focus:border-[#2A52BE]
+        focus:ring-2
+        focus:ring-[#2A52BE]/20
+        transition-all
+        disabled:opacity-60
+        "
+      />
+
+      {/* Password */}
+
       <div className="relative">
         <input
-          type="text"
-          value={lastName}
+          type="password"
+          value={password}
           onChange={(e) => {
-            setLastName(e.target.value);
+            setPassword(e.target.value);
             setError("");
           }}
-          placeholder="نام خانوادگی خود را وارد کنید"
+          placeholder="رمز عبور خود را وارد کنید"
           dir="rtl"
+          disabled={loading}
+          autoComplete="new-password"
           className="
           w-full
           border
@@ -139,59 +293,11 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           focus:ring-2
           focus:ring-[#2A52BE]/20
           transition-all
+          disabled:opacity-60
           "
         />
 
-        <User
-          size={17}
-          className="
-          absolute
-          right-4
-          top-1/2
-          -translate-y-1/2
-          text-gray-400
-          pointer-events-none
-          "
-        />
-      </div>
-
-      {/* Email */}
-
-      <div className="relative">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setError("");
-          }}
-          placeholder="ایمیل خود را وارد کنید (اختیاری)"
-          dir="rtl"
-          className="
-          w-full
-          border
-          border-gray-200
-          dark:border-[#353535]
-          bg-white
-          dark:bg-[#353535]
-          rounded-full
-          py-3
-          pr-11
-          pl-4
-          text-sm
-          text-gray-700
-          dark:text-gray-300
-          placeholder-gray-400
-          dark:placeholder-gray-200
-          outline-none
-          focus:border-[#2A52BE]
-          focus:ring-2
-          focus:ring-[#2A52BE]/20
-          transition-all
-          "
-        />
-
-        <Mail
+        <Lock
           size={17}
           className="
           absolute
@@ -204,6 +310,65 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
           "
         />
       </div>
+
+      {/* Phone */}
+
+      <div className="relative">
+        <input
+          type="tel"
+          value={phoneNumber}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, "").slice(0, 11);
+
+            setPhoneNumber(value);
+            setError("");
+          }}
+          placeholder="شماره موبایل خود را وارد کنید"
+          dir="rtl"
+          inputMode="numeric"
+          maxLength={11}
+          disabled={loading}
+          autoComplete="tel"
+          className="
+          w-full
+          border
+          border-gray-200
+          dark:border-[#353535]
+          bg-white
+          dark:bg-[#353535]
+          rounded-full
+          py-3
+          pr-11
+          pl-4
+          text-sm
+          text-gray-700
+          dark:text-gray-300
+          placeholder-gray-400
+          dark:placeholder-gray-200
+          outline-none
+          focus:border-[#2A52BE]
+          focus:ring-2
+          focus:ring-[#2A52BE]/20
+          transition-all
+          disabled:opacity-60
+          "
+        />
+
+        <Phone
+          size={17}
+          className="
+          absolute
+          right-4
+          top-1/2
+          -translate-y-1/2
+          text-gray-400
+          dark:text-gray-200
+          pointer-events-none
+          "
+        />
+      </div>
+
+      {/* Error */}
 
       {error && (
         <p
@@ -218,13 +383,18 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         </p>
       )}
 
+      {/* Submit */}
+
       <button
         type="submit"
+        disabled={loading}
         className="
         w-full
         bg-[#2A52BE]
         hover:bg-[#1e3fa0]
         active:bg-[#173090]
+        disabled:opacity-60
+        disabled:cursor-not-allowed
         text-white
         font-semibold
         py-3.5
@@ -235,12 +405,15 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         mt-2
         "
       >
-        تکمیل ثبت نام
+        {loading ? "در حال تکمیل ثبت‌نام..." : "تکمیل ثبت نام"}
       </button>
+
+      {/* Back */}
 
       <button
         type="button"
         onClick={handleBack}
+        disabled={loading}
         className="
         flex
         items-center
@@ -252,6 +425,7 @@ export default function RegisterStep3({ onBack }: RegisterStep3Props) {
         dark:text-white
         hover:text-[#2A52BE]
         transition
+        disabled:opacity-50
         "
       >
         بازگشت

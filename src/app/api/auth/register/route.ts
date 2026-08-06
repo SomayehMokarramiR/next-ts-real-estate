@@ -1,90 +1,123 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 
-import { connectDB } from "../../../lib/mongodb";
-import User from "../../../models/User";
-
+import { connectDB } from "@/app/lib/mongodb";
+import { sendVerificationEmail } from "@/app/lib/email";
+import TempUser from "@/app/models/TempUser";
 export async function POST(request: Request) {
   try {
     await connectDB();
 
-    const { name, email, password } = await request.json();
+    const body = await request.json();
 
-    // بررسی ورودی‌ها
-    if (!name || !email || !password) {
+    const email = body?.email;
+
+    /* =========================
+       Validate Email
+    ========================= */
+
+    if (!email || typeof email !== "string") {
       return NextResponse.json(
         {
           success: false,
-          message: "نام، ایمیل و رمز عبور الزامی هستند",
+          message: "لطفا ایمیل خود را وارد کنید",
         },
         { status: 400 },
       );
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const normalizedName = name.trim();
 
-    // بررسی وجود کاربر
-    const existingUser = await User.findOne({
-      email: normalizedEmail,
-    });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (existingUser) {
+    if (!emailRegex.test(normalizedEmail)) {
       return NextResponse.json(
         {
           success: false,
-          message: "این ایمیل قبلاً ثبت شده است",
+          message: "فرمت ایمیل صحیح نیست",
         },
-        { status: 409 },
+        { status: 400 },
       );
     }
 
-    // هش کردن رمز عبور
-    const hashedPassword = await bcrypt.hash(password, 10);
+    /* =========================
+       Delete Previous Temp User
+    ========================= */
 
-    // تعیین نقش کاربر
-    // اولین کاربر مدیر می‌شود
-    const usersCount = await User.countDocuments();
-
-    const role = usersCount === 0 ? "admin" : "user";
-
-    // ایجاد کاربر
-    const user = await User.create({
-      name: normalizedName,
+    await TempUser.deleteMany({
       email: normalizedEmail,
-      password: hashedPassword,
-      role,
     });
+
+    /* =========================
+       Generate 5 Digit OTP
+    ========================= */
+
+    const verificationCode = Math.floor(
+      10000 + Math.random() * 90000,
+    ).toString();
+
+    /* =========================
+       OTP Expiration
+       5 Minutes
+    ========================= */
+
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+    /* =========================
+       Create Temp User
+    ========================= */
+
+    const tempUser = await TempUser.create({
+      email: normalizedEmail,
+      verificationCode,
+      isVerified: false,
+      expiresAt,
+    });
+
+    /* =========================
+       Send OTP Email
+    ========================= */
+
+    const emailSent = await sendVerificationEmail(
+      normalizedEmail,
+      verificationCode,
+    );
+
+    if (!emailSent) {
+      await TempUser.findByIdAndDelete(tempUser._id);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "ارسال کد تایید به ایمیل انجام نشد",
+        },
+        {
+          status: 502,
+        },
+      );
+    }
+
+    /* =========================
+       Response
+    ========================= */
 
     return NextResponse.json(
       {
         success: true,
-        message:
-          role === "admin"
-            ? "ثبت‌نام مدیر اصلی با موفقیت انجام شد"
-            : "ثبت‌نام با موفقیت انجام شد. لطفاً وارد حساب کاربری شوید",
-        user: {
-          id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        message: "کد تایید به ایمیل شما ارسال شد",
+        tempUserId: tempUser._id.toString(),
       },
-      {
-        status: 201,
-      },
+      { status: 201 },
     );
   } catch (error) {
-    console.error("REGISTER ERROR:", error);
+    console.error("REGISTER API ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "خطایی در ثبت‌نام رخ داد",
+        message:
+          error instanceof Error ? error.message : "خطایی در ثبت ایمیل رخ داد",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }

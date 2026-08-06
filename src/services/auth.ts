@@ -1,9 +1,14 @@
 const API_URL = "/api/auth";
 
+/* =========================
+   Types
+========================= */
+
 export interface User {
   id: string;
   name: string;
   email: string;
+  role?: "admin" | "user";
 }
 
 export interface LoginResponse {
@@ -15,6 +20,17 @@ export interface LoginResponse {
 export interface RegisterResponse {
   success: boolean;
   message: string;
+  tempUserId?: string | number;
+}
+
+export interface VerifyEmailResponse {
+  success?: boolean;
+  message: string;
+}
+
+export interface CompleteRegistrationResponse {
+  success: boolean;
+  message: string;
   user?: User;
 }
 
@@ -23,7 +39,9 @@ export interface MeResponse {
   user?: {
     _id: string;
     name: string;
+    lastName?: string;
     email: string;
+    role?: "admin" | "user";
     createdAt?: string;
     updatedAt?: string;
   };
@@ -35,6 +53,10 @@ export interface LogoutResponse {
   message: string;
 }
 
+/* =========================
+   API Request
+========================= */
+
 async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...options,
@@ -45,14 +67,38 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
     },
   });
 
-  const data = await response.json();
+  const responseText = await response.text();
+
+  console.log("API URL:", url);
+  console.log("API STATUS:", response.status);
+  console.log("API RAW RESPONSE:", responseText);
+
+  let data: T;
+
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    console.error("API RESPONSE IS NOT JSON:", responseText);
+
+    throw new Error(`پاسخ API معتبر نیست. Status: ${response.status}`);
+  }
+
+  console.log("API DATA:", data);
 
   if (!response.ok) {
-    throw new Error(data.message || "خطایی رخ داده است");
+    const errorData = data as T & {
+      message?: string;
+    };
+
+    throw new Error(errorData?.message || "خطایی رخ داده است");
   }
 
   return data;
 }
+
+/* =========================
+   Login
+========================= */
 
 export function login(data: { email: string; password: string }) {
   return apiRequest<LoginResponse>(`${API_URL}/login`, {
@@ -61,22 +107,62 @@ export function login(data: { email: string; password: string }) {
   });
 }
 
-export function register(data: {
-  name: string;
-  email: string;
-  password: string;
-}) {
+/* =========================
+   Register - Step 1
+========================= */
+
+export function register(data: { email: string }) {
   return apiRequest<RegisterResponse>(`${API_URL}/register`, {
     method: "POST",
     body: JSON.stringify(data),
   });
 }
 
+/* =========================
+   Verify Email - Step 2
+========================= */
+
+export function verifyEmail(data: {
+  tempUserId: string | number;
+  verificationCode: string;
+}) {
+  return apiRequest<VerifyEmailResponse>(`${API_URL}/verify-email`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/* =========================
+   Complete Registration - Step 3
+========================= */
+
+export function completeRegistration(data: {
+  userId: string | number;
+  password: string;
+  phoneNumber: string;
+}) {
+  return apiRequest<CompleteRegistrationResponse>(
+    `${API_URL}/complete-registration`,
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    },
+  );
+}
+
+/* =========================
+   Get Current User
+========================= */
+
 export function getMe() {
   return apiRequest<MeResponse>(`${API_URL}/me`, {
     method: "GET",
   });
 }
+
+/* =========================
+   Logout
+========================= */
 
 export function logout() {
   return apiRequest<LogoutResponse>(`${API_URL}/logout`, {

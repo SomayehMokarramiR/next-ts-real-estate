@@ -4,33 +4,64 @@ import { useState } from "react";
 import { Mail } from "lucide-react";
 
 import { useRegisterProgress } from "@/app/context/RegisterProgressContext";
+import { useRegister } from "../../../../hooks/useAuth";
 
 type Props = {
   onNext: () => void;
+  onUserCreated: (id: string) => void;
 };
 
-export default function RegisterStep1({ onNext }: Props) {
+export default function RegisterStep1({ onNext, onUserCreated }: Props) {
   const { setProgress } = useRegisterProgress();
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const registerMutation = useRegister();
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email.trim()) {
-      setError("لطفا ایمیل خود را وارد کنید");
+    const normalizedEmail = email.trim().toLowerCase();
 
+    if (!normalizedEmail) {
+      setError("لطفا ایمیل خود را وارد کنید");
       return;
     }
 
     setError("");
 
-    // مرحله 1 به 2
-    setProgress(33.33);
+    try {
+      const data = await registerMutation.mutateAsync({
+        email: normalizedEmail,
+      });
 
-    onNext();
+      console.log("REGISTER RESPONSE:", data);
+
+      const tempUserId = data?.tempUserId;
+
+      if (!tempUserId) {
+        setError("شناسه ثبت‌نام از سرور دریافت نشد");
+        return;
+      }
+
+      onUserCreated(String(tempUserId));
+
+      setProgress(33.33);
+
+      onNext();
+    } catch (error: unknown) {
+      console.error("REGISTER STEP 1 ERROR:", error);
+
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError("خطایی در ثبت ایمیل رخ داد");
+      }
+    }
   };
+
+  const loading = registerMutation.isPending;
 
   return (
     <form
@@ -53,6 +84,8 @@ export default function RegisterStep1({ onNext }: Props) {
           }}
           placeholder="ایمیل خود را وارد کنید"
           dir="rtl"
+          disabled={loading}
+          autoComplete="email"
           className="
           w-full
           border
@@ -74,6 +107,8 @@ export default function RegisterStep1({ onNext }: Props) {
           focus:ring-2
           focus:ring-[#2A52BE]/20
           transition-all
+          disabled:opacity-60
+          disabled:cursor-not-allowed
           "
         />
 
@@ -110,6 +145,7 @@ export default function RegisterStep1({ onNext }: Props) {
 
       <button
         type="submit"
+        disabled={loading}
         className="
         w-full
         bg-[#2A52BE]
@@ -119,9 +155,11 @@ export default function RegisterStep1({ onNext }: Props) {
         py-3.5
         rounded-full
         transition
+        disabled:opacity-60
+        disabled:cursor-not-allowed
         "
       >
-        ادامه
+        {loading ? "در حال ارسال..." : "ادامه"}
       </button>
 
       <p

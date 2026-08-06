@@ -1,14 +1,9 @@
-import RegisterLayout from "../components/layout/RegisterLayout";
 import RegisterForm from "../components/templates/register/RegisterForm";
 
-function Page() {
+export default function Page() {
   return (
-    <RegisterLayout>
-      <div className="pt-20">
-        <RegisterForm />
-      </div>
-    </RegisterLayout>
+    <div className="pt-20">
+      <RegisterForm />
+    </div>
   );
 }
-
-export default Page;

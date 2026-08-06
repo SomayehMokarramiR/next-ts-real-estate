@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Home, User } from "lucide-react";
+import { User } from "lucide-react";
 import Logo from "../../modules/logo/Logo";
+import { usePathname, useRouter } from "next/navigation";
 
 const HOUSE_IMAGES = [
   "https://images.unsplash.com/photo-1721815693498-cc28507c0ba2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
@@ -16,7 +17,7 @@ export default function RegisterLayout({
   children: React.ReactNode;
 }) {
   const [activeSlide, setActiveSlide] = useState(0);
-  const [activeTab, setActiveTab] = useState<"register" | "login">("register");
+  // const [activeTab, setActiveTab] = useState<"register" | "login">("register");
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -27,6 +28,10 @@ export default function RegisterLayout({
 
     return () => clearInterval(timer);
   }, []);
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const activeTab = pathname === "/login" ? "login" : "register";
 
   return (
     <div
@@ -102,7 +107,8 @@ export default function RegisterLayout({
           >
             <button
               type="button"
-              onClick={() => setActiveTab("register")}
+              // onClick={() => setActiveTab("register")}
+              onClick={() => router.push("/register")}
               className={`
               flex-1
               flex
@@ -142,7 +148,8 @@ export default function RegisterLayout({
 
             <button
               type="button"
-              onClick={() => setActiveTab("login")}
+              // onClick={() => {setActiveTab("login"); }}
+              onClick={() => router.push("/login")}
               className={`
               flex-1
               flex
