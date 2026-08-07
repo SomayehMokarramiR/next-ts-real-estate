@@ -47,9 +47,11 @@ export async function GET() {
       {
         success: true,
         user: {
-          id: user._id,
+          id: user._id.toString(),
           name: user.name,
+          lastName: user.lastName,
           email: user.email,
+          phoneNumber: user.phoneNumber,
           role: user.role,
         },
       },

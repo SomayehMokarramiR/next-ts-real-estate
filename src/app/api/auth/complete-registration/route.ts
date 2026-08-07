@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { connectDB } from "@/app/lib/mongodb";
 import TempUser from "@/app/models/TempUser";
 import User from "@/app/models/User";
+import { createToken } from "@/app/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -148,7 +149,7 @@ export async function POST(request: Request) {
     }
 
     /* =========================
-       Check Temp User Expiration
+       Check Expiration
     ========================= */
 
     if (
@@ -167,7 +168,7 @@ export async function POST(request: Request) {
     }
 
     /* =========================
-       Check Existing Email
+       Existing Email
     ========================= */
 
     const existingUser = await User.findOne({
@@ -185,7 +186,7 @@ export async function POST(request: Request) {
     }
 
     /* =========================
-       Check Existing Phone
+       Existing Phone
     ========================= */
 
     const existingPhone = await User.findOne({
@@ -203,7 +204,7 @@ export async function POST(request: Request) {
     }
 
     /* =========================
-       Determine Role
+       Role
     ========================= */
 
     const usersCount = await User.countDocuments();
@@ -234,6 +235,16 @@ export async function POST(request: Request) {
     console.log("USER CREATED:", user._id.toString());
 
     /* =========================
+       Create JWT Token
+    ========================= */
+
+    const token = createToken({
+      id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+    });
+
+    /* =========================
        Delete Temp User
     ========================= */
 
@@ -243,7 +254,7 @@ export async function POST(request: Request) {
        Response
     ========================= */
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
         success: true,
         message: "ثبت‌نام با موفقیت انجام شد",
@@ -256,8 +267,24 @@ export async function POST(request: Request) {
           role: user.role,
         },
       },
-      { status: 201 },
+      {
+        status: 201,
+      },
     );
+
+    /* =========================
+       Save JWT Cookie
+    ========================= */
+
+    response.cookies.set("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+
+    return response;
   } catch (error) {
     console.error("COMPLETE REGISTRATION API ERROR:", error);
 
@@ -269,7 +296,9 @@ export async function POST(request: Request) {
             ? error.message
             : "خطایی در تکمیل ثبت‌نام رخ داد",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

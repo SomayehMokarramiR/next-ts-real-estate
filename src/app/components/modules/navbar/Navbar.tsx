@@ -1,6 +1,7 @@
 "use client";
 
 import Logo from "@/app/components/modules/logo/Logo";
+
 import {
   ChevronDown,
   Moon,
@@ -14,11 +15,14 @@ import {
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+
+import Swal from "sweetalert2";
+
 import { BLUE } from "../constants";
 import NewsIcon from "./NewsIcon";
+
 import { useMe, useLogout } from "@/hooks/useAuth";
-import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
 
 type NavLink = {
   label: string;
@@ -81,23 +85,10 @@ function Avatar() {
 
 export default function Navbar() {
   const router = useRouter();
+
   const { data, isLoading } = useMe();
+
   const logoutMutation = useLogout();
-
-  const isLoggedIn = Boolean(data?.success && data?.user);
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        Swal.fire({
-          icon: "success",
-          title: "خروج موفق",
-          text: "با موفقیت از حساب کاربری خارج شدید",
-          confirmButtonText: "باشه",
-        });
-      },
-    });
-  };
 
   const [dark, setDark] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -109,11 +100,27 @@ export default function Navbar() {
 
   const [userOpen, setUserOpen] = useState(false);
 
+  const isLoggedIn = Boolean(data?.user);
+
   const navLinks: NavLink[] = [
-    { label: "خانه", href: "#" },
-    { label: "رهن و اجاره", href: "#" },
-    { label: "بررسی سریع", href: "#", arrow: true },
-    { label: "تماس با ما", href: "#", arrow: true },
+    {
+      label: "خانه",
+      href: "#",
+    },
+    {
+      label: "رهن و اجاره",
+      href: "#",
+    },
+    {
+      label: "بررسی سریع",
+      href: "#",
+      arrow: true,
+    },
+    {
+      label: "تماس با ما",
+      href: "#",
+      arrow: true,
+    },
     {
       label: "مهم‌ترین اخبار",
       href: "#",
@@ -135,6 +142,61 @@ export default function Navbar() {
       localStorage.setItem("theme", "light");
     }
   }, [dark]);
+
+  const handleLogout = () => {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => {
+        setUserOpen(false);
+
+        Swal.fire({
+          icon: "success",
+          title: "خروج موفق",
+          text: "با موفقیت از حساب کاربری خارج شدید",
+          confirmButtonText: "باشه",
+        });
+      },
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <nav
+        className="
+        fixed
+        top-0
+        left-0
+        right-0
+        z-[9999]
+        bg-background
+        shadow-sm
+        "
+      >
+        <div
+          className="
+          max-w-7xl
+          mx-auto
+          px-4
+          h-16
+          flex
+          items-center
+          justify-between
+          "
+        >
+          <Logo />
+
+          <div
+            className="
+            w-24
+            h-8
+            rounded-full
+            bg-gray-200
+            animate-pulse
+            "
+          />
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav
@@ -196,6 +258,7 @@ export default function Navbar() {
                   ? "bg-primary500 text-white px-4 py-2 rounded-full"
                   : "hover:text-primary500"
               }
+
               `}
             >
               {item.icon && <NewsIcon />}
@@ -206,7 +269,6 @@ export default function Navbar() {
             </a>
           ))}
         </div>
-
         {/* Actions */}
 
         <div
@@ -239,55 +301,55 @@ export default function Navbar() {
             )}
           </button>
 
-          {/* Auth */}
+          {/* User / Auth */}
 
           {isLoggedIn ? (
             <div
               className="
-                relative
-                "
+              relative
+              "
             >
               <button
                 onClick={() => setUserOpen((prev) => !prev)}
                 className="
-                  flex
-                  items-center
-                  gap-2
-                  rounded-full
-                  border
-                  border-gray-200
-                  dark:border-[#353535]
-                  px-2
-                  py-1
-                  "
+                flex
+                items-center
+                gap-2
+                rounded-full
+                border
+                border-gray-200
+                dark:border-[#353535]
+                px-2
+                py-1
+                "
               >
                 <Avatar />
 
                 <div
                   className="
-                    hidden
-                    sm:flex
-                    flex-col
-                    text-right
-                    "
+                  hidden
+                  sm:flex
+                  flex-col
+                  text-right
+                  "
                 >
                   <span
                     className="
-                      text-xs
-                      font-semibold
-                      dark:text-white
-                      "
+                    text-xs
+                    font-semibold
+                    dark:text-white
+                    "
                   >
-                    {data?.user?.name}
+                    {data?.user?.name || "کاربر"}
                   </span>
 
                   <span
                     className="
-                      text-[11px]
-                      text-gray-400
-                      "
+                    text-[11px]
+                    text-gray-400
+                    "
                   >
-                    09373808890
+                    {data?.user?.phoneNumber || ""}
                   </span>
                 </div>
 
@@ -297,19 +359,19 @@ export default function Navbar() {
               {userOpen && (
                 <div
                   className="
-                      absolute
-                      left-0
-                      top-12
-                      w-52
-                      bg-white
-                      dark:bg-[#272727]
-                      border
-                      border-gray-200
-                      dark:border-[#353535]
-                      rounded-2xl
-                      shadow-lg
-                      p-2
-                      "
+                  absolute
+                  left-0
+                  top-12
+                  w-52
+                  bg-white
+                  dark:bg-[#272727]
+                  border
+                  border-gray-200
+                  dark:border-[#353535]
+                  rounded-2xl
+                  shadow-lg
+                  p-2
+                  "
                 >
                   {userMenu.map(({ label, icon: Icon }) => (
                     <button
@@ -318,18 +380,18 @@ export default function Navbar() {
                         label === "خروج از حساب" ? handleLogout : undefined
                       }
                       className="
-                              w-full
-                              flex
-                              items-center
-                              gap-3
-                              px-3
-                              py-2
-                              rounded-xl
-                              text-sm
-                              hover:bg-gray-100
-                              dark:hover:bg-[#353535]
-                              dark:text-white
-                              "
+                        w-full
+                        flex
+                        items-center
+                        gap-3
+                        px-3
+                        py-2
+                        rounded-xl
+                        text-sm
+                        hover:bg-gray-100
+                        dark:hover:bg-[#353535]
+                        dark:text-white
+                        "
                     >
                       <Icon size={16} />
 
@@ -343,22 +405,22 @@ export default function Navbar() {
             <button
               onClick={() => router.push("/login")}
               className="
-    hidden
-    sm:block
-    bg-primary500
-    text-white
-    text-xs
-    sm:text-sm
-    px-4
-    py-2
-    rounded-full
-    "
+              hidden
+              sm:block
+              bg-primary500
+              text-white
+              text-xs
+              sm:text-sm
+              px-4
+              py-2
+              rounded-full
+              "
             >
-              ورود / ثبت‌ نام
+              ورود / ثبت نام
             </button>
           )}
 
-          {/* Mobile Menu */}
+          {/* Mobile Menu Button */}
 
           <button
             onClick={() => setOpen((prev) => !prev)}
@@ -383,28 +445,44 @@ export default function Navbar() {
       {open && (
         <div
           className="
-            md:hidden
-            bg-background
-            text-foreground
-            px-5
-            py-4
-            space-y-3
-            shadow-md
-            "
+          md:hidden
+          bg-background
+          text-foreground
+          px-5
+          py-4
+          space-y-3
+          shadow-md
+          "
         >
           {navLinks.map((item) => (
             <a
               key={item.label}
               href={item.href}
               className="
-                  block
-                  text-sm
-                  hover:text-primary500
-                  "
+              block
+              text-sm
+              hover:text-primary500
+              "
             >
               {item.label}
             </a>
           ))}
+
+          {!isLoggedIn && (
+            <button
+              onClick={() => router.push("/login")}
+              className="
+              w-full
+              bg-primary500
+              text-white
+              py-2
+              rounded-full
+              text-sm
+              "
+            >
+              ورود / ثبت نام
+            </button>
+          )}
         </div>
       )}
     </nav>

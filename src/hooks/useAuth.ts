@@ -2,7 +2,16 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { login, register, getMe, logout, verifyEmail } from "@/services/auth";
+import {
+  login,
+  register,
+  getMe,
+  logout,
+  verifyEmail,
+  forgotPassword,
+  verifyResetCode,
+  resetPassword,
+} from "@/services/auth";
 
 export function useMe() {
   return useQuery({
@@ -54,5 +63,27 @@ export function useLogout() {
         queryKey: ["me"],
       });
     },
+  });
+}
+
+// =========================
+// Forgot Password
+// =========================
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: forgotPassword,
+  });
+}
+
+export function useVerifyResetCode() {
+  return useMutation({
+    mutationFn: verifyResetCode,
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: resetPassword,
   });
 }

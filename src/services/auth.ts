@@ -34,20 +34,37 @@ export interface CompleteRegistrationResponse {
   user?: User;
 }
 
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface VerifyResetCodeResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface MeResponse {
   success: boolean;
+
   user?: {
     _id: string;
     name: string;
     lastName?: string;
     email: string;
+    phoneNumber?: string;
     role?: "admin" | "user";
     createdAt?: string;
     updatedAt?: string;
   };
+
   message?: string;
 }
-
 export interface LogoutResponse {
   success: boolean;
   message: string;
@@ -167,5 +184,37 @@ export function getMe() {
 export function logout() {
   return apiRequest<LogoutResponse>(`${API_URL}/logout`, {
     method: "POST",
+  });
+}
+/* =========================
+   Forgot Password - Step 1
+========================= */
+
+export function forgotPassword(data: { email: string }) {
+  return apiRequest<ForgotPasswordResponse>(`${API_URL}/forgot-password`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/* =========================
+   Verify Reset Code - Step 2
+========================= */
+
+export function verifyResetCode(data: { email: string; code: string }) {
+  return apiRequest<VerifyResetCodeResponse>(`${API_URL}/verify-reset-code`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+/* =========================
+   Reset Password - Step 3
+========================= */
+
+export function resetPassword(data: { email: string; password: string }) {
+  return apiRequest<ResetPasswordResponse>(`${API_URL}/reset-password`, {
+    method: "POST",
+    body: JSON.stringify(data),
   });
 }

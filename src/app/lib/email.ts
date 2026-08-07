@@ -4,40 +4,37 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendVerificationEmail(email: string, code: string) {
   try {
-    const fromEmail = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+    console.log("==============================");
+    console.log("RESEND DEBUG");
+    console.log("==============================");
 
-    console.log("RESEND KEY EXISTS:", !!process.env.RESEND_API_KEY);
-    console.log("FROM EMAIL:", fromEmail);
-    console.log("TO EMAIL:", email);
+    console.log("API KEY:", process.env.RESEND_API_KEY ? "EXISTS" : "MISSING");
+
+    console.log("FROM:", process.env.RESEND_FROM_EMAIL);
+
+    console.log("TO:", email);
+    console.log("CODE:", code);
 
     const { data, error } = await resend.emails.send({
-      from: `Real Estate <${fromEmail}>`,
+      from: "onboarding@resend.dev",
       to: [email],
       subject: "کد تایید ثبت نام",
       html: `
-        <div
-          dir="rtl"
-          style="
-            font-family: Arial, sans-serif;
-            text-align:center;
-            padding:30px;
-          "
-        >
-          <h2>
-            تایید ایمیل
-          </h2>
+        <div dir="rtl" style="
+          font-family:Arial;
+          text-align:center;
+          padding:30px;
+        ">
+          <h2>تایید ایمیل</h2>
 
           <p>
-            کد تایید ثبت نام شما:
+            کد تایید شما:
           </p>
 
-          <h1
-            style="
-              color:#2A52BE;
-              letter-spacing:8px;
-              font-size:32px;
-            "
-          >
+          <h1 style="
+            color:#2A52BE;
+            letter-spacing:8px;
+          ">
             ${code}
           </h1>
 
@@ -45,32 +42,21 @@ export async function sendVerificationEmail(email: string, code: string) {
             این کد تا ۵ دقیقه معتبر است.
           </p>
 
-          <p
-            style="
-              color:#888;
-              font-size:12px;
-            "
-          >
-            اگر شما درخواست ثبت نام نداده‌اید، این ایمیل را نادیده بگیرید.
-          </p>
         </div>
       `,
     });
 
     if (error) {
-      console.error("RESEND EMAIL ERROR:", JSON.stringify(error, null, 2));
+      console.error("RESEND ERROR:", JSON.stringify(error, null, 2));
 
       return false;
     }
 
-    console.log("VERIFICATION EMAIL SENT:", data?.id);
+    console.log("EMAIL SENT:", JSON.stringify(data, null, 2));
 
     return true;
   } catch (error) {
-    console.error(
-      "SEND EMAIL ERROR:",
-      error instanceof Error ? error.message : error,
-    );
+    console.error("SEND EMAIL ERROR:", error);
 
     return false;
   }

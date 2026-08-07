@@ -54,6 +54,9 @@ export async function POST(request: Request) {
     const verificationCode = Math.floor(
       10000 + Math.random() * 90000,
     ).toString();
+    console.log("========== REGISTER ==========");
+    console.log("EMAIL:", normalizedEmail);
+    console.log("OTP:", verificationCode);
 
     /* =========================
        OTP Expiration
