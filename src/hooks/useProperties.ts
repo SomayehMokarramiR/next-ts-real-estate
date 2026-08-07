@@ -1,98 +1,89 @@
-"use client";
+import { useQuery } from "@tanstack/react-query";
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+export interface Filters {
+  search?: string;
+  city?: string;
+  facility?: string;
+  minPrice?: string;
+  maxPrice?: string;
+  sort?: string;
+  rating?: string;
+  type?: string;
+}
+interface Property {
+  _id: string;
 
-import {
-  getProperties,
-  getPropertyById,
-  createProperty,
-  updateProperty,
-  deleteProperty,
-} from "@/services/property";
+  title: string;
 
-import { IProperty } from "@/app/models/Property";
+  description?: string;
 
-// =========================
-// GET ALL PROPERTIES
-// =========================
+  type: string;
 
-export function useProperties() {
+  location: {
+    city: string;
+    address: string;
+  };
+
+  images: string[];
+
+  facilities: {
+    bedrooms: number;
+    bathrooms: number;
+    parking: boolean;
+    pool: boolean;
+    capacity: number;
+  };
+
+  pricing: {
+    daily: number;
+    monthly?: number;
+  };
+
+  rating: number;
+
+  views: number;
+
+  status: string;
+}
+
+interface PropertiesResponse {
+  success: boolean;
+  count: number;
+  properties: Property[];
+}
+
+async function getProperties(filters?: Filters): Promise<PropertiesResponse> {
+  const params = new URLSearchParams();
+
+  Object.entries(filters || {}).forEach(([key, value]) => {
+    if (value && value.trim() !== "") {
+      params.append(key, value);
+    }
+  });
+
+  const query = params.toString();
+
+  const url = query ? `/api/properties?${query}` : "/api/properties";
+
+  console.log("API URL ===>", url);
+
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error("خطا در دریافت املاک");
+  }
+
+  const data = await res.json();
+
+  return data;
+}
+
+export function useProperties(filters?: Filters) {
   return useQuery({
-    queryKey: ["properties"],
+    queryKey: ["properties", filters],
 
-    queryFn: getProperties,
-  });
-}
+    queryFn: () => getProperties(filters),
 
-// =========================
-// GET SINGLE PROPERTY
-// =========================
-
-export function useProperty(id: string) {
-  return useQuery({
-    queryKey: ["property", id],
-
-    queryFn: () => getPropertyById(id),
-
-    enabled: !!id,
-  });
-}
-
-// =========================
-// CREATE PROPERTY
-// =========================
-
-export function useCreateProperty() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (data: Partial<IProperty>) => createProperty(data),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["properties"],
-      });
-    },
-  });
-}
-
-// =========================
-// UPDATE PROPERTY
-// =========================
-
-export function useUpdateProperty() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<IProperty> }) =>
-      updateProperty(id, data),
-
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["properties"],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["property", variables.id],
-      });
-    },
-  });
-}
-
-// =========================
-// DELETE PROPERTY
-// =========================
-
-export function useDeleteProperty() {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: (id: string) => deleteProperty(id),
-
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["properties"],
-      });
-    },
+    staleTime: 1000 * 60 * 5,
   });
 }

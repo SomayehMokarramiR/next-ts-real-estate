@@ -10,94 +10,134 @@ import {
   ChevronLeft,
   X,
 } from "lucide-react";
+
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-import { properties } from "./constants";
 import MapPinCmp from "./MapPinCmp";
+import { useProperties } from "@/hooks/useProperties";
 
-function formatPrice(number: number) {
-  return number.toLocaleString("fa-IR");
+interface Property {
+  _id: string;
+
+  title: string;
+
+  images?: string[];
+
+  rating?: number;
+
+  views?: number;
+
+  location?: {
+    address?: string;
+    city?: string;
+  };
+
+  facilities?: {
+    bedrooms?: number;
+    bathrooms?: number;
+    parking?: boolean;
+    pool?: boolean;
+    capacity?: number;
+  };
+
+  pricing?: {
+    daily?: number;
+  };
+
+  mapPosition?: {
+    top?: string;
+    left?: string;
+  };
 }
 
-export default function ContentReseve() {
-  const [activePin, setActivePin] = useState<number>(1);
+type Props = {
+  filters?: Record<string, string>;
+};
 
-  const activeProp = properties.find((item) => item.id === activePin);
+function formatPrice(price: number) {
+  return price.toLocaleString("fa-IR");
+}
+
+export default function ContentReseve({ filters = {} }: Props) {
+  const [activePin, setActivePin] = useState<string | null>(null);
+
+  const { data, isLoading, error } = useProperties(filters);
+
+  const apiProperties: Property[] = data?.properties || [];
+
+  const activeProp = apiProperties.find((item) => item._id === activePin);
+
+  console.log("FILTERS ===>", filters);
+  console.log("PROPERTIES ===>", apiProperties);
+
+  if (isLoading) {
+    return <div>در حال دریافت اطلاعات...</div>;
+  }
+
+  if (error) {
+    return <div>خطا در دریافت اطلاعات املاک</div>;
+  }
 
   return (
-    <div
-      className="
-        flex
-    flex-col
-    min-[1200px]:flex-row
-    overflow-hidden
-    py-6
-    lg:py-12
-    gap-4
-      "
-    >
+    <div className="flex flex-col min-[1200px]:flex-row gap-4">
       {/* LIST */}
 
       <div
         className="
-    flex-1
-    px-3
-    lg:px-4
-    py-4
-    order-2
-    min-[1200px]:order-1
-    grid
-    grid-cols-1
-    min-[700px]:grid-cols-2
-    min-[1200px]:grid-cols-1
-    gap-3
+         flex-1
+  px-3
+  lg:px-4
+  py-4
+  grid
+  grid-cols-1
+  min-[700px]:grid-cols-2
+  min-[1200px]:grid-cols-1
+  gap-3
+  content-start
         "
       >
-        {properties.map((p) => (
+        {apiProperties.map((p) => (
           <div
-            key={p.id}
-            onMouseEnter={() => setActivePin(p.id)}
+            key={p._id}
+            onMouseEnter={() => setActivePin(p._id)}
             className={`
-            bg-white dark:bg-[#272727]
-              rounded-2xl
-              border
-              overflow-hidden
-              flex
-              flex-row
-              cursor-pointer
-             transition-all
-              h-auto
-              min-h-[200px]
-              min-[1200px]:h-[200px]
-              min-w-0
+            bg-white
+            dark:bg-[#272727]
+            rounded-2xl
+            border
+            overflow-hidden
+            flex
+            flex-row
+            cursor-pointer
+            min-h-[200px]
 
-  ${
-    activePin === p.id
-      ? "border-primary500 dark:border-primary600 shadow-md"
-      : "border-gray-100 shadow-sm hover:shadow-md dark:border-[#353535]"
-  }
-`}
+
+
+            ${
+              activePin === p._id
+                ? "border-primary500 shadow-md"
+                : "border-gray-100 shadow-sm"
+            }
+            `}
           >
             {/* IMAGE */}
 
             <div
               className="
-               w-[150px]
-    lg:w-[180px]
-    h-full
-    shrink-0
+              relative
+              w-[150px]
+              lg:w-[180px]
+              min-h-[200px]
+              shrink-0
               "
             >
-              <img
-                src={p.image}
+              <Image
+                src={p.images?.[0] || "/images/placeholder.jpg"}
                 alt={p.title}
-                className="
-                  w-full
-                  h-full
-                  object-cover
-                  rounded-2xl
-                "
+                fill
+                className="object-cover"
               />
             </div>
 
@@ -105,220 +145,160 @@ export default function ContentReseve() {
 
             <div
               className="
-                overflow-hidden
-                flex-1
-                min-w-0
-                p-3
-                lg:p-4
-                flex
-                flex-col
-                gap-2.5
+              flex-1
+              p-3
+              lg:p-4
+              flex
+              flex-col
+              gap-2.5
               "
             >
-              {/* STAR */}
+              {/* RATING */}
 
               <div
                 className="
-                  flex
-                  items-center
-                  gap-1
-                  text-white
-                  text-xs
-                  font-semibold
-                  px-2
-                  py-1
-                  rounded-full
-                  bg-primary500
-                  w-fit
+                flex
+                items-center
+                gap-1
+                bg-primary500
+                text-white
+                text-xs
+                px-2
+                py-1
+                rounded-full
+                w-fit
                 "
               >
-                <Star size={16} className="fill-primary500 text-white" />
-
-                <span>{p.stars} ستاره</span>
+                <Star size={15} className="fill-white" />
+                {p.rating ?? 0} ستاره
               </div>
-
-              {/* TITLE */}
 
               <h3
                 className="
-                  text-base
-                  font-bold
-                  text-gray-900
-                  dark:text-white
+                font-bold
+                text-base
+                truncate
                 "
               >
                 {p.title}
               </h3>
 
-              {/* ADDRESS */}
-
               <div
                 className="
-                  flex
-                  items-center
-                  gap-1.5
-                  text-gray-400
-                  dark:text-white
+                flex
+                items-center
+                gap-1
+                text-gray-400
                 "
               >
                 <MapPin size={13} />
 
-                <span className="text-xs">{p.address}</span>
+                <span className="text-xs truncate">
+                  {p.location?.address || p.location?.city || "بدون آدرس"}
+                </span>
               </div>
 
               {/* FEATURES */}
 
               <div
                 className="
-                  flex
-                  flex-wrap
-                  items-center
-                  gap-2
-                  text-xs
-                  text-gray-500
-                  dark:text-white
+                flex
+                flex-wrap
+                gap-2
+                text-xs
+                text-gray-500
                 "
               >
-                <span className="flex items-center gap-1">
+                <span className="flex gap-1">
                   <Home size={13} />
-                  {p.yard} حیاط
+                  {p.facilities?.bedrooms ?? 0}
+                  اتاق
                 </span>
 
                 <span>|</span>
 
-                <span className="flex items-center gap-1">
+                <span className="flex gap-1">
                   <Bath size={13} />
-                  {p.bath} حمام
+                  {p.facilities?.bathrooms ?? 0}
+                  حمام
                 </span>
 
                 <span>|</span>
 
-                <span className="flex items-center gap-1">
+                <span className="flex gap-1">
                   <Users size={13} />
-                  {p.persons} نفر
+                  {p.facilities?.capacity ?? 0}
+                  نفر
                 </span>
 
                 <span>|</span>
 
-                <span className="flex items-center gap-1">
+                <span className="flex gap-1">
                   <Car size={13} />
-                  {p.parking} پارکینگ
+
+                  {p.facilities?.parking ? "پارکینگ" : "بدون پارکینگ"}
                 </span>
               </div>
 
-              <div className="border-t border-dashed border-gray-100" />
+              <div
+                className="
+                border-t
+                border-dashed
+                border-gray-200
+                "
+              />
 
-              {/* PRICE */}
               {/* PRICE */}
 
               <div
                 className="
-    flex
-    items-center
-    justify-between
-    gap-2
-    min-w-0
-    max-[1100px]:min-[701px]:flex-col
-    max-[1100px]:min-[701px]:items-stretch
-  "
+                flex
+                items-center
+                justify-between
+                "
               >
-                {/* PRICE BOX */}
-
                 <div
                   className="
-      flex
-      items-center
-      justify-center
-      gap-1.5
-      bg-[#EDEDED]
-      dark:bg-[#353535]
-      rounded-full
-      px-2
-      h-[38px]
-      min-w-0
-      w-full
-      overflow-hidden
-      min-[1101px]:flex-1
-    "
+                  bg-[#EDEDED]
+                  dark:bg-[#353535]
+                  rounded-full
+                  px-3
+                  h-[38px]
+                  flex
+                  items-center
+                  gap-2
+                  "
                 >
-                  {p.discount && (
-                    <span
-                      className="
-          bg-red-500
-          text-white
-          text-[10px]
-          w-[28px]
-          h-[18px]
-          flex
-          items-center
-          justify-center
-          rounded
-          shrink-0
-        "
-                    >
-                      ٪{p.discount}
-                    </span>
-                  )}
-
-                  {p.originalPrice && (
-                    <span
-                      className="
-          text-gray-400
-          dark:text-white
-          text-[11px]
-          line-through
-          shrink-0
-        "
-                    >
-                      {formatPrice(p.originalPrice)}
-                    </span>
-                  )}
-
                   <span
                     className="
-        font-bold
-        text-sm
-        text-gray-900
-        dark:text-white
-        whitespace-nowrap
-        shrink-0
-        max-[800px]:text-xs
-      "
+                    font-bold
+                    text-sm
+                    "
                   >
-                    {formatPrice(p.price)}
+                    {formatPrice(p.pricing?.daily ?? 0)}
                   </span>
 
                   <span
                     className="
-        text-gray-400
-        text-[11px]
-        whitespace-nowrap
-        shrink-0
-        max-[800px]:text-[10px]
-      "
+                    text-gray-400
+                    text-xs
+                    "
                   >
-                    تومان / {p.type === "monthly" ? "ماه" : "شب"}
+                    تومان / شب
                   </span>
                 </div>
 
-                {/* LINK */}
-
                 <Link
-                  href={`/properties/${p.id}`}
+                  href={`/properties/${p._id}`}
                   className="
-      flex
-      items-center
-      justify-end
-      gap-1
-      text-xs
-      text-primary500
-      whitespace-nowrap
-      shrink-0
-      max-[1100px]:min-[701px]:w-full
-    "
+                  text-primary500
+                  text-xs
+                  flex
+                  items-center
+                  gap-1
+                  "
                 >
-                  {p.type === "monthly" ? "اجاره ماهیانه" : "مشاهده جزئیات"}
-
+                  جزئیات
                   <ChevronLeft size={14} />
                 </Link>
               </div>
@@ -326,138 +306,110 @@ export default function ContentReseve() {
           </div>
         ))}
       </div>
+
       {/* MAP */}
+
       <div
         className="
-  relative
-    w-full
-    h-[350px]
-    rounded-2xl
-    overflow-hidden
-    order-1
-    min-[1200px]:order-2
-    min-[1200px]:w-[42%]
-    min-[1200px]:h-[700px]
-    shrink-0
-  "
+        relative
+        w-full
+        h-[350px]
+        rounded-2xl
+        overflow-hidden
+        min-[1200px]:w-[42%]
+        min-[1200px]:h-[700px]
+        "
       >
-        <img
+        <Image
           src="/images/mapImg.png"
           alt="map"
-          className="
-      w-full
-      h-full
-      object-cover
-    "
+          fill
+          className="object-cover"
         />
 
-        {/* PINS */}
-        {properties.map((p) => (
+        {apiProperties.map((p) => (
           <div
-            key={p.id}
-            className="absolute"
+            key={p._id}
+            className="absolute z-10"
             style={{
-              top: p.mapPosition.top,
-              left: p.mapPosition.left,
+              top: p.mapPosition?.top || "50%",
+              left: p.mapPosition?.left || "50%",
             }}
           >
             <MapPinCmp
-              active={activePin === p.id}
-              onClick={() => setActivePin(p.id)}
+              active={activePin === p._id}
+              onClick={() => setActivePin(p._id)}
             />
           </div>
         ))}
 
-        {/* POPUP */}
         {activeProp && (
           <div
             className="
-        hidden
-        md:block
-        absolute
-        z-30
-        w-56
-        -translate-x-1/2
-        -translate-y-full
-        -mt-4
-      "
+            absolute
+            z-20
+            w-56
+            -translate-x-1/2
+            -translate-y-full
+            "
             style={{
-              top: activeProp.mapPosition.top,
-              left: activeProp.mapPosition.left,
+              top: activeProp.mapPosition?.top || "50%",
+              left: activeProp.mapPosition?.left || "50%",
             }}
           >
             <div
               className="
-          bg-white
-          rounded-xl
-          shadow-xl
-          overflow-hidden
-        "
-            >
-              {/* IMAGE */}
-              <div className="relative h-28">
-                <img
-                  src={activeProp.image}
-                  alt={activeProp.title}
-                  className="
-              w-full
-              h-full
-              object-cover
-            "
-                />
-
-                <button
-                  onClick={() => setActivePin(0)}
-                  className="
-              absolute
-              top-2
-              left-2
               bg-white
-              rounded-full
-              p-1
-              shadow
-            "
-                >
-                  <X size={12} />
-                </button>
-              </div>
+              rounded-xl
+              shadow-xl
+              overflow-hidden
+              "
+            >
+              <Image
+                src={activeProp.images?.[0] || "/images/placeholder.jpg"}
+                alt={activeProp.title}
+                width={400}
+                height={300}
+                className="
+                w-full
+                h-28
+                object-cover
+                "
+              />
 
-              {/* CONTENT */}
+              <button
+                onClick={() => setActivePin(null)}
+                className="
+                absolute
+                top-2
+                left-2
+                bg-white
+                rounded-full
+                p-1
+                "
+              >
+                <X size={12} />
+              </button>
+
               <div className="p-3">
                 <p
                   className="
-              text-xs
-              font-bold
-              text-gray-900
-            "
+                  text-xs
+                  font-bold
+                  "
                 >
                   {activeProp.title}
                 </p>
 
-                <div
-                  className="
-              flex
-              items-center
-              gap-1
-              text-gray-400
-              mt-2
-            "
-                >
-                  <MapPin size={10} />
-
-                  <span className="text-[10px]">{activeProp.address}</span>
-                </div>
-
                 <Link
-                  href={`/properties/${activeProp.id}`}
+                  href={`/properties/${activeProp._id}`}
                   className="
-              mt-2
-              text-primary500
-              text-xs
-              flex
-              items-center
-              gap-1
-            "
+                  text-primary500
+                  text-xs
+                  mt-2
+                  flex
+                  gap-1
+                  "
                 >
                   جزئیات بیشتر
                   <ChevronLeft size={12} />

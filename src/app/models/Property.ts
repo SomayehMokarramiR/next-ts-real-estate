@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
 // =========================
-// PROPERTY INTERFACE
+// INTERFACE
 // =========================
 
 export interface IProperty extends Document {
@@ -22,6 +22,7 @@ export interface IProperty extends Document {
     bedrooms: number;
     bathrooms: number;
     parking: boolean;
+    pool: boolean;
     capacity: number;
   };
 
@@ -29,6 +30,10 @@ export interface IProperty extends Document {
     daily: number;
     monthly?: number;
   };
+
+  rating: number;
+
+  views: number;
 
   status: "available" | "reserved" | "inactive";
 
@@ -39,36 +44,33 @@ export interface IProperty extends Document {
 }
 
 // =========================
-// PROPERTY SCHEMA
+// SCHEMA
 // =========================
 
 const PropertySchema = new Schema<IProperty>(
   {
     // =========================
-    // BASIC INFORMATION
+    // BASIC
     // =========================
 
     title: {
       type: String,
       required: [true, "عنوان ملک الزامی است"],
       trim: true,
-      minlength: [3, "عنوان ملک باید حداقل ۳ کاراکتر باشد"],
-      maxlength: [150, "عنوان ملک نمی‌تواند بیشتر از ۱۵۰ کاراکتر باشد"],
+      minlength: 3,
+      maxlength: 150,
     },
 
     description: {
       type: String,
       trim: true,
-      maxlength: [2000, "توضیحات ملک نمی‌تواند بیشتر از ۲۰۰۰ کاراکتر باشد"],
+      maxlength: 2000,
     },
 
     type: {
       type: String,
-      enum: {
-        values: ["apartment", "villa", "house", "hotel", "suite"],
-        message: "نوع ملک معتبر نیست",
-      },
-      default: "apartment",
+      enum: ["apartment", "villa", "house", "hotel", "suite"],
+      default: "villa",
     },
 
     // =========================
@@ -78,13 +80,13 @@ const PropertySchema = new Schema<IProperty>(
     location: {
       city: {
         type: String,
-        required: [true, "شهر الزامی است"],
+        required: true,
         trim: true,
       },
 
       address: {
         type: String,
-        required: [true, "آدرس الزامی است"],
+        required: true,
         trim: true,
       },
     },
@@ -96,12 +98,6 @@ const PropertySchema = new Schema<IProperty>(
     images: {
       type: [String],
       default: [],
-      validate: {
-        validator: function (images: string[]) {
-          return images.length <= 20;
-        },
-        message: "تعداد تصاویر نمی‌تواند بیشتر از ۲۰ عدد باشد",
-      },
     },
 
     // =========================
@@ -112,13 +108,13 @@ const PropertySchema = new Schema<IProperty>(
       bedrooms: {
         type: Number,
         default: 0,
-        min: [0, "تعداد اتاق خواب نمی‌تواند منفی باشد"],
+        min: 0,
       },
 
       bathrooms: {
         type: Number,
         default: 0,
-        min: [0, "تعداد حمام نمی‌تواند منفی باشد"],
+        min: 0,
       },
 
       parking: {
@@ -126,10 +122,15 @@ const PropertySchema = new Schema<IProperty>(
         default: false,
       },
 
+      pool: {
+        type: Boolean,
+        default: false,
+      },
+
       capacity: {
         type: Number,
         default: 1,
-        min: [1, "ظرفیت باید حداقل ۱ نفر باشد"],
+        min: 1,
       },
     },
 
@@ -141,13 +142,39 @@ const PropertySchema = new Schema<IProperty>(
       daily: {
         type: Number,
         required: [true, "قیمت روزانه الزامی است"],
-        min: [0, "قیمت روزانه نمی‌تواند منفی باشد"],
+        min: 0,
       },
 
       monthly: {
         type: Number,
-        min: [0, "قیمت ماهانه نمی‌تواند منفی باشد"],
+        min: 0,
       },
+    },
+
+    // =========================
+    // RATING
+    // =========================
+
+    rating: {
+      type: Number,
+
+      default: 0,
+
+      min: 0,
+
+      max: 5,
+    },
+
+    // =========================
+    // POPULARITY
+    // =========================
+
+    views: {
+      type: Number,
+
+      default: 0,
+
+      min: 0,
     },
 
     // =========================
@@ -156,10 +183,9 @@ const PropertySchema = new Schema<IProperty>(
 
     status: {
       type: String,
-      enum: {
-        values: ["available", "reserved", "inactive"],
-        message: "وضعیت ملک معتبر نیست",
-      },
+
+      enum: ["available", "reserved", "inactive"],
+
       default: "available",
     },
 
@@ -169,19 +195,43 @@ const PropertySchema = new Schema<IProperty>(
 
     owner: {
       type: Schema.Types.ObjectId,
+
       ref: "User",
+
       default: undefined,
     },
   },
-
-  // =========================
-  // TIMESTAMPS
-  // =========================
 
   {
     timestamps: true,
   },
 );
+
+// =========================
+// INDEXES
+// =========================
+
+// سرچ سریع
+PropertySchema.index({
+  title: "text",
+  "location.city": "text",
+  "location.address": "text",
+});
+
+// مرتب سازی محبوب ترین
+PropertySchema.index({
+  views: -1,
+});
+
+// مرتب سازی ارزان ترین
+PropertySchema.index({
+  "pricing.daily": 1,
+});
+
+// فیلتر شهر
+PropertySchema.index({
+  "location.city": 1,
+});
 
 // =========================
 // MODEL

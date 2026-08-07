@@ -13,21 +13,11 @@ const SelectField = ({
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="
-        flex
-        flex-col
-        gap-1
-        w-full
-        sm:flex-1
-        sm:min-w-[140px]
-      "
-    >
-      <label className="text-sm font-medium text-gray-700 text-right">
-        {label}
-      </label>
+    <div className="relative">
+      <label className="block text-sm text-gray-700 mb-2">{label}</label>
 
       <button
+        type="button"
         onClick={() => setOpen(!open)}
         className="
           flex
@@ -47,7 +37,12 @@ const SelectField = ({
           w-full
         "
       >
-        <ChevronDown size={16} className="text-gray-400 shrink-0" />
+        <ChevronDown
+          size={16}
+          className={`text-gray-400 shrink-0 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
 
         <span className="truncate">{placeholder}</span>
       </button>
@@ -55,7 +50,12 @@ const SelectField = ({
       {open && (
         <div
           className="
-            mt-1
+            absolute
+            top-full
+            left-0
+            right-0
+            mt-2
+            z-20
             bg-white
             border
             border-gray-200

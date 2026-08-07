@@ -7,27 +7,21 @@ type Props = {
   label: string;
   placeholder?: string;
   options?: string[];
+  value?: string;
+  onChange?: (value: string) => void;
 };
 
 export default function SelectField({
   label,
   placeholder = "انتخاب کنید",
   options = [],
+  value = "",
+  onChange,
 }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div
-      className="
-        flex
-        flex-col
-        gap-1
-        w-full
-        sm:flex-1
-        sm:min-w-[140px]
-        relative
-      "
-    >
+    <div className="relative flex flex-col gap-1">
       <label
         className="
           text-sm
@@ -41,7 +35,8 @@ export default function SelectField({
       </label>
 
       <button
-        onClick={() => setOpen(!open)}
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
         className="
           flex
           items-center
@@ -59,7 +54,7 @@ export default function SelectField({
       >
         <ChevronDown size={16} className="text-gray-500 dark:text-gray-300" />
 
-        <span>{placeholder}</span>
+        <span>{value || placeholder}</span>
       </button>
 
       {open && (
@@ -80,9 +75,33 @@ export default function SelectField({
             p-2
           "
         >
+          {/* پاک کردن انتخاب */}
+          <div
+            onClick={() => {
+              onChange?.("");
+              setOpen(false);
+            }}
+            className="
+              px-3
+              py-2
+              hover:bg-gray-100
+              dark:hover:bg-[#454545]
+              rounded-lg
+              text-sm
+              cursor-pointer
+              text-gray-400
+            "
+          >
+            انتخاب کنید
+          </div>
+
           {options.map((item) => (
             <div
               key={item}
+              onClick={() => {
+                onChange?.(item);
+                setOpen(false);
+              }}
               className="
                 px-3
                 py-2

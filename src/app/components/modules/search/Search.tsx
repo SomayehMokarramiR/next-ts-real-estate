@@ -1,14 +1,24 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import SelectField from "./SelectField";
 import { SearchField } from "./types";
 
 type Props = {
   fields: SearchField[];
   variant?: "default" | "mortgage" | "houseReserve";
+  onSearch?: (data: Record<string, string>) => void;
+  resetKey?: number;
 };
 
-export default function Search({ fields, variant = "default" }: Props) {
+export default function Search({
+  fields,
+  variant = "default",
+  onSearch,
+  resetKey,
+}: Props) {
+  const [values, setValues] = useState<Record<string, string>>({});
+
   const renderField = (field: SearchField, index: number) => {
     const isSearch = index === 0;
 
@@ -47,6 +57,16 @@ export default function Search({ fields, variant = "default" }: Props) {
           `}
         >
           <button
+            type="button"
+            onClick={() => {
+              if (field.label.includes("حذف")) {
+                setValues({});
+                onSearch?.({});
+                return;
+              }
+
+              onSearch?.(values);
+            }}
             className={`
               h-10
               w-full
@@ -117,6 +137,13 @@ export default function Search({ fields, variant = "default" }: Props) {
 
           <input
             type="text"
+            value={values[field.label] || ""}
+            onChange={(e) =>
+              setValues((prev) => ({
+                ...prev,
+                [field.label]: e.target.value,
+              }))
+            }
             placeholder={field.placeholder}
             className="
               h-10
@@ -174,56 +201,40 @@ export default function Search({ fields, variant = "default" }: Props) {
           label={field.label}
           placeholder={field.placeholder}
           options={field.options}
+          value={values[field.key || field.label] || ""}
+          onChange={(value) => {
+            const key = field.key || field.label;
+
+            setValues((prev) => ({
+              ...prev,
+              [key]: value,
+            }));
+          }}
         />
       </div>
     );
   };
 
-  // ==========================
-  // MORTGAGE
-  // ==========================
-
-  if (variant === "mortgage") {
-    return (
-      <div className="bg-white dark:bg-background p-4 sm:p-6">
-        <div className="flex flex-wrap gap-4 items-end">
-          {fields.map(renderField)}
-        </div>
-      </div>
-    );
-  }
-
-  // ==========================
-  // HOUSE RESERVE
-  // ==========================
-
   if (variant === "houseReserve") {
     return (
-      <div className="bg-white dark:bg-background p-4 sm:p-6">
-        <div
-          className="
-            flex
-            flex-wrap
-            gap-4
-            items-end
-
-            max-[987px]:grid
-            max-[987px]:grid-cols-2
-          "
-        >
-          {fields.map(renderField)}
-        </div>
+      <div
+        className="
+          flex
+          flex-wrap
+          gap-4
+          items-end
+          max-[987px]:grid
+          max-[987px]:grid-cols-2
+        "
+      >
+        {fields.map(renderField)}
       </div>
     );
   }
 
-  // ==========================
-  // DEFAULT
-  // ==========================
+  if (variant === "mortgage") {
+    return <>{fields.map(renderField)}</>;
+  }
 
-  return (
-    <div className="bg-white dark:bg-[#127127127] p-4 sm:p-6">
-      <div className="flex flex-wrap gap-4">{fields.map(renderField)}</div>
-    </div>
-  );
+  return <>{fields.map(renderField)}</>;
 }

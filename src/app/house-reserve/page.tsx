@@ -1,87 +1,112 @@
-// import Search from "../components/templates/houseReserve/search/Search";
+"use client";
+
+import { useState } from "react";
+
 import Search from "@/app/components/modules/search/Search";
 import ContentReseve from "../components/templates/houseReserve/contentReseve/ContentReseve";
 import MainLayout from "../components/layout/MainLayout";
-function page() {
+
+export default function Page() {
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [resetKey, setResetKey] = useState(0);
+
+  const clearFilters = () => {
+    setFilters({});
+    setResetKey((prev) => prev + 1);
+  };
+
   return (
     <MainLayout>
-      <div>
-        <main className="pt-20">
-          {/* <Search /> */}
+      <div className="mt-20">
+        <Search
+          key={resetKey}
+          variant="houseReserve"
+          onSearch={(data) => {
+            const apiFilters = {
+              search: data["جستجو"] || "",
 
-          <div>
-            <Search
-              variant="houseReserve"
-              fields={[
-                {
-                  type: "input",
-                  label: "جستجو",
-                  placeholder: "نام ویلا یا شهر مورد نظر",
-                },
+              city: data["مقصد یا هتل شما"] || "",
 
-                {
-                  type: "select",
-                  label: "مقصد یا هتل شما",
-                  placeholder: "انتخاب شهر",
-                  options: ["رشت", "مازندران", "گیلان"],
-                },
+              sort: data["مرتب سازی براساس"] || "",
 
-                {
-                  type: "select",
-                  label: "مرتب سازی براساس",
-                  placeholder: "انتخاب کنید",
-                  options: ["محبوب‌ترین", "ارزان‌ترین"],
-                },
+              facility: data["امکانات هتل"] || "",
 
-                {
-                  type: "select",
-                  label: "امکانات هتل",
-                  placeholder: "انتخاب امکانات",
-                  options: ["استخر", "پارکینگ"],
-                },
+              rating: data["امتیاز هتل"] || "",
 
-                {
-                  type: "select",
-                  label: "امتیاز هتل",
-                  placeholder: "انتخاب امتیاز",
-                  options: ["5 ستاره", "4 ستاره"],
-                },
+              minPrice: data["حداقل قیمت"] || "",
 
-                {
-                  type: "input",
-                  label: "حداقل قیمت",
-                  placeholder: "حداقل قیمت",
-                },
+              maxPrice: data["حداکثر قیمت"] || "",
+            };
+            console.log("API FILTERS ===>", apiFilters);
 
-                {
-                  type: "input",
-                  label: "حداکثر قیمت",
-                  placeholder: "حداکثر قیمت",
-                },
+            setFilters(apiFilters);
+          }}
+          fields={[
+            {
+              type: "input",
+              label: "جستجو",
+              placeholder: "نام ویلا یا شهر مورد نظر",
+            },
 
-                {
-                  type: "button",
-                  label: "اعمال فیلتر",
-                },
+            {
+              type: "select",
+              label: "مقصد یا هتل شما",
+              placeholder: "انتخاب شهر",
+              options: ["محمودآباد", "رشت", "گیلان"],
+            },
 
-                {
-                  type: "button",
-                  label: "حذف فیلتر",
-                },
+            {
+              type: "select",
+              label: "مرتب سازی براساس",
+              placeholder: "انتخاب کنید",
+              options: ["محبوب‌ترین", "ارزان‌ترین"],
+            },
 
-                {
-                  type: "button",
-                  label: "۳۳ آگهی پیدا شد",
-                },
-              ]}
-            />
-          </div>
+            {
+              type: "select",
+              label: "امکانات هتل",
+              placeholder: "انتخاب امکانات",
+              options: ["استخر", "پارکینگ"],
+            },
 
-          <ContentReseve />
-        </main>
+            {
+              type: "select",
+              label: "امتیاز هتل",
+              placeholder: "انتخاب امتیاز",
+              options: ["5 ستاره", "4 ستاره"],
+            },
+
+            {
+              type: "input",
+              label: "حداقل قیمت",
+              placeholder: "حداقل قیمت",
+            },
+
+            {
+              type: "input",
+              label: "حداکثر قیمت",
+              placeholder: "حداکثر قیمت",
+            },
+
+            {
+              type: "button",
+              label: "اعمال فیلتر",
+            },
+
+            {
+              type: "button",
+              label: "حذف فیلتر",
+            },
+
+            {
+              type: "button",
+              label: "۳۳ آگهی پیدا شد",
+            },
+          ]}
+        />
+
+        <ContentReseve filters={filters} />
       </div>
     </MainLayout>
   );
 }
-
-export default page;
