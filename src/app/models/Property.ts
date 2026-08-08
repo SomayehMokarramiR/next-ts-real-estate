@@ -29,6 +29,10 @@ export interface IProperty extends Document {
   pricing: {
     daily: number;
     monthly?: number;
+
+    // تخفیف
+    oldPrice?: number;
+    discount?: number;
   };
 
   rating: number;
@@ -47,7 +51,7 @@ export interface IProperty extends Document {
 // SCHEMA
 // =========================
 
-const PropertySchema = new Schema<IProperty>(
+const PropertySchema = new Schema(
   {
     // =========================
     // BASIC
@@ -149,6 +153,19 @@ const PropertySchema = new Schema<IProperty>(
         type: Number,
         min: 0,
       },
+
+      // قیمت قبل از تخفیف
+      oldPrice: {
+        type: Number,
+        min: 0,
+      },
+
+      // درصد تخفیف
+      discount: {
+        type: Number,
+        min: 0,
+        max: 100,
+      },
     },
 
     // =========================
@@ -157,11 +174,8 @@ const PropertySchema = new Schema<IProperty>(
 
     rating: {
       type: Number,
-
       default: 0,
-
       min: 0,
-
       max: 5,
     },
 
@@ -171,9 +185,7 @@ const PropertySchema = new Schema<IProperty>(
 
     views: {
       type: Number,
-
       default: 0,
-
       min: 0,
     },
 
@@ -183,9 +195,7 @@ const PropertySchema = new Schema<IProperty>(
 
     status: {
       type: String,
-
       enum: ["available", "reserved", "inactive"],
-
       default: "available",
     },
 
@@ -195,9 +205,7 @@ const PropertySchema = new Schema<IProperty>(
 
     owner: {
       type: Schema.Types.ObjectId,
-
       ref: "User",
-
       default: undefined,
     },
   },

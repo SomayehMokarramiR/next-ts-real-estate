@@ -17,13 +17,6 @@ import Stepper from "./Stepper";
 
 import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
-const passenger = {
-  ageGroup: "میانسال",
-  name: "امیر محمد خیابادی",
-  gender: "مرد",
-  nationalCode: "208148****151",
-};
-
 type Props = {
   prevStep: () => void;
 };
@@ -31,7 +24,12 @@ type Props = {
 export default function SingleReserveHouse3({ prevStep }: Props) {
   const [discountCode, setDiscountCode] = useState("");
 
-  const { step, setProgress } = useReserveProgress();
+  const { step, setProgress, property, passengers, checkIn, nights } =
+    useReserveProgress();
+
+  if (!property) {
+    return <div className="p-5">در حال دریافت اطلاعات اقامتگاه...</div>;
+  }
 
   return (
     <div className="flex flex-col pb-14">
@@ -96,7 +94,7 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
                   </h3>
 
                   {[
-                    ["نام مسافر", passenger.name],
+                    ["نام مسافر", passengers[0]?.name],
                     ["هتل", "خانه نمونه"],
                     ["تاریخ ورود", "1405/05/20"],
                     ["تعداد شب", "3 شب"],
@@ -195,10 +193,19 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
                 </h3>
 
                 {[
-                  ["بازه سنی", passenger.ageGroup],
-                  ["نام و نام خانوادگی", passenger.name],
-                  ["جنسیت", passenger.gender],
-                  ["کد ملی", passenger.nationalCode],
+                  [
+                    "نام و نام خانوادگی",
+                    `${passengers[0]?.name ?? ""} ${passengers[0]?.family ?? ""}`,
+                  ],
+                  [
+                    "جنسیت",
+                    passengers[0]?.gender === "male"
+                      ? "آقا"
+                      : passengers[0]?.gender === "female"
+                        ? "خانم"
+                        : "",
+                  ],
+                  ["کد ملی", passengers[0]?.nationalId ?? ""],
                 ].map(([label, value]) => (
                   <div
                     key={label}
@@ -332,7 +339,7 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
             shrink-0
             "
           >
-            <PropertyCard />
+            {property && <PropertyCard property={property} />}
 
             <div
               className="

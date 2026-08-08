@@ -1,29 +1,40 @@
 "use client";
 
-import { useState } from "react";
 import { UserPlus, Users, Ticket } from "lucide-react";
 
 import Field from "./Field";
 import { Passenger } from "./types";
+
+type Props = {
+  passenger: Passenger;
+  index: number;
+
+  onChange: (field: keyof Passenger, value: string) => void;
+
+  onAddPassenger: () => void;
+
+  phone: string;
+  setPhone: (value: string) => void;
+
+  email: string;
+  setEmail: (value: string) => void;
+
+  onUpdateContact: () => void;
+};
 
 export default function PassengerForm({
   passenger,
   index,
   onChange,
   onAddPassenger,
-}: {
-  passenger: Passenger;
-  index: number;
-  onChange: (field: keyof Passenger, value: string) => void;
-  onAddPassenger: () => void;
-}) {
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-
+  phone,
+  setPhone,
+  email,
+  setEmail,
+  onUpdateContact,
+}: Props) {
   return (
-    <div className="mb-2 pb-6">
-      {/* عنوان مسافرهای بعدی */}
-
+    <>
       {index > 0 && (
         <div
           className="
@@ -42,8 +53,6 @@ export default function PassengerForm({
           <div className="h-px flex-1 bg-gray-100" />
         </div>
       )}
-
-      {/* اطلاعات مسافر */}
 
       <div
         className="
@@ -66,8 +75,6 @@ export default function PassengerForm({
           value={passenger.family}
           onChange={(v) => onChange("family", v)}
         />
-
-        {/* جنسیت */}
 
         <div>
           <label
@@ -124,8 +131,6 @@ export default function PassengerForm({
           onChange={(v) => onChange("birthDate", v)}
         />
 
-        {/* دکمه های مسافر */}
-
         {index === 0 && (
           <div
             className="
@@ -136,6 +141,7 @@ export default function PassengerForm({
             "
           >
             <button
+              type="button"
               onClick={onAddPassenger}
               className="
               h-[42px]
@@ -158,6 +164,7 @@ export default function PassengerForm({
             </button>
 
             <button
+              type="button"
               className="
               h-[42px]
               w-full
@@ -183,8 +190,6 @@ export default function PassengerForm({
           </div>
         )}
       </div>
-
-      {/* ارسال بلیط */}
 
       {index === 0 && (
         <div
@@ -213,13 +218,7 @@ export default function PassengerForm({
             gap-2
             "
           >
-            <Ticket
-              className="
-              w-4
-              h-4
-              text-primary500
-              "
-            />
+            <Ticket className="w-4 h-4 text-primary500" />
             ارسال بلیط به دیگران
           </h2>
 
@@ -248,6 +247,8 @@ export default function PassengerForm({
           </div>
 
           <button
+            type="button"
+            onClick={onUpdateContact}
             className="
             h-[42px]
             w-full
@@ -269,6 +270,6 @@ export default function PassengerForm({
           </button>
         </div>
       )}
-    </div>
+    </>
   );
 }

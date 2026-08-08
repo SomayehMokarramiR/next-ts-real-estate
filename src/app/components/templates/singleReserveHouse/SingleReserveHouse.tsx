@@ -1,19 +1,39 @@
 "use client";
 
+import { useEffect } from "react";
 import { ChevronLeft } from "lucide-react";
 
-import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
 
 import { useReserveProgress } from "@/app/context/ReserveProgressContext";
+import { useProperty } from "../../../../hooks/useProperties";
+import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 
 type Props = {
   onNext: () => void;
 };
 
 export default function SingleReserveHouse({ onNext }: Props) {
-  const { step, setProgress } = useReserveProgress();
+  const { step, setProgress, propertyId, setProperty } = useReserveProgress();
+
+  console.log("RESERVE PROPERTY ID:", propertyId);
+
+  const { data: property, isLoading, error } = useProperty(propertyId);
+
+  useEffect(() => {
+    if (property) {
+      setProperty(property);
+    }
+  }, [property]);
+
+  if (isLoading) {
+    return <div className="p-5">در حال دریافت اطلاعات اقامتگاه...</div>;
+  }
+
+  if (error || !property) {
+    return <div className="p-5">اطلاعات اقامتگاه پیدا نشد.</div>;
+  }
 
   return (
     <div className="flex flex-col pb-20">
@@ -99,7 +119,7 @@ export default function SingleReserveHouse({ onNext }: Props) {
                     <span className="text-gray-400">نام اقامتگاه</span>
 
                     <span className="font-medium dark:text-white">
-                      خانه نمونه
+                      {property.title}
                     </span>
                   </div>
 
@@ -130,7 +150,8 @@ export default function SingleReserveHouse({ onNext }: Props) {
                     <span className="text-gray-400">مبلغ رزرو</span>
 
                     <span className="font-bold text-primary500">
-                      11,500,000 تومان
+                      {(property.pricing?.daily ?? 0).toLocaleString("fa-IR")}{" "}
+                      تومان
                     </span>
                   </div>
                 </div>
@@ -139,25 +160,28 @@ export default function SingleReserveHouse({ onNext }: Props) {
               <button
                 type="button"
                 onClick={() => {
+                  setProperty(property);
+
                   setProgress(33.33);
+
                   onNext();
                 }}
                 className="
-                mt-6
-                w-full
-                h-11
-                flex
-                items-center
-                justify-center
-                gap-2
-                rounded-full
-                bg-primary500
-                text-white
-                text-sm
-                font-semibold
-                hover:bg-primary600
-                transition
-                "
+    mt-6
+    w-full
+    h-11
+    flex
+    items-center
+    justify-center
+    gap-2
+    rounded-full
+    bg-primary500
+    text-white
+    text-sm
+    font-semibold
+    hover:bg-primary600
+    transition
+  "
               >
                 ادامه رزرو
                 <ChevronLeft size={17} />
@@ -175,7 +199,7 @@ export default function SingleReserveHouse({ onNext }: Props) {
             shrink-0
             "
           >
-            <PropertyCard />
+            <PropertyCard property={property} />
           </div>
         </div>
       </div>

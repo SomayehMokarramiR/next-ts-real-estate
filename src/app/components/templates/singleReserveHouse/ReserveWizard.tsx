@@ -1,13 +1,24 @@
 "use client";
 
+import { useEffect } from "react";
+
 import SingleReserveHouse from "./SingleReserveHouse";
 import SingleReserveHouse2 from "./SingleReserveHouse2";
 import SingleReserveHouse3 from "./SingleReserveHouse3";
 
 import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 
-export default function ReserveWizard() {
-  const { step, setStep } = useReserveProgress();
+type Props = {
+  propertyId: string;
+};
+
+export default function ReserveWizard({ propertyId }: Props) {
+  const { step, setStep, setPropertyId } = useReserveProgress();
+
+  // ذخیره id ملک برای کل مراحل رزرو
+  useEffect(() => {
+    setPropertyId(propertyId);
+  }, [propertyId, setPropertyId]);
 
   const nextStep = () => {
     setStep((prev) => Math.min(prev + 1, 3));
@@ -18,7 +29,7 @@ export default function ReserveWizard() {
   };
 
   return (
-    <div>
+    <>
       {step === 1 && <SingleReserveHouse onNext={nextStep} />}
 
       {step === 2 && (
@@ -26,6 +37,6 @@ export default function ReserveWizard() {
       )}
 
       {step === 3 && <SingleReserveHouse3 prevStep={prevStep} />}
-    </div>
+    </>
   );
 }

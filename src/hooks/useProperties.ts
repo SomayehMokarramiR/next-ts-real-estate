@@ -1,30 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 
-export interface Filters {
-  search?: string;
-  city?: string;
-  facility?: string;
-  minPrice?: string;
-  maxPrice?: string;
-  sort?: string;
-  rating?: string;
-  type?: string;
-}
-interface Property {
+export interface Property {
   _id: string;
 
   title: string;
 
   description?: string;
 
-  type: string;
+  type: "apartment" | "villa" | "house" | "hotel" | "suite";
+
+  images: string[];
 
   location: {
     city: string;
     address: string;
   };
-
-  images: string[];
 
   facilities: {
     bedrooms: number;
@@ -37,53 +27,57 @@ interface Property {
   pricing: {
     daily: number;
     monthly?: number;
+
+    oldPrice?: number;
+
+    discount?: number;
   };
 
   rating: number;
 
   views: number;
 
-  status: string;
+  status: "available" | "reserved" | "inactive";
 }
-
-interface PropertiesResponse {
+interface PropertyResponse {
   success: boolean;
-  count: number;
-  properties: Property[];
+  property: Property;
 }
 
-async function getProperties(filters?: Filters): Promise<PropertiesResponse> {
-  const params = new URLSearchParams();
-
-  Object.entries(filters || {}).forEach(([key, value]) => {
-    if (value && value.trim() !== "") {
-      params.append(key, value);
-    }
-  });
-
-  const query = params.toString();
-
-  const url = query ? `/api/properties?${query}` : "/api/properties";
-
-  console.log("API URL ===>", url);
-
-  const res = await fetch(url);
+async function getProperty(propertyId: string): Promise<Property> {
+  const res = await fetch(`/api/properties/${propertyId}`);
 
   if (!res.ok) {
-    throw new Error("خطا در دریافت املاک");
+    throw new Error("خطا در دریافت اطلاعات ملک");
   }
 
-  const data = await res.json();
+  const data: PropertyResponse = await res.json();
 
-  return data;
+  if (!data.success || !data.property) {
+    throw new Error("اطلاعات ملک پیدا نشد");
+  }
+
+  return data.property;
 }
 
-export function useProperties(filters?: Filters) {
-  return useQuery({
-    queryKey: ["properties", filters],
+export function useProperty(propertyId?: string) {
+  return useQuery<Property, Error>({
+    queryKey: ["property", propertyId],
 
-    queryFn: () => getProperties(filters),
+    queryFn: () => getProperty(propertyId!),
 
-    staleTime: 1000 * 60 * 5,
+    enabled: !!propertyId,
+
+    // داده تا ۵ دقیقه fresh است
+    staleTime: 5 * 60 * 1000,
+
+    // داده تا ۳۰ دقیقه در Cache نگه داشته می‌شود
+    gcTime: 30 * 60 * 1000,
+
+    // جلوگیری از درخواست مجدد هنگام برگشتن به پنجره
+    refetchOnWindowFocus: false,
+
+    // تا زمانی که داده fresh است هنگام mount مجدد درخواست نمی‌زند
+    refetchOnMount: false,
   });
 }

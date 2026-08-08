@@ -15,4 +15,6 @@ export const emptyPassenger = (): Passenger => ({
   gender: "",
   nationalId: "",
   birthDate: "",
+  phone: "",
+  email: "",
 });
