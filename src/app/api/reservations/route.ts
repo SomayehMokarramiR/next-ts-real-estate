@@ -9,10 +9,21 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    const { propertyId, checkIn, checkOut, nights, contact, passengers } = body;
+    const {
+      propertyId,
+      checkIn,
+      checkOut,
+      nights,
+      contact,
+      passengers,
+      amount,
+    } = body;
 
     if (
       !propertyId ||
+      !checkIn ||
+      !checkOut ||
+      !nights ||
       !contact?.phone ||
       !contact?.email ||
       !passengers ||
@@ -43,11 +54,16 @@ export async function POST(req: Request) {
       },
 
       passengers,
+
+      amount: amount ?? 0,
+
+      status: "pending",
     });
 
     return NextResponse.json(
       {
         message: "رزرو با موفقیت ثبت شد",
+
         reservation,
       },
       {

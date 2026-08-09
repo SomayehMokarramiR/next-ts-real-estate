@@ -20,6 +20,8 @@ type Props = {
   setEmail: (value: string) => void;
 
   onUpdateContact: () => void;
+
+  contactSaved: boolean;
 };
 
 export default function PassengerForm({
@@ -32,22 +34,12 @@ export default function PassengerForm({
   email,
   setEmail,
   onUpdateContact,
+  contactSaved,
 }: Props) {
   return (
     <>
       {index > 0 && (
-        <div
-          className="
-          flex
-          items-center
-          gap-2
-          mb-4
-          mt-4
-          "
-          dir="rtl"
-        >
-          <div className="h-px flex-1 bg-gray-100" />
-
+        <div className="flex items-center gap-3 mb-4">
           <span className="text-xs text-gray-400">مسافر {index + 1}</span>
 
           <div className="h-px flex-1 bg-gray-100" />
@@ -77,16 +69,7 @@ export default function PassengerForm({
         />
 
         <div>
-          <label
-            className="
-            block
-            text-xs
-            text-gray-500
-            dark:text-white
-            mb-1.5
-            font-medium
-            "
-          >
+          <label className="block text-xs text-gray-500 dark:text-white mb-1.5 font-medium">
             جنسیت شما
           </label>
 
@@ -102,11 +85,9 @@ export default function PassengerForm({
             px-3
             py-2.5
             text-sm
-            text-gray-700
-            dark:text-gray-200
             bg-gray-50
             dark:bg-[#353535]
-            focus:outline-none
+            dark:text-white
             "
           >
             <option value="">انتخاب کنید</option>
@@ -131,67 +112,60 @@ export default function PassengerForm({
           onChange={(v) => onChange("birthDate", v)}
         />
 
-        {index === 0 && (
-          <div
+        <div
+          className="
+          grid
+          grid-cols-2
+          gap-2
+          items-end
+          "
+        >
+          <button
+            type="button"
+            onClick={onAddPassenger}
             className="
-            grid
-            grid-cols-2
-            gap-2
-            items-end
+            h-[42px]
+            w-full
+            bg-primary500
+            hover:bg-primary700
+            text-white
+            text-xs
+            rounded-full
+            flex
+            items-center
+            justify-center
+            gap-1
             "
           >
-            <button
-              type="button"
-              onClick={onAddPassenger}
-              className="
-              h-[42px]
-              w-full
-              bg-primary500
-              hover:bg-primary700
-              text-white
-              text-xs
-              font-medium
-              rounded-full
-              flex
-              items-center
-              justify-center
-              gap-1
-              whitespace-nowrap
-              "
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              افزودن مسافر
-            </button>
+            <UserPlus size={14} />
+            افزودن مسافر
+          </button>
 
-            <button
-              type="button"
-              className="
-              h-[42px]
-              w-full
-              border
-              border-gray-200
-              dark:border-[#353535]
-              dark:bg-[#353535]
-              text-gray-600
-              dark:text-gray-100
-              text-xs
-              font-medium
-              rounded-full
-              flex
-              items-center
-              justify-center
-              gap-1
-              whitespace-nowrap
-              "
-            >
-              <Users className="w-3.5 h-3.5" />
-              مسافر سابق
-            </button>
-          </div>
-        )}
+          <button
+            type="button"
+            className="
+            h-[42px]
+            w-full
+            border
+            border-gray-200
+            dark:border-[#353535]
+            rounded-full
+            text-xs
+            flex
+            items-center
+            justify-center
+            gap-1
+            dark:text-white
+            "
+          >
+            <Users size={14} />
+            مسافر سابق
+          </button>
+        </div>
       </div>
 
-      {index === 0 && (
+      {/* فقط مسافر اول و فقط تا قبل از ثبت */}
+      {index === 0 && !contactSaved && (
         <div
           className="
           bg-white
@@ -218,7 +192,7 @@ export default function PassengerForm({
             gap-2
             "
           >
-            <Ticket className="w-4 h-4 text-primary500" />
+            <Ticket size={16} className="text-primary500" />
             ارسال بلیط به دیگران
           </h2>
 
@@ -251,19 +225,12 @@ export default function PassengerForm({
             onClick={onUpdateContact}
             className="
             h-[42px]
-            w-full
-            sm:w-auto
-            px-5
+            px-6
             bg-primary500
             hover:bg-primary700
             text-white
             text-xs
-            font-medium
             rounded-full
-            flex
-            items-center
-            justify-center
-            gap-1
             "
           >
             ثبت اطلاعات

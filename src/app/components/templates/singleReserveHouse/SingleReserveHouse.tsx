@@ -162,7 +162,7 @@ export default function SingleReserveHouse({ onNext }: Props) {
                 onClick={() => {
                   setProperty(property);
 
-                  setProgress(33.33);
+                  setProgress(20);
 
                   onNext();
                 }}

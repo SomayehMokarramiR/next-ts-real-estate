@@ -1,63 +1,34 @@
 import { Check } from "lucide-react";
 import { STEPS } from "./constants";
 
-export default function Stepper({ active }: { active: number }) {
+type StepperProps = {
+  active: number;
+};
+
+export default function Stepper({ active }: StepperProps) {
   return (
-    <div className="w-full" dir="rtl">
-      <div
-        className="
-        bg-[#EDEDED]
-        dark:bg-[#353535]
-        rounded-2xl
-        p-3
-        overflow-hidden
-        "
-      >
-        <div className="flex items-center w-full">
-          {STEPS.map((step, idx) => {
-            const Icon = step.icon;
+    <div className="w-full">
+      <div className="flex w-full items-start">
+        {STEPS.map((item, idx) => {
+          const Icon = item.icon;
 
-            const isActive = step.id === active;
-            const isDone = step.id < active;
+          const isActive = item.id === active;
+          const isDone = item.id < active;
 
-            return (
-              <div
-                key={step.id}
-                className="
-                flex
-                items-center
-                flex-1
-                min-w-0
-                "
-              >
-                {/* Step */}
+          return (
+            <div key={item.id} className="flex flex-1 min-w-0 items-start">
+              <div className="flex flex-1 min-w-0 flex-col items-center">
                 <div
-                  className="
-                  flex
-                  flex-col
-                  items-center
-                  justify-center
-                  flex-1
-                  min-w-0
-                  "
-                >
-                  <div
-                    className={`
+                  className={`
                     rounded-full
                     flex
                     items-center
                     justify-center
                     shrink-0
 
-                    w-8
-                    h-8
-
-                    sm:w-9
-                    sm:h-9
-
-                    md:w-10
-                    md:h-10
-
+                    w-8 h-8
+                    sm:w-9 sm:h-9
+                    md:w-10 md:h-10
 
                     ${
                       isActive
@@ -66,54 +37,48 @@ export default function Stepper({ active }: { active: number }) {
                           ? "bg-blue-200 text-primary500"
                           : "bg-gray-100 text-gray-400"
                     }
-                    `}
-                  >
-                    {isDone ? <Check size={16} /> : <Icon size={16} />}
-                  </div>
+                  `}
+                >
+                  {isDone ? <Check size={16} /> : <Icon size={16} />}
+                </div>
 
-                  <span
-                    className={`
+                <span
+                  className={`
                     mt-2
                     text-center
                     whitespace-nowrap
 
                     text-[10px]
-
                     sm:text-xs
-
                     md:text-sm
-
-                    lg:text-[14px]
-
 
                     ${
                       isActive || isDone
                         ? "text-primary500 dark:text-white"
                         : "text-gray-400 dark:text-gray-200"
                     }
-                    `}
-                  >
-                    {step.label}
-                  </span>
-                </div>
-
-                {/* Line */}
-                {idx !== STEPS.length - 1 && (
-                  <div
-                    className={`
-                      h-[2px]
-                      flex-1
-                      mx-1
-                      sm:mx-2
-
-                      ${step.id < active ? "bg-blue-300" : "bg-gray-300"}
-                      `}
-                  />
-                )}
+                  `}
+                >
+                  {item.label}
+                </span>
               </div>
-            );
-          })}
-        </div>
+
+              {idx !== STEPS.length - 1 && (
+                <div
+                  className={`
+                    h-[2px]
+                    flex-1
+                    mt-4
+                    mx-1
+                    sm:mx-2
+
+                    ${item.id < active ? "bg-blue-300" : "bg-gray-300"}
+                  `}
+                />
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

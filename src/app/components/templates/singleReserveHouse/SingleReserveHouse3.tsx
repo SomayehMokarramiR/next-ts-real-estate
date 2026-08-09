@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Passenger } from "./types";
 
 import {
   Phone,
@@ -16,16 +17,127 @@ import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
 
 import { useReserveProgress } from "@/app/context/ReserveProgressContext";
+import EditPassengers from "./EditPassengers";
+import { useCreateReservation } from "@/hooks/useCreateReservation";
+import Swal from "sweetalert2";
 
 type Props = {
   prevStep: () => void;
+  nextStep: () => void;
 };
 
-export default function SingleReserveHouse3({ prevStep }: Props) {
+export default function SingleReserveHouse3({ prevStep, nextStep }: Props) {
   const [discountCode, setDiscountCode] = useState("");
 
-  const { step, setProgress, property, passengers, checkIn, nights } =
-    useReserveProgress();
+  const {
+    setReservationId,
+    step,
+    setProgress,
+
+    property,
+    propertyId,
+
+    passengers,
+    setPassengers,
+
+    checkIn,
+    checkOut,
+
+    nights,
+
+    phone,
+    email,
+  } = useReserveProgress();
+
+  const [editPassengers, setEditPassengers] = useState(false);
+  const createReservationMutation = useCreateReservation();
+
+  const handlePayment = () => {
+    console.log("HANDLE PAYMENT START");
+
+    const reservationPassengers = passengers
+      .filter(
+        (p) => p.name && p.family && p.gender && p.nationalId && p.birthDate,
+      )
+      .map((p) => ({
+        name: p.name,
+        family: p.family,
+        gender: p.gender as "male" | "female",
+        nationalId: p.nationalId,
+        birthDate: p.birthDate,
+      }));
+
+    console.log("PAYLOAD", {
+      propertyId: property?._id,
+      checkIn,
+      checkOut,
+      nights,
+      phone,
+      email,
+      passengers: reservationPassengers,
+      amount: (property?.pricing?.daily ?? 0) * nights,
+    });
+
+    createReservationMutation.mutate(
+      {
+        propertyId: property?._id as string,
+        checkIn,
+        checkOut,
+        nights,
+
+        contact: {
+          phone,
+          email,
+        },
+
+        passengers: reservationPassengers,
+
+        amount: (property?.pricing?.daily ?? 0) * nights,
+      },
+      {
+        onSuccess: (data) => {
+          console.log("SUCCESS", data);
+
+          setReservationId(data.reservation._id);
+
+          setProgress(80);
+
+          nextStep();
+        },
+
+        onError: (error) => {
+          console.log("ERROR", error);
+
+          Swal.fire({
+            icon: "error",
+            title: "خطا",
+            text: error.message,
+          });
+        },
+      },
+    );
+  };
+
+  const updatePassenger = (
+    index: number,
+    field: keyof Passenger,
+    value: string,
+  ) => {
+    setPassengers((prev) =>
+      prev.map((passenger, i) =>
+        i === index
+          ? {
+              ...passenger,
+              [field]: value,
+            }
+          : passenger,
+      ),
+    );
+  };
+
+  const validPassengers = passengers.filter(
+    (p) => p.name && p.family && p.gender && p.nationalId && p.birthDate,
+  );
 
   if (!property) {
     return <div className="p-5">در حال دریافت اطلاعات اقامتگاه...</div>;
@@ -94,10 +206,11 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
                   </h3>
 
                   {[
-                    ["نام مسافر", passengers[0]?.name],
-                    ["هتل", "خانه نمونه"],
-                    ["تاریخ ورود", "1405/05/20"],
-                    ["تعداد شب", "3 شب"],
+                    ["نام مسافر", `${validPassengers.length} نفر`],
+                    ["اقامتگاه", property.title],
+                    ["تاریخ ورود", checkIn],
+                    ["تاریخ خروج", checkOut],
+                    ["تعداد شب", `${nights} شب`],
                   ].map(([label, value]) => (
                     <div
                       key={label}
@@ -171,75 +284,104 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
 
               {/* PASSENGER */}
 
-              <div
-                className="
-                mt-5
-                bg-[#F0F0F3]
-                dark:bg-[#353535]
-                rounded-2xl
-                p-5
-                "
-              >
-                <h3
+              {editPassengers ? (
+                <EditPassengers
+                  passengers={passengers}
+                  setPassengers={setPassengers}
+                  onChange={updatePassenger}
+                  onSave={() => {
+                    setEditPassengers(false);
+                  }}
+                />
+              ) : (
+                <div
                   className="
-                  text-center
-                  font-bold
-                  dark:text-white
-                  border-b
-                  pb-3
-                  "
+    mt-5
+    bg-[#F0F0F3]
+    dark:bg-[#353535]
+    rounded-2xl
+    p-5
+    "
                 >
-                  مشخصات مسافران
-                </h3>
-
-                {[
-                  [
-                    "نام و نام خانوادگی",
-                    `${passengers[0]?.name ?? ""} ${passengers[0]?.family ?? ""}`,
-                  ],
-                  [
-                    "جنسیت",
-                    passengers[0]?.gender === "male"
-                      ? "آقا"
-                      : passengers[0]?.gender === "female"
-                        ? "خانم"
-                        : "",
-                  ],
-                  ["کد ملی", passengers[0]?.nationalId ?? ""],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
+                  <h3
                     className="
-                    flex
-                    justify-between
-                    mt-4
-                    text-sm
-                    "
+      text-center
+      font-bold
+      dark:text-white
+      border-b
+      pb-3
+      "
                   >
-                    <span className="text-gray-400">{label}</span>
+                    مشخصات مسافران
+                  </h3>
 
-                    <span className="dark:text-white">{value}</span>
-                  </div>
-                ))}
+                  {passengers.map((passenger, index) => (
+                    <div key={index} className="mt-4">
+                      <h3 className="font-bold text-sm mb-3 dark:text-white">
+                        مسافر {index + 1}
+                      </h3>
 
-                <button
-                  className="
-                  mt-5
-                  w-full
-                  py-2.5
-                  rounded-full
-                  bg-primary500
-                  text-white
-                  flex
-                  justify-center
-                  items-center
-                  gap-2
-                  "
-                >
-                  <Edit2 size={14} />
-                  ویرایش مسافران
-                </button>
-              </div>
+                      {(
+                        [
+                          [
+                            "نام و نام خانوادگی",
+                            `${passenger.name} ${passenger.family}`,
+                          ],
+
+                          [
+                            "جنسیت",
+                            passenger.gender === "male" ? "آقا" : "خانم",
+                          ],
+
+                          ["کد ملی", passenger.nationalId],
+
+                          ["تاریخ تولد", passenger.birthDate],
+                        ] as [string, string][]
+                      ).map(([label, value]) => (
+                        <div
+                          key={label}
+                          className="
+            flex
+            justify-between
+            text-sm
+            py-2
+            "
+                        >
+                          <span className="text-gray-500 dark:text-gray-300">
+                            {label}
+                          </span>
+
+                          <span className="font-medium dark:text-white">
+                            {value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditPassengers(true);
+                    }}
+                    className="
+      mt-5
+      w-full
+      py-2.5
+      rounded-full
+      bg-primary500
+      text-white
+      flex
+      justify-center
+      items-center
+      gap-2
+      "
+                  >
+                    <Edit2 size={14} />
+                    ویرایش مسافران
+                  </button>
+                </div>
+              )}
 
               {/* CONTACT */}
 
@@ -256,77 +398,71 @@ export default function SingleReserveHouse3({ prevStep }: Props) {
                 >
                   <span className="flex items-center gap-2">
                     <Phone size={15} />
-                    09229167194
+                    {phone}
                   </span>
 
                   <span className="flex items-center gap-2">
                     <Mail size={15} />
-                    example@gmail.com
+                    {email}
                   </span>
                 </div>
               </div>
 
               {/* BUTTONS */}
 
-              <div
-                className="
-                mt-6
-                flex
-                flex-col
-                sm:flex-row
-                gap-3
-                "
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProgress(66.66);
-
-                    prevStep();
-                  }}
+              {!editPassengers && (
+                <div
                   className="
-                  w-full
-                  sm:w-1/2
-                  h-11
-                  rounded-full
-                  border
-                  border-gray-300
-                  dark:border-[#555]
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  text-sm
-                  dark:text-white
-                  "
+    mt-6
+    flex
+    flex-col
+    sm:flex-row
+    gap-3
+    "
                 >
-                  <ChevronRight size={16} />
-                  مرحله قبل
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setProgress(40);
+                      prevStep();
+                    }}
+                    className="
+      w-full
+      sm:w-1/2
+      h-11
+      rounded-full
+      border
+      border-gray-300
+      dark:border-[#555]
+      flex
+      items-center
+      justify-center
+      gap-2
+      text-sm
+      dark:text-white
+      "
+                  >
+                    مرحله قبل
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setProgress(100);
-                  }}
-                  className="
-                  w-full
-                  sm:w-1/2
-                  h-11
-                  rounded-full
-                  bg-primary500
-                  text-white
-                  flex
-                  items-center
-                  justify-center
-                  gap-2
-                  text-sm
-                  "
-                >
-                  تایید و پرداخت
-                  <ChevronLeft size={16} />
-                </button>
-              </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handlePayment();
+                    }}
+                    className="
+    w-full
+    sm:w-1/2
+    h-11
+    rounded-full
+    bg-primary500
+    text-white
+  "
+                  >
+                    تایید و پرداخت
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 

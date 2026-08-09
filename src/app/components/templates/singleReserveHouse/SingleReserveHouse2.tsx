@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Users, ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
@@ -9,6 +10,8 @@ import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 import PassengerForm from "./PassengerForm";
 import { Passenger } from "./types";
 import { emptyPassenger } from "./constants";
+import { validatePassenger } from "@/validators/passengerValidator";
+import { validateContact } from "@/validators/contactValidator";
 
 import Swal from "sweetalert2";
 
@@ -33,6 +36,9 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
     setEmail,
   } = useReserveProgress();
 
+  const [activePassenger, setActivePassenger] = useState(0);
+  const [contactSaved, setContactSaved] = useState(false);
+
   const updatePassenger = (
     idx: number,
     field: keyof Passenger,
@@ -52,19 +58,25 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
 
   // ثبت مسافر
   const addPassenger = async () => {
-    const passenger = passengers[passengers.length - 1];
+    const passenger = passengers[activePassenger];
 
-    if (
-      !passenger.name ||
-      !passenger.family ||
-      !passenger.gender ||
-      !passenger.nationalId ||
-      !passenger.birthDate
-    ) {
+    const error = validatePassenger(passenger);
+
+    if (error) {
       await Swal.fire({
         icon: "warning",
         title: "اطلاعات ناقص",
-        text: "لطفاً اطلاعات مسافر را کامل کنید",
+        text: error,
+      });
+
+      return;
+    }
+
+    if (!contactSaved) {
+      await Swal.fire({
+        icon: "warning",
+        title: "ثبت اطلاعات تماس",
+        text: "ابتدا تلفن و ایمیل را ثبت کنید",
       });
 
       return;
@@ -73,16 +85,9 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
     setPassengers((prev) => {
       const updated = [...prev, emptyPassenger()];
 
-      console.log("PASSENGERS:", updated);
+      setActivePassenger(updated.length - 1);
 
       return updated;
-    });
-
-    await Swal.fire({
-      icon: "success",
-      title: "مسافر اضافه شد",
-      timer: 1000,
-      showConfirmButton: false,
     });
   };
 
@@ -98,34 +103,57 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
       return;
     }
 
+    setContactSaved(true);
+
     await Swal.fire({
       icon: "success",
       title: "اطلاعات تماس ذخیره شد",
       timer: 1200,
       showConfirmButton: false,
     });
-
-    // فقط فیلدهای تماس پاک شوند
-    setPhone("");
-    setEmail("");
   };
 
-  const handleNext = () => {
-    const firstPassenger = passengers[0];
+  const handleNext = async () => {
+    // حذف فرم خالی آخر
+    const cleanedPassengers = passengers.filter((passenger) => {
+      return (
+        passenger.name ||
+        passenger.family ||
+        passenger.gender ||
+        passenger.nationalId ||
+        passenger.birthDate
+      );
+    });
 
-    if (
-      !firstPassenger.name ||
-      !firstPassenger.family ||
-      !firstPassenger.nationalId ||
-      !firstPassenger.gender
-    ) {
-      alert("لطفا اطلاعات مسافر اول را کامل کنید");
+    // حداقل یک مسافر باید باشد
+    if (cleanedPassengers.length === 0) {
+      await Swal.fire({
+        icon: "warning",
+        title: "اطلاعات ناقص",
+        text: "حداقل یک مسافر کامل ثبت کنید",
+      });
 
       return;
     }
 
-    setProgress(66.66);
+    // اعتبارسنجی مسافرهای وارد شده
+    for (const passenger of cleanedPassengers) {
+      const error = validatePassenger(passenger);
 
+      if (error) {
+        await Swal.fire({
+          icon: "warning",
+          title: "اطلاعات ناقص",
+          text: error,
+        });
+
+        return;
+      }
+    }
+
+    setPassengers(cleanedPassengers);
+
+    setProgress(60);
     nextStep();
   };
 
@@ -187,15 +215,18 @@ gap-2
             </h2>
 
             <PassengerForm
-              index={0}
-              passenger={passengers[0]}
+              index={activePassenger}
+              passenger={passengers[activePassenger] ?? emptyPassenger()}
               onAddPassenger={addPassenger}
-              onChange={(field, value) => updatePassenger(0, field, value)}
+              onChange={(field, value) =>
+                updatePassenger(activePassenger, field, value)
+              }
               phone={phone}
               setPhone={setPhone}
               email={email}
               setEmail={setEmail}
               onUpdateContact={updateContact}
+              contactSaved={contactSaved}
             />
 
             <div
@@ -208,7 +239,7 @@ gap-3
               <button
                 type="button"
                 onClick={() => {
-                  setProgress(33.33);
+                  setProgress(20);
 
                   prevStep();
                 }}
@@ -236,25 +267,25 @@ dark:text-white
                 type="button"
                 onClick={handleNext}
                 className="
-flex-1
-h-11
-rounded-full
-bg-primary500
-text-white
-font-semibold
-text-xs
-min-[410px]:text-sm
-flex
-items-center
-justify-center
-gap-1
-"
+      flex-1
+      h-11
+      rounded-full
+      bg-primary500
+      text-white
+      font-semibold
+      text-xs
+      min-[410px]:text-sm
+      flex
+      items-center
+      justify-center
+      gap-1
+    "
               >
+                <span className="inline min-[410px]:hidden">ادامه</span>
+
                 <span className="hidden min-[410px]:inline">
                   تایید و ادامه فرآیند
                 </span>
-
-                <span className="inline min-[410px]:hidden">ادامه</span>
 
                 <ChevronLeft size={16} />
               </button>
