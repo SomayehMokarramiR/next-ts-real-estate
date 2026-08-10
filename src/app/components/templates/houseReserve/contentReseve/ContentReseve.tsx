@@ -65,7 +65,7 @@ export default function ContentReseve({ filters = {} }: Props) {
 
   const { data, isLoading, error } = useProperties(filters);
 
-  const apiProperties: Property[] = data?.properties || [];
+  const apiProperties: Property[] = data ?? [];
 
   const activeProp = apiProperties.find((item) => item._id === activePin);
 

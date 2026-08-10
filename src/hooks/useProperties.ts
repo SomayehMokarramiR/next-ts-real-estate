@@ -2,9 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export interface Property {
   _id: string;
-
   title: string;
-
   description?: string;
 
   type: "apartment" | "villa" | "house" | "hotel" | "suite";
@@ -27,57 +25,58 @@ export interface Property {
   pricing: {
     daily: number;
     monthly?: number;
-
     oldPrice?: number;
-
     discount?: number;
   };
 
   rating: number;
-
   views: number;
 
   status: "available" | "reserved" | "inactive";
-}
-interface PropertyResponse {
-  success: boolean;
-  property: Property;
+
+  mapPosition?: {
+    top?: string;
+    left?: string;
+  };
 }
 
-async function getProperty(propertyId: string): Promise<Property> {
-  const res = await fetch(`/api/properties/${propertyId}`);
+interface PropertiesResponse {
+  success: boolean;
+  properties: Property[];
+}
+
+async function getProperties(
+  filters: Record<string, string> = {},
+): Promise<Property[]> {
+  const params = new URLSearchParams(filters);
+
+  const res = await fetch(`/api/properties?${params.toString()}`);
 
   if (!res.ok) {
-    throw new Error("خطا در دریافت اطلاعات ملک");
+    throw new Error("خطا در دریافت اطلاعات املاک");
   }
 
-  const data: PropertyResponse = await res.json();
+  const data: PropertiesResponse = await res.json();
 
-  if (!data.success || !data.property) {
-    throw new Error("اطلاعات ملک پیدا نشد");
+  if (!data.success || !data.properties) {
+    throw new Error("اطلاعات املاک پیدا نشد");
   }
 
-  return data.property;
+  return data.properties;
 }
 
-export function useProperty(propertyId?: string) {
-  return useQuery<Property, Error>({
-    queryKey: ["property", propertyId],
+export function useProperties(filters: Record<string, string> = {}) {
+  return useQuery<Property[], Error>({
+    queryKey: ["properties", filters],
 
-    queryFn: () => getProperty(propertyId!),
+    queryFn: () => getProperties(filters),
 
-    enabled: !!propertyId,
-
-    // داده تا ۵ دقیقه fresh است
     staleTime: 5 * 60 * 1000,
 
-    // داده تا ۳۰ دقیقه در Cache نگه داشته می‌شود
     gcTime: 30 * 60 * 1000,
 
-    // جلوگیری از درخواست مجدد هنگام برگشتن به پنجره
     refetchOnWindowFocus: false,
 
-    // تا زمانی که داده fresh است هنگام mount مجدد درخواست نمی‌زند
     refetchOnMount: false,
   });
 }
