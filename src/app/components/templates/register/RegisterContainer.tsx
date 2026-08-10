@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import { User } from "lucide-react";
 import Logo from "../../modules/logo/Logo";
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 
 const HOUSE_IMAGES = [
-  "https://images.unsplash.com/photo-1721815693498-cc28507c0ba2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
-  "https://images.unsplash.com/photo-1628012209120-d9db7abf7eab?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
-  "https://images.unsplash.com/photo-1722421492323-eaf9c401befe?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080",
+  "/images/photo-1.jpg",
+  "/images/photo-2.jpg",
+  "/images/photo-3.jpg",
 ];
 
 export default function RegisterLayout({
@@ -201,18 +202,19 @@ export default function RegisterLayout({
           md:min-h-[520px]
           "
         >
-          <img
+          <Image
             src={HOUSE_IMAGES[activeSlide]}
             alt="house"
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 60vw"
             className="
-            absolute
-            inset-0
-            w-full
-            h-full
-            object-cover
-            transition-opacity
-            duration-700
-            "
+    absolute
+    inset-0
+    object-cover
+    transition-opacity
+    duration-700
+  "
           />
 
           <div
