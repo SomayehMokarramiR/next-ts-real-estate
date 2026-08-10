@@ -39,6 +39,8 @@ export async function GET(request: NextRequest) {
 
     const search = searchParams.get("search")?.trim();
     const city = searchParams.get("city")?.trim();
+    const guests = searchParams.get("guests")?.trim();
+    const type = searchParams.get("type")?.trim();
 
     const facility = searchParams.get("facility")?.trim();
 
@@ -62,14 +64,12 @@ export async function GET(request: NextRequest) {
             $options: "i",
           },
         },
-
         {
           "location.city": {
             $regex: search,
             $options: "i",
           },
         },
-
         {
           "location.address": {
             $regex: search,
@@ -88,6 +88,28 @@ export async function GET(request: NextRequest) {
         $regex: city,
         $options: "i",
       };
+    }
+
+    // =========================
+    // TYPE
+    // =========================
+
+    if (type) {
+      filter.type = type as IProperty["type"];
+    }
+
+    // =========================
+    // GUESTS / CAPACITY
+    // =========================
+
+    if (guests) {
+      const capacity = Number(guests);
+
+      if (!Number.isNaN(capacity)) {
+        filter["facilities.capacity"] = {
+          $gte: capacity,
+        };
+      }
     }
 
     // =========================
@@ -171,15 +193,21 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    console.log("FINAL FILTER ===>", JSON.stringify(filter, null, 2));
+    // =========================
+    // DEBUG
+    // =========================
 
-    console.log("SORT ===>", sortQuery);
+    console.log("FINAL FILTER ===>", JSON.stringify(filter, null, 2));
 
     const properties = await Property.find(filter)
       .populate("owner", "name email")
       .sort(sortQuery);
 
     console.log("RESULT COUNT ===>", properties.length);
+
+    // =========================
+    // NORMALIZE RESPONSE
+    // =========================
 
     const fixedProperties = properties.map((property) => {
       const data = property.toObject();

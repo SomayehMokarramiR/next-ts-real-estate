@@ -1,17 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
 import Image from "next/image";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { validateSearchHome } from "@/validators/searchHomeValidator";
+import Swal from "sweetalert2";
+
+import {
+  setDestination,
+  setCheckIn,
+  setCheckOut,
+  setGuests,
+  setType,
+} from "@/store/slices/searchPropertiesSlice";
+import { useRouter } from "next/navigation";
 
 type Tab = "buy" | "rent" | "selling";
 
 export default function HeroSection() {
-  const [activeTab, setActiveTab] = useState<Tab>("buy");
-  const [destination, setDestination] = useState("");
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
-  const [guests, setGuests] = useState("");
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
+  const { destination, checkIn, checkOut, guests, type } = useAppSelector(
+    (state) => state.searchProperties,
+  );
 
   const tabActive = "bg-white dark:bg-[#272727] text-gray-800 dark:text-white";
 
@@ -62,7 +74,7 @@ export default function HeroSection() {
                 "
               >
                 <button
-                  onClick={() => setActiveTab("buy")}
+                  onClick={() => dispatch(setType("buy"))}
                   className={`
                   rounded-t-xl
                   font-semibold
@@ -81,14 +93,14 @@ export default function HeroSection() {
                   max-[404px]:text-[10px]
                   sm:text-sm
 
-                  ${activeTab === "buy" ? tabActive : tabInactive}
+                   ${type === "buy" ? tabActive : tabInactive}
                   `}
                 >
                   خرید ملک
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("rent")}
+                  onClick={() => dispatch(setType("rent"))}
                   className={`
                   rounded-t-xl
                   font-semibold
@@ -107,14 +119,14 @@ export default function HeroSection() {
                   max-[404px]:text-[10px]
                   sm:text-sm
 
-                 ${activeTab === "rent" ? tabActive : tabInactive}
+                   ${type === "rent" ? tabActive : tabInactive}
                   `}
                 >
                   رهن و اجاره
                 </button>
 
                 <button
-                  onClick={() => setActiveTab("selling")}
+                  onClick={() => dispatch(setType("selling"))}
                   className={`
                   rounded-t-xl
                   font-semibold
@@ -133,7 +145,7 @@ export default function HeroSection() {
                   max-[404px]:text-[10px]
                   sm:text-sm
 
-                  ${activeTab === "selling" ? tabActive : tabInactive}
+                    ${type === "selling" ? tabActive : tabInactive}
                   `}
                 >
                   خرید و فروش
@@ -181,7 +193,9 @@ export default function HeroSection() {
                         type="text"
                         placeholder="استان، شهر، فاصله..."
                         value={destination}
-                        onChange={(e) => setDestination(e.target.value)}
+                        onChange={(e) =>
+                          dispatch(setDestination(e.target.value))
+                        }
                         className="
                         w-full
                         text-sm
@@ -216,7 +230,7 @@ dark:placeholder:text-gray-500
                         type="text"
                         placeholder="وارد کنید..."
                         value={checkIn}
-                        onChange={(e) => setCheckIn(e.target.value)}
+                        onChange={(e) => dispatch(setCheckIn(e.target.value))}
                         className="
       w-full
       text-sm
@@ -252,7 +266,7 @@ dark:placeholder:text-gray-500
                         type="text"
                         placeholder="وارد کنید..."
                         value={checkOut}
-                        onChange={(e) => setCheckOut(e.target.value)}
+                        onChange={(e) => dispatch(setCheckOut(e.target.value))}
                         className="
       w-full
       text-sm
@@ -288,16 +302,8 @@ dark:placeholder:text-gray-500
                         type="text"
                         placeholder="وارد کنید..."
                         value={guests}
-                        onChange={(e) => setGuests(e.target.value)}
-                        className="
-      w-full
-      text-sm
-     text-foreground
-placeholder:text-gray-400
-dark:placeholder:text-gray-500
-      bg-transparent
-      focus:outline-none
-      "
+                        onChange={(e) => dispatch(setGuests(e.target.value))}
+                        className="w-full text-sm text-foreground placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent focus:outline-none"
                       />
 
                       <ChevronDown
@@ -307,26 +313,80 @@ dark:placeholder:text-gray-500
                     </div>
                   </div>
                   {/* Search Button */}
-                  <div className="lg:col-span-1 px-5 py-4 flex items-center">
+                  <div className="flex items-center px-5 py-4">
                     <button
+                      onClick={() => {
+                        console.log({
+                          destination,
+                          checkIn,
+                          checkOut,
+                          guests,
+                          type,
+                        });
+
+                        const validation = validateSearchHome({
+                          destination,
+                          checkIn,
+                          checkOut,
+                          guests,
+                        });
+
+                        if (!validation.valid) {
+                          Swal.fire({
+                            icon: "warning",
+                            title: "اطلاعات ناقص",
+                            text: "لطفاً مقصد، تاریخ ورود، تاریخ خروج و تعداد نفرات را کامل کنید",
+                            confirmButtonText: "باشه",
+                            confirmButtonColor: "#00A86B",
+                            customClass: {
+                              popup: "rtl",
+                            },
+                          });
+
+                          return;
+                        }
+
+                        const params = new URLSearchParams();
+
+                        if (destination.trim()) {
+                          params.set("destination", destination.trim());
+                        }
+
+                        if (checkIn.trim()) {
+                          params.set("checkIn", checkIn.trim());
+                        }
+
+                        if (checkOut.trim()) {
+                          params.set("checkOut", checkOut.trim());
+                        }
+
+                        if (guests.trim()) {
+                          params.set("guests", guests.trim());
+                        }
+
+                        params.set("type", type);
+
+                        router.push(`/properties?${params.toString()}`);
+                      }}
+                      type="button"
                       className="
-    w-full
-    flex
-    items-center
-    justify-center
-    gap-2
-    bg-primary500
-    hover:bg-primary600
-    text-white
-    text-sm
-    font-bold
-    py-3
-    px-6
-    rounded-xl
-    transition-colors
-    shadow-md
-    shadow-primary500/30
-    "
+                    flex
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-xl
+                    bg-primary500
+                    px-6
+                    py-3
+                    text-sm
+                    font-bold
+                    text-white
+                    shadow-md
+                    shadow-primary500/30
+                    transition-colors
+                    hover:bg-primary600
+                  "
                     >
                       <Search size={16} strokeWidth={2.5} />
                       جستجو کن
