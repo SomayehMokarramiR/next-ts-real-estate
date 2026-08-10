@@ -16,6 +16,7 @@ export default async function PropertiesPage({ searchParams }: Props) {
   const filters = {
     city: params.destination || "",
     guests: params.guests || "",
+    type: params.type || "",
   };
 
   return <ContentReseve filters={filters} />;

@@ -12,6 +12,7 @@ import { IProperty } from "@/app/models/Property";
 function normalizeImageUrl(image: string) {
   if (!image) return image;
 
+  // اگر اشتباهی JSON string ذخیره شده باشد
   if (image.startsWith("[")) {
     try {
       const parsed = JSON.parse(image);
@@ -52,10 +53,7 @@ export async function GET(request: NextRequest) {
 
     const filter: FilterQuery<IProperty> = {};
 
-    // =========================
     // SEARCH
-    // =========================
-
     if (search) {
       filter.$or = [
         {
@@ -79,10 +77,7 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    // =========================
     // CITY
-    // =========================
-
     if (city) {
       filter["location.city"] = {
         $regex: city,
@@ -90,18 +85,12 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // =========================
     // TYPE
-    // =========================
-
     if (type) {
       filter.type = type as IProperty["type"];
     }
 
-    // =========================
-    // GUESTS / CAPACITY
-    // =========================
-
+    // GUESTS
     if (guests) {
       const capacity = Number(guests);
 
@@ -112,38 +101,25 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // =========================
     // PRICE
-    // =========================
-
     const priceFilter: {
       $gte?: number;
       $lte?: number;
     } = {};
 
     if (minPrice) {
-      const min = Number(minPrice);
-
-      if (!Number.isNaN(min)) {
-        priceFilter.$gte = min;
-      }
+      priceFilter.$gte = Number(minPrice);
     }
 
     if (maxPrice) {
-      const max = Number(maxPrice);
-
-      if (!Number.isNaN(max)) {
-        priceFilter.$lte = max;
-      }
+      priceFilter.$lte = Number(maxPrice);
     }
 
     if (Object.keys(priceFilter).length) {
       filter["pricing.daily"] = priceFilter;
     }
 
-    // =========================
-    // FACILITY
-    // =========================
+    // FACILITIES
 
     if (facility === "استخر") {
       filter["facilities.pool"] = true;
@@ -153,9 +129,7 @@ export async function GET(request: NextRequest) {
       filter["facilities.parking"] = true;
     }
 
-    // =========================
     // RATING
-    // =========================
 
     if (rating) {
       const rate = Number(rating.replace("ستاره", "").trim());
@@ -167,9 +141,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // =========================
     // SORT
-    // =========================
 
     let sortQuery: Record<string, 1 | -1> = {
       createdAt: -1,
@@ -193,31 +165,15 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // =========================
-    // DEBUG
-    // =========================
-
     console.log("FINAL FILTER ===>", JSON.stringify(filter, null, 2));
 
-    const properties = await Property.find(filter)
-      .populate("owner", "name email")
-      .sort(sortQuery);
+    const properties = await Property.find(filter).sort(sortQuery).lean();
 
-    console.log("RESULT COUNT ===>", properties.length);
+    const fixedProperties = properties.map((property) => ({
+      ...property,
 
-    // =========================
-    // NORMALIZE RESPONSE
-    // =========================
-
-    const fixedProperties = properties.map((property) => {
-      const data = property.toObject();
-
-      if (Array.isArray(data.images)) {
-        data.images = data.images.map((img: string) => normalizeImageUrl(img));
-      }
-
-      return data;
-    });
+      images: property.images?.map((img) => normalizeImageUrl(img)),
+    }));
 
     return NextResponse.json(
       {
