@@ -30,9 +30,8 @@ export interface IProperty extends Document {
     daily: number;
     monthly?: number;
 
-    // تخفیف
+    // قیمت قبل از تخفیف
     oldPrice?: number;
-    discount?: number;
   };
 
   rating: number;
@@ -51,7 +50,7 @@ export interface IProperty extends Document {
 // SCHEMA
 // =========================
 
-const PropertySchema = new Schema(
+const PropertySchema = new Schema<IProperty>(
   {
     // =========================
     // BASIC
@@ -159,13 +158,6 @@ const PropertySchema = new Schema(
         type: Number,
         min: 0,
       },
-
-      // درصد تخفیف
-      discount: {
-        type: Number,
-        min: 0,
-        max: 100,
-      },
     },
 
     // =========================
@@ -219,24 +211,20 @@ const PropertySchema = new Schema(
 // INDEXES
 // =========================
 
-// سرچ سریع
 PropertySchema.index({
   title: "text",
   "location.city": "text",
   "location.address": "text",
 });
 
-// مرتب سازی محبوب ترین
 PropertySchema.index({
   views: -1,
 });
 
-// مرتب سازی ارزان ترین
 PropertySchema.index({
   "pricing.daily": 1,
 });
 
-// فیلتر شهر
 PropertySchema.index({
   "location.city": 1,
 });

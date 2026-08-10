@@ -1,96 +1,216 @@
-import { Bath, Bed, Car, MapPin, Star, Users } from "lucide-react";
-import { OFFERS } from "./constants";
+"use client";
 
-export default function OfferCard({ offer }: { offer: (typeof OFFERS)[0] }) {
-  const fmt = (n: number) => n.toLocaleString("fa-IR");
+import { Bath, Bed, Car, MapPin, Star, Users } from "lucide-react";
+import Link from "next/link";
+
+type Offer = {
+  _id: string;
+  title: string;
+
+  location:
+    | {
+        city?: string;
+        address?: string;
+      }
+    | string;
+
+  images?: string[];
+  img?: string;
+
+  rating: number;
+
+  pricing?: {
+    daily: number;
+    oldPrice?: number;
+    discount?: number;
+  };
+
+  price?: number;
+
+  facilities?: {
+    bedrooms?: number;
+    bathrooms?: number;
+    parking?: boolean;
+    capacity?: number;
+    pool?: boolean;
+  };
+};
+
+export default function OfferCard({ offer }: { offer: Offer }) {
+  const fmt = (n: number = 0) => n.toLocaleString("fa-IR");
 
   return (
-    <div className="bg-white dark:bg-[#272727] rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden flex flex-col">
+    <Link
+      href={`/properties/${offer._id}`}
+      className="
+      group
+      bg-white
+      dark:bg-[#1f1f1f]
+      rounded-2xl
+      overflow-hidden
+      shadow-sm
+      hover:shadow-xl
+      transition
+      flex
+      flex-col
+      "
+    >
       {/* Image */}
-      <div className="relative h-52 bg-gray-200 shrink-0">
+      <div className="relative h-56 overflow-hidden">
         <img
-          src={offer.img}
+          src={offer.images?.[0] || offer.img || "/images/placeholder.jpg"}
           alt={offer.title}
-          className="w-full h-full object-cover"
+          className="
+          w-full
+          h-full
+          object-cover
+          group-hover:scale-105
+          transition
+          duration-300
+          "
         />
 
-        {/* Discount badge — top right */}
-        <div className="absolute top-3 right-3 bg-red-500 text-white  text-xs font-bold px-2.5 py-1 rounded-full shadow">
-          %{offer.discount}
+        {/* Discount */}
+        <div
+          className="
+          absolute
+          top-3
+          right-3
+          bg-red-500
+          text-white
+          text-xs
+          font-bold
+          px-2.5
+          py-1
+          rounded-full
+        "
+        >
+          %{offer.pricing?.discount ?? 0}
         </div>
 
-        {/* Rating badge — next to discount */}
-        <div className="absolute top-3 right-14  bg-primary600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow">
+        {/* Rating */}
+        <div
+          className="
+          absolute
+          top-3
+          right-14
+          bg-primary600
+          text-white
+          text-xs
+          font-bold
+          px-2.5
+          py-1
+          rounded-full
+          flex
+          items-center
+          gap-1
+        "
+        >
           <Star size={11} fill="white" strokeWidth={0} />
           {offer.rating}
         </div>
 
-        {/* Location overlay */}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent px-3 py-3">
-          <div className="flex items-center gap-1.5 justify-end">
-            <span className="text-white text-xs leading-relaxed line-clamp-1">
-              {offer.location}
+        {/* Location */}
+        <div
+          className="
+          absolute
+          bottom-0
+          left-0
+          right-0
+          bg-gradient-to-t
+          from-black/70
+          to-transparent
+          px-3
+          py-3
+        "
+        >
+          <div className="flex items-center justify-end gap-1.5">
+            <span className="text-white text-xs line-clamp-1">
+              {typeof offer.location === "string"
+                ? offer.location
+                : `${offer.location.city ?? ""} ${offer.location.address ?? ""}`}
             </span>
-            <MapPin size={13} className="text-white shrink-0" />
+
+            <MapPin size={13} className="text-white" />
           </div>
         </div>
       </div>
 
       {/* Body */}
-      <div className="p-4 flex flex-col gap-3 flex-1">
-        {/* Title */}
-        <h3 className="text-gray-900 dark:text-white text-base font-bold text-right leading-snug">
+      <div className="p-4 flex flex-col gap-3">
+        <h3
+          className="
+        text-gray-900
+        dark:text-white
+        text-base
+        font-bold
+        text-right
+        "
+        >
           {offer.title}
         </h3>
 
-        {/* Features row */}
-        <div className="flex items-center justify-end gap-4 text-gray-500 dark:text-white text-xs border-t border-gray-100 pt-3">
-          <span className="flex items-center gap-1">
-            <span>{offer.parking} پارکینگ</span>
-            <Car size={14} className="text-gray-400" />
+        {/* Facilities */}
+
+        <div
+          className="
+        flex
+        justify-end
+        gap-4
+        text-gray-500
+        text-xs
+        border-t
+        pt-3
+        "
+        >
+          <span className="flex gap-1">
+            {offer.facilities?.parking ? "دارد" : "ندارد"} پارکینگ
+            <Car size={14} />
           </span>
-          <span className="flex items-center gap-1">
-            <span>{offer.guests} نفر</span>
-            <Users size={14} className="text-gray-400" />
+
+          <span className="flex gap-1">
+            {offer.facilities?.capacity ?? 0} نفر
+            <Users size={14} />
           </span>
-          <span className="flex items-center gap-1">
-            <span>{offer.baths} حمام</span>
-            <Bath size={14} className="text-gray-400" />
+
+          <span className="flex gap-1">
+            {offer.facilities?.bathrooms ?? 0} حمام
+            <Bath size={14} />
           </span>
-          <span className="flex items-center gap-1">
-            <span>{offer.beds} خواب</span>
-            <Bed size={14} className="text-gray-400" />
+
+          <span className="flex gap-1">
+            {offer.facilities?.bedrooms ?? 0} خواب
+            <Bed size={14} />
           </span>
         </div>
 
-        {/* Price row */}
+        {/* Price */}
+
         <div
           className="
-    flex
-    items-center
-    justify-between
-    gap-2
-    flex-wrap
-    bg-[#EDEDED]
-    dark:bg-[#353535]
-    rounded-full
-    px-3
-    py-1.5
-  "
+        flex
+        items-center
+        justify-between
+        bg-[#EDEDED]
+        dark:bg-[#353535]
+        rounded-full
+        px-3
+        py-2
+        text-sm
+        "
         >
-          <div>
-            <span className="text-red-500 line-through text-xs font-medium">
-              {fmt(offer.originalPrice)} تومان
-            </span>
-          </div>
-          <div>
-            <span className="text-gray-900 dark:text-white font-bold text-sm">
-              {fmt(offer.price)} تومان
-            </span>
-            <span className="text-gray-400 text-xs">/ هر شب</span>
-          </div>
+          <span className="line-through text-gray-400">
+            {offer.pricing?.oldPrice
+              ? `${fmt(offer.pricing.oldPrice)} تومان`
+              : ""}
+          </span>
+
+          <span className="font-bold text-gray-900 dark:text-white">
+            {fmt(offer.pricing?.daily ?? offer.price ?? 0)}
+            {" تومان / هر شب"}
+          </span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
