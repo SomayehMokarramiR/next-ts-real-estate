@@ -2,10 +2,13 @@
 
 import { useRef } from "react";
 import PropertyCard from "./PropertyCard";
-import { PROPERTIES } from "./constants";
+import { useProperties } from "@/hooks/useProperties";
+// import { PROPERTIES } from "./constants";
 
 export default function PropertySection() {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef(null);
+
+  const { data: properties = [], isLoading } = useProperties();
 
   return (
     <section
@@ -51,19 +54,20 @@ export default function PropertySection() {
         <div
           ref={scrollRef}
           className="
-          flex
-          gap-4
-          overflow-x-auto
-          pb-4
-          scrollbar-hide
+         flex
+flex-wrap
+justify-center
+gap-4
+pb-4
+scrollbar-hide
           "
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
           }}
         >
-          {PROPERTIES.map((p) => (
-            <PropertyCard key={p.id} property={p} active={p.active} />
+          {properties.map((p) => (
+            <PropertyCard key={p._id} property={p} />
           ))}
         </div>
       </div>
