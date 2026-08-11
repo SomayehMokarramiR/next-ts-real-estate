@@ -1,5 +1,7 @@
 import { FaInstagram, FaLinkedinIn, FaTelegramPlane } from "react-icons/fa";
+
 import Logo from "../../modules/logo/Logo";
+import { footerDescription, footerColumns, contactInfo } from "./constants";
 
 export default function Footer() {
   return (
@@ -47,9 +49,7 @@ export default function Footer() {
                 text-right
               "
             >
-              ما همراه شما هستیم در مسیر اجاره، خرید و فروش ویلا؛ تا با اطمینان
-              و آرامش، تجربه‌ای دلنشین از انتخاب اقامتگاه یا سرمایه‌گذاری
-              یادماندنی داشته باشید.
+              {footerDescription}
             </p>
 
             {/* Social */}
@@ -100,25 +100,15 @@ export default function Footer() {
               gap-8
             "
           >
-            <FooterColumn
-              title="نحوه رزرو اقامتگاه"
-              items={[
-                "راهنمای رزرو اقامتگاه",
-                "شیوه پرداخت",
-                "لغو رزرو اقامتگاه",
-              ]}
-            />
+            {footerColumns.map((column) => (
+              <FooterColumn
+                key={column.id}
+                title={column.title}
+                items={column.items}
+              />
+            ))}
 
-            <FooterColumn
-              title="خدمات مشتریان"
-              items={[
-                "پرسش های متداول مهمان",
-                "پرسش های متداول میزبان",
-                "چطور اقامتگاه ثبت کنم ؟",
-                "حریم شخصی کاربران",
-              ]}
-            />
-
+            {/* Contact */}
             <div>
               <h4 className="text-primary500 font-bold text-sm mb-5">
                 راه ارتباطی با ما
@@ -133,9 +123,9 @@ export default function Footer() {
                   text-xs
                 "
               >
-                <p>09229167194 - 09854161231</p>
+                <p>{contactInfo.phones.join(" - ")}</p>
 
-                <p>Delta@gmail.com</p>
+                <p>{contactInfo.email}</p>
               </div>
             </div>
           </div>
@@ -143,7 +133,6 @@ export default function Footer() {
       </div>
 
       {/* Bottom */}
-
       <div
         className="
           border-t
