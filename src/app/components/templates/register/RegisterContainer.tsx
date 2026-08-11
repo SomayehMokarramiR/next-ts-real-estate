@@ -38,13 +38,12 @@ export default function RegisterLayout({
     <div
       dir="rtl"
       className="
-      flex
-      items-center
-      justify-center
-      p-4
-      sm:p-6
-      lg:p-8
-      "
+    w-full
+    flex
+    justify-center
+    px-4
+    py-12
+  "
     >
       <div
         className="

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import { sendVerificationEmail } from "@/app/lib/email";
 import TempUser from "@/app/models/TempUser";
+
 export async function POST(request: Request) {
   try {
     await connectDB();
@@ -48,15 +49,20 @@ export async function POST(request: Request) {
     });
 
     /* =========================
-       Generate 5 Digit OTP
+       Generate OTP
     ========================= */
 
     const verificationCode = Math.floor(
       10000 + Math.random() * 90000,
     ).toString();
-    console.log("========== REGISTER ==========");
-    console.log("EMAIL:", normalizedEmail);
-    console.log("OTP:", verificationCode);
+
+    console.log("");
+    console.log("=================================");
+    console.log("🚀 REGISTER OTP");
+    console.log("📧 EMAIL:", normalizedEmail);
+    console.log("🔐 CODE:", verificationCode);
+    console.log("=================================");
+    console.log("");
 
     /* =========================
        OTP Expiration
@@ -77,13 +83,20 @@ export async function POST(request: Request) {
     });
 
     /* =========================
-       Send OTP Email
+       Send OTP
     ========================= */
 
-    const emailSent = await sendVerificationEmail(
-      normalizedEmail,
-      verificationCode,
-    );
+    let emailSent = true;
+
+    // فقط در production ایمیل واقعی ارسال شود
+    if (process.env.NODE_ENV === "production") {
+      emailSent = await sendVerificationEmail(
+        normalizedEmail,
+        verificationCode,
+      );
+    } else {
+      console.log("🧪 DEVELOPMENT MODE - RESEND SKIPPED");
+    }
 
     if (!emailSent) {
       await TempUser.findByIdAndDelete(tempUser._id);
@@ -106,10 +119,15 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
-        message: "کد تایید به ایمیل شما ارسال شد",
+        message:
+          process.env.NODE_ENV === "production"
+            ? "کد تایید به ایمیل شما ارسال شد"
+            : "کد تایید در ترمینال نمایش داده شد",
         tempUserId: tempUser._id.toString(),
       },
-      { status: 201 },
+      {
+        status: 201,
+      },
     );
   } catch (error) {
     console.error("REGISTER API ERROR:", error);
@@ -120,7 +138,9 @@ export async function POST(request: Request) {
         message:
           error instanceof Error ? error.message : "خطایی در ثبت ایمیل رخ داد",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

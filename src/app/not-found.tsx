@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Navbar from "./components/modules/navbar/Navbar";
+import Navbar from "./components/layout/navbar/Navbar";
 import MainLayout from "./components/layout/MainLayout";
 
 export default function NotFound() {

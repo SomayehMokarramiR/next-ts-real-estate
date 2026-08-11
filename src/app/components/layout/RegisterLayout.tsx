@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import ProgressNavbar from "../modules/navbarProgress/ProgressNavbar";
+import ProgressNavbar from "./navbarProgress/ProgressNavbar";
 import Footer from "./footer/Footer";
 
 import {
