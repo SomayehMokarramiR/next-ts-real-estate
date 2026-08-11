@@ -1,3 +1,4 @@
+import MainLayout from "@/app/components/layout/MainLayout";
 import PropertyDetails from "@/app/components/templates/propertyDetails/propertyDetails";
 
 type Props = {
@@ -9,5 +10,11 @@ type Props = {
 export default async function PropertyPage({ params }: Props) {
   const { id } = await params;
 
-  return <PropertyDetails propertyId={id} />;
+  return (
+    <MainLayout>
+      <main className="pt-20 pb-16">
+        <PropertyDetails propertyId={id} />
+      </main>
+    </MainLayout>
+  );
 }

@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 import Swal from "sweetalert2";
 
@@ -85,6 +85,7 @@ function Avatar() {
 
 export default function Navbar() {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { data, isLoading } = useMe();
 
@@ -105,26 +106,29 @@ export default function Navbar() {
   const navLinks: NavLink[] = [
     {
       label: "خانه",
-      href: "#",
+      href: "/",
     },
     {
       label: "رهن و اجاره",
-      href: "#",
+      href: "/mortgage-house",
+    },
+    {
+      label: "رزرو ویلا",
+      href: "/house-reserve",
     },
     {
       label: "بررسی سریع",
-      href: "#",
+      href: "/properties",
       arrow: true,
     },
     {
       label: "تماس با ما",
-      href: "#",
+      href: "/contact-us",
       arrow: true,
     },
     {
       label: "مهم‌ترین اخبار",
       href: "#",
-      highlight: true,
       icon: true,
     },
   ];
@@ -248,18 +252,18 @@ export default function Navbar() {
               key={item.label}
               href={item.href}
               className={`
-              flex
-              items-center
-              gap-1
-              transition
+flex
+items-center
+gap-1
+transition
 
-              ${
-                item.highlight
-                  ? "bg-primary500 text-white px-4 py-2 rounded-full"
-                  : "hover:text-primary500"
-              }
+${
+  pathname === item.href
+    ? "bg-primary500 text-white px-4 py-2 rounded-full"
+    : "hover:text-primary500"
+}
 
-              `}
+`}
             >
               {item.icon && <NewsIcon />}
 

@@ -24,7 +24,7 @@ import { useClickOutside } from "./hooks/useClickOutside";
 import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
 import { useMe, useLogout } from "@/hooks/useAuth";
 import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 type Props = {
   dark: boolean;
@@ -93,6 +93,7 @@ function Avatar() {
 
 export default function ProgressNavbar({ dark, setDark, progress }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const { data } = useMe();
   const logoutMutation = useLogout();
@@ -150,30 +151,33 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
   const navLinks: NavLink[] = [
     {
       label: "خانه",
-      href: "#",
+      href: "/",
     },
     {
       label: "رهن و اجاره",
-      href: "#",
+      href: "/mortgage-house",
+    },
+    {
+      label: "رزرو ویلا",
+      href: "/house-reserve",
+      highlight: pathname.startsWith("/single-reserve-house"),
     },
     {
       label: "بررسی سریع",
-      href: "#",
+      href: "/properties",
       arrow: true,
     },
     {
       label: "تماس با ما",
-      href: "#",
+      href: "/contact-us",
       arrow: true,
     },
     {
       label: "مهم‌ترین اخبار",
       href: "#",
-      highlight: true,
       icon: true,
     },
   ];
-
   return (
     <nav
       ref={wrapRef}

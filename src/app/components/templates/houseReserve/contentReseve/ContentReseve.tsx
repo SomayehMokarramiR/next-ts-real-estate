@@ -89,7 +89,6 @@ export default function ContentReseve({ filters = {} }: Props) {
          flex-1
   px-3
   lg:px-4
-  py-4
   grid
   grid-cols-1
   min-[700px]:grid-cols-2
