@@ -29,14 +29,17 @@ export interface IProperty extends Document {
   pricing: {
     daily: number;
     monthly?: number;
-
-    // قیمت قبل از تخفیف
     oldPrice?: number;
   };
 
   rating: number;
 
   views: number;
+
+  // Featured
+  isFeatured: boolean;
+
+  featuredOrder: number;
 
   status: "available" | "reserved" | "inactive";
 
@@ -52,9 +55,7 @@ export interface IProperty extends Document {
 
 const PropertySchema = new Schema<IProperty>(
   {
-    // =========================
     // BASIC
-    // =========================
 
     title: {
       type: String,
@@ -76,9 +77,7 @@ const PropertySchema = new Schema<IProperty>(
       default: "villa",
     },
 
-    // =========================
     // LOCATION
-    // =========================
 
     location: {
       city: {
@@ -94,18 +93,14 @@ const PropertySchema = new Schema<IProperty>(
       },
     },
 
-    // =========================
     // IMAGES
-    // =========================
 
     images: {
       type: [String],
       default: [],
     },
 
-    // =========================
     // FACILITIES
-    // =========================
 
     facilities: {
       bedrooms: {
@@ -137,9 +132,7 @@ const PropertySchema = new Schema<IProperty>(
       },
     },
 
-    // =========================
     // PRICING
-    // =========================
 
     pricing: {
       daily: {
@@ -153,51 +146,67 @@ const PropertySchema = new Schema<IProperty>(
         min: 0,
       },
 
-      // قیمت قبل از تخفیف
       oldPrice: {
         type: Number,
         min: 0,
       },
     },
 
-    // =========================
     // RATING
-    // =========================
 
     rating: {
       type: Number,
+
       default: 0,
+
       min: 0,
+
       max: 5,
     },
 
-    // =========================
     // POPULARITY
-    // =========================
 
     views: {
       type: Number,
+
       default: 0,
+
       min: 0,
     },
 
-    // =========================
+    // FEATURED
+
+    isFeatured: {
+      type: Boolean,
+
+      default: false,
+    },
+
+    featuredOrder: {
+      type: Number,
+
+      default: 0,
+
+      min: 0,
+    },
+
     // STATUS
-    // =========================
 
     status: {
       type: String,
+
       enum: ["available", "reserved", "inactive"],
+
       default: "available",
     },
 
-    // =========================
     // OWNER
-    // =========================
 
     owner: {
       type: Schema.Types.ObjectId,
+
       ref: "User",
+
       default: undefined,
     },
   },
@@ -213,7 +222,9 @@ const PropertySchema = new Schema<IProperty>(
 
 PropertySchema.index({
   title: "text",
+
   "location.city": "text",
+
   "location.address": "text",
 });
 
@@ -227,6 +238,14 @@ PropertySchema.index({
 
 PropertySchema.index({
   "location.city": 1,
+});
+
+// برای صفحه بهترین‌ها
+
+PropertySchema.index({
+  isFeatured: 1,
+
+  featuredOrder: 1,
 });
 
 // =========================

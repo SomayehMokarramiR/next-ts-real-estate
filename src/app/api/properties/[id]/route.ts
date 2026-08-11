@@ -21,35 +21,28 @@ export async function GET(
 
     const { id } = await context.params;
 
-    // بررسی معتبر بودن ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
           message: "شناسه ملک معتبر نیست",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
-    // دریافت ملک
     const property = await Property.findById(id).populate(
       "owner",
       "name email",
     );
 
-    // ملک پیدا نشد
     if (!property) {
       return NextResponse.json(
         {
           success: false,
           message: "ملک مورد نظر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
 
@@ -58,9 +51,7 @@ export async function GET(
         success: true,
         property,
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   } catch (error) {
     console.error("GET SINGLE PROPERTY ERROR:", error);
@@ -70,9 +61,7 @@ export async function GET(
         success: false,
         message: "خطا در دریافت اطلاعات ملک",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
@@ -94,20 +83,16 @@ export async function PUT(
 
     const { id } = await context.params;
 
-    // بررسی معتبر بودن ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
           message: "شناسه ملک معتبر نیست",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
-    // دریافت اطلاعات ارسالی
     const body = await request.json();
 
     const {
@@ -120,9 +105,9 @@ export async function PUT(
       pricing,
       status,
       owner,
+      isFeatured,
     } = body;
 
-    // بررسی اینکه حداقل یک فیلد برای ویرایش ارسال شده باشد
     if (
       title === undefined &&
       description === undefined &&
@@ -132,32 +117,40 @@ export async function PUT(
       facilities === undefined &&
       pricing === undefined &&
       status === undefined &&
-      owner === undefined
+      owner === undefined &&
+      isFeatured === undefined
     ) {
       return NextResponse.json(
         {
           success: false,
           message: "اطلاعاتی برای ویرایش ارسال نشده است",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
-    // ویرایش ملک
     const property = await Property.findByIdAndUpdate(
       id,
       {
         ...(title !== undefined && { title }),
+
         ...(description !== undefined && { description }),
+
         ...(type !== undefined && { type }),
+
         ...(location !== undefined && { location }),
+
         ...(images !== undefined && { images }),
+
         ...(facilities !== undefined && { facilities }),
+
         ...(pricing !== undefined && { pricing }),
+
         ...(status !== undefined && { status }),
+
         ...(owner !== undefined && { owner }),
+
+        ...(isFeatured !== undefined && { isFeatured }),
       },
       {
         new: true,
@@ -165,16 +158,13 @@ export async function PUT(
       },
     ).populate("owner", "name email");
 
-    // ملک پیدا نشد
     if (!property) {
       return NextResponse.json(
         {
           success: false,
           message: "ملک مورد نظر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
 
@@ -184,9 +174,7 @@ export async function PUT(
         message: "ملک با موفقیت ویرایش شد",
         property,
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   } catch (error) {
     console.error("UPDATE PROPERTY ERROR:", error);
@@ -196,9 +184,7 @@ export async function PUT(
         success: false,
         message: "خطا در ویرایش ملک",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
@@ -220,32 +206,25 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    // بررسی معتبر بودن ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
           message: "شناسه ملک معتبر نیست",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
-    // حذف ملک
     const property = await Property.findByIdAndDelete(id);
 
-    // ملک پیدا نشد
     if (!property) {
       return NextResponse.json(
         {
           success: false,
           message: "ملک مورد نظر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
 
@@ -255,9 +234,7 @@ export async function DELETE(
         message: "ملک با موفقیت حذف شد",
         property,
       },
-      {
-        status: 200,
-      },
+      { status: 200 },
     );
   } catch (error) {
     console.error("DELETE PROPERTY ERROR:", error);
@@ -267,9 +244,7 @@ export async function DELETE(
         success: false,
         message: "خطا در حذف ملک",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }

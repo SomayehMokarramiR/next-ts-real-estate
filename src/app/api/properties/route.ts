@@ -12,7 +12,6 @@ import { IProperty } from "@/app/models/Property";
 function normalizeImageUrl(image: string) {
   if (!image) return image;
 
-  // اگر اشتباهی JSON string ذخیره شده باشد
   if (image.startsWith("[")) {
     try {
       const parsed = JSON.parse(image);
@@ -43,17 +42,21 @@ export async function GET(request: NextRequest) {
     const guests = searchParams.get("guests")?.trim();
     const type = searchParams.get("type")?.trim();
 
+    const featured = searchParams.get("featured");
+
     const facility = searchParams.get("facility")?.trim();
 
     const minPrice = searchParams.get("minPrice");
     const maxPrice = searchParams.get("maxPrice");
 
     const rating = searchParams.get("rating");
+
     const sort = searchParams.get("sort");
 
     const filter: FilterQuery<IProperty> = {};
 
     // SEARCH
+
     if (search) {
       filter.$or = [
         {
@@ -62,12 +65,14 @@ export async function GET(request: NextRequest) {
             $options: "i",
           },
         },
+
         {
           "location.city": {
             $regex: search,
             $options: "i",
           },
         },
+
         {
           "location.address": {
             $regex: search,
@@ -78,6 +83,7 @@ export async function GET(request: NextRequest) {
     }
 
     // CITY
+
     if (city) {
       filter["location.city"] = {
         $regex: city,
@@ -86,11 +92,19 @@ export async function GET(request: NextRequest) {
     }
 
     // TYPE
+
     if (type) {
       filter.type = type as IProperty["type"];
     }
 
+    // FEATURED
+
+    if (featured === "true") {
+      filter.isFeatured = true;
+    }
+
     // GUESTS
+
     if (guests) {
       const capacity = Number(guests);
 
@@ -102,6 +116,7 @@ export async function GET(request: NextRequest) {
     }
 
     // PRICE
+
     const priceFilter: {
       $gte?: number;
       $lte?: number;
@@ -147,19 +162,22 @@ export async function GET(request: NextRequest) {
       createdAt: -1,
     };
 
-    if (sort === "محبوب‌ترین") {
+    if (featured === "true") {
+      // بهترین اقامتگاه‌ها
+      sortQuery = {
+        rating: -1,
+
+        views: -1,
+      };
+    } else if (sort === "محبوب‌ترین") {
       sortQuery = {
         views: -1,
       };
-    }
-
-    if (sort === "ارزان‌ترین") {
+    } else if (sort === "ارزان‌ترین") {
       sortQuery = {
         "pricing.daily": 1,
       };
-    }
-
-    if (sort === "بالاترین امتیاز") {
+    } else if (sort === "بالاترین امتیاز") {
       sortQuery = {
         rating: -1,
       };
@@ -167,7 +185,15 @@ export async function GET(request: NextRequest) {
 
     console.log("FINAL FILTER ===>", JSON.stringify(filter, null, 2));
 
-    const properties = await Property.find(filter).sort(sortQuery).lean();
+    let query = Property.find(filter).sort(sortQuery);
+
+    // محدود کردن برای Landing و BestSection
+
+    if (featured === "true") {
+      query = query.limit(6);
+    }
+
+    const properties = await query.lean();
 
     const fixedProperties = properties.map((property) => ({
       ...property,
@@ -178,9 +204,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
+
         count: fixedProperties.length,
+
         properties: fixedProperties,
       },
+
       {
         status: 200,
       },
@@ -191,8 +220,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
+
         message: "خطا در دریافت املاک",
       },
+
       {
         status: 500,
       },
@@ -215,8 +246,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
+
         property,
       },
+
       {
         status: 201,
       },
@@ -227,8 +260,10 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
+
         message: "خطا در ایجاد ملک",
       },
+
       {
         status: 500,
       },
