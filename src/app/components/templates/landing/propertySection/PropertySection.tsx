@@ -3,12 +3,15 @@
 import { useRef } from "react";
 import PropertyCard from "./PropertyCard";
 import { useProperties } from "@/hooks/useProperties";
+import Link from "next/link";
 // import { PROPERTIES } from "./constants";
 
 export default function PropertySection() {
   const scrollRef = useRef(null);
 
   const { data: properties = [], isLoading } = useProperties();
+  // فقط ۵ ملک برای Preview لندینگ
+  const visibleProperties = properties.slice(0, 5);
 
   return (
     <section
@@ -66,9 +69,33 @@ scrollbar-hide
             msOverflowStyle: "none",
           }}
         >
-          {properties.map((p) => (
+          {visibleProperties.map((p) => (
             <PropertyCard key={p._id} property={p} />
           ))}
+        </div>
+        {/* More Button */}
+        <div className="flex justify-center mt-10">
+          <Link
+            href="/properties"
+            className="
+      inline-flex
+      items-center
+      justify-center
+      border
+      border-primary500
+      text-primary500
+      hover:bg-primary500
+      hover:text-white
+      rounded-full
+      px-8
+      py-2.5
+      text-sm
+      font-semibold
+      transition-colors
+    "
+          >
+            مشاهده بیشتر
+          </Link>
         </div>
       </div>
     </section>

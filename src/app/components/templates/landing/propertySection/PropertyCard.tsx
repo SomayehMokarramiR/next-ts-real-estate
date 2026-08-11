@@ -2,7 +2,6 @@ import { ArrowLeft } from "lucide-react";
 import { Property } from "@/hooks/useProperties";
 import Image from "next/image";
 import Link from "next/link";
-// import { PROPERTIES } from "./constants";
 
 export default function PropertyCard({
   property,
@@ -14,7 +13,7 @@ export default function PropertyCard({
   return (
     <div className="relative shrink-0 w-[170px] sm:w-[190px] md:w-[210px] lg:w-[220px] rounded-2xl overflow-hidden group cursor-pointer shadow-md hover:shadow-xl transition-shadow duration-300">
       {/* Image */}
-      <div className="h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-200 ">
+      <div className="relative h-56 sm:h-64 md:h-72 lg:h-80 bg-gray-200">
         <Image
           src={property.images?.[0] || "/images/placeholder.jpg"}
           alt={property.title}
@@ -25,7 +24,25 @@ export default function PropertyCard({
 
       {/* Bottom label */}
       <div className="absolute bottom-[26px] left-5 right-5 bg-white dark:bg-[#353535] rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
-        <span className="text-gray-800 dark:text-white text-sm font-semibold">
+        <span
+          className="
+    text-gray-800
+    dark:text-white
+
+    text-xs
+    md:text-sm
+
+    font-semibold
+    leading-5
+
+    line-clamp-2
+
+    min-h-[40px]
+    md:min-h-[44px]
+
+    overflow-hidden
+  "
+        >
           {property.title}
         </span>
 
@@ -40,7 +57,6 @@ export default function PropertyCard({
             justify-center
             shrink-0
             bg-[#FFFFFA]
-            
             border
             border-primary500
             text-primary500

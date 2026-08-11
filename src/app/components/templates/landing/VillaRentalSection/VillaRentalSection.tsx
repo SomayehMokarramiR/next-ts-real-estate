@@ -9,6 +9,9 @@ export default function VillaRentalSection() {
 
   const villas = properties.filter((property) => property.type === "villa");
 
+  // فقط ۴ ویلا در لندینگ نمایش داده شود
+  const visibleVillas = villas.slice(0, 4);
+
   return (
     <section className="py-12">
       <div className="container mx-auto px-4">
@@ -42,15 +45,15 @@ export default function VillaRentalSection() {
       grid gap-5
 
       ${
-        villas.length === 1
+        visibleVillas.length === 1
           ? "grid-cols-1 max-w-md mx-auto"
-          : villas.length === 2
+          : visibleVillas.length === 2
             ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
             : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
       }
     `}
           >
-            {villas.map((villa) => (
+            {visibleVillas.map((villa) => (
               <Link
                 key={villa._id}
                 href={`/properties/${villa._id}`}
@@ -130,6 +133,7 @@ export default function VillaRentalSection() {
             ))}
           </div>
         )}
+
         {/* More Button */}
         <div className="flex justify-center mt-8">
           <Link
