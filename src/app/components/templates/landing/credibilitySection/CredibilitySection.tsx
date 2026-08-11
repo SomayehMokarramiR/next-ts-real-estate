@@ -1,14 +1,20 @@
+"use client";
+
 import Image from "next/image";
+
 import ReviewCard from "./ReviewCard";
-import { reviews } from "./constants";
+import { useReviews } from "@/hooks/useReviews";
 
 export default function CredibilitySection() {
+  const { data: reviews = [], isLoading } = useReviews();
+
   return (
     <section
       className="
         relative
         w-full
-        bg-white dark:bg-[#272727]
+        bg-white
+        dark:bg-[#272727]
         overflow-hidden
         min-h-[900px]
         md:min-h-[650px]
@@ -90,11 +96,20 @@ export default function CredibilitySection() {
           </p>
         </div>
 
-        {/* Left */}
+        {/* Left - Reviews */}
         <div className="flex flex-col">
-          {reviews.map((review) => (
-            <ReviewCard key={review.id} review={review} />
-          ))}
+          {isLoading && (
+            <p className="text-white text-center">در حال بارگذاری نظرات...</p>
+          )}
+
+          {!isLoading &&
+            reviews
+              .slice(0, 3)
+              .map((review) => <ReviewCard key={review._id} review={review} />)}
+
+          {!isLoading && reviews.length === 0 && (
+            <p className="text-white/70 text-center">هنوز نظری ثبت نشده است</p>
+          )}
         </div>
       </div>
     </section>

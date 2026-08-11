@@ -1,11 +1,7 @@
-import { reviews } from "./constants";
 import { Calendar } from "lucide-react";
+import type { Review } from "@/services/reviewService";
 
-export default function ReviewCard({
-  review,
-}: {
-  review: (typeof reviews)[0];
-}) {
+export default function ReviewCard({ review }: { review: Review }) {
   return (
     <div
       className="relative mb-4 rounded-2xl p-5"
