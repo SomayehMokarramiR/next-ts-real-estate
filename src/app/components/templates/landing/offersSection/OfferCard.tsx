@@ -199,7 +199,7 @@ export default function OfferCard({ offer }: { offer: Offer }) {
         text-sm
         "
         >
-          <span className="line-through text-gray-400">
+          <span className="line-through text-red-500">
             {offer.pricing?.oldPrice
               ? `${fmt(offer.pricing.oldPrice)} تومان`
               : ""}
