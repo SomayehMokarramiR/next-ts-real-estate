@@ -1,4 +1,5 @@
 import { MapPin, Phone, Mail } from "lucide-react";
+
 import Breadcrumb from "./Breadcrumb";
 import InfoCard from "./InfoCard";
 import SectionHeading from "./SectionHeading";
@@ -20,6 +21,7 @@ export default function ContactUs() {
               <br />
               <span className="text-primary500">شریک آرامش و سرمایه شما</span>
             </h1>
+
             <p className="text-gray-500 dark:text-white text-sm sm:text-base leading-8">
               با تخصص، شفافیت و تعهد، رویای ملک ایده‌آل را به واقعیت تبدیل
               می‌کنیم. از مشاوره تا کلید، همراه شما هستیم.
@@ -31,11 +33,13 @@ export default function ContactUs() {
             <InfoCard icon={<MapPin className="w-4 h-4" />}>
               گیلان، رشت، میدان آزادی، جنب چهار راه عظیمی‌زاده
             </InfoCard>
+
             <InfoCard icon={<Phone className="w-4 h-4" />}>
               <span dir="ltr" className="inline-block">
                 ۰۱۳۳۳۱۶۱۲۹۰ — ۰۹۱۴۹۶۷۱۹۳۴
               </span>
             </InfoCard>
+
             <InfoCard icon={<Mail className="w-4 h-4" />}>
               <span dir="ltr" className="inline-block">
                 Delta@gmail.com
@@ -44,9 +48,6 @@ export default function ContactUs() {
           </div>
         </div>
       </section>
-
-      {/* ── Divider ── */}
-      {/* <div className="w-full h-px bg-gray-200" /> */}
 
       {/* ── Bottom section ── */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

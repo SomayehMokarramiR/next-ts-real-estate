@@ -4,7 +4,7 @@ import {
   getReviews,
   createReview,
   type CreateReviewPayload,
-} from "../services/reviewService.ts";
+} from "../services/reviewService";
 
 // =========================
 // GET REVIEWS HOOK

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Clock, Calendar, Copy, Share2 } from "lucide-react";
-import Navbar from "../../modules/navbar/Navbar";
+import Navbar from "../../layout/navbar/Navbar";
 import ListingCard from "./ListingCard";
 import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
 
