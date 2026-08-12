@@ -1,16 +1,43 @@
 "use client";
 
 import Image from "next/image";
-import { useProperties } from "@/hooks/useProperties";
 import Link from "next/link";
 
+import { useProperties } from "@/hooks/useProperties";
+
 export default function VillaRentalSection() {
-  const { data: properties = [], isLoading } = useProperties();
+  const { data, isLoading } = useProperties({
+    limit: "10",
+  });
+
+  // ======================================
+  // API DATA
+  // ======================================
+
+  const properties = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.properties)
+      ? data.properties
+      : [];
+
+  // ======================================
+  // VILLAS
+  // ======================================
 
   const villas = properties.filter((property) => property.type === "villa");
 
-  // فقط ۴ ویلا در لندینگ نمایش داده شود
+  // فقط ۴ ویلا برای لندینگ
   const visibleVillas = villas.slice(0, 4);
+
+  // ======================================
+  // DEBUG
+  // ======================================
+
+  console.log("=== VILLA RENTAL SECTION ===");
+  console.log("All properties:", properties.length);
+  console.log("All villas:", villas.length);
+  console.log("Visible villas:", visibleVillas.length);
+  console.log("Villa data:", villas);
 
   return (
     <section className="py-12">
@@ -39,35 +66,33 @@ export default function VillaRentalSection() {
         )}
 
         {/* Cards */}
-        {!isLoading && villas.length > 0 && (
+        {!isLoading && visibleVillas.length > 0 && (
           <div
-            className={`
-      grid gap-5
-
-      ${
-        visibleVillas.length === 1
-          ? "grid-cols-1 max-w-md mx-auto"
-          : visibleVillas.length === 2
-            ? "grid-cols-1 sm:grid-cols-2 max-w-3xl mx-auto"
-            : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-      }
-    `}
+            className="
+              grid
+              grid-cols-1
+              sm:grid-cols-2
+              lg:grid-cols-4
+              gap-5
+              w-full
+            "
           >
             {visibleVillas.map((villa) => (
               <Link
                 key={villa._id}
                 href={`/properties/${villa._id}`}
                 className="
-          relative
-          rounded-2xl
-          overflow-hidden
-          cursor-pointer
-          group
-          shadow-sm
-          hover:shadow-lg
-          transition
-          block
-        "
+                  relative
+                  rounded-2xl
+                  overflow-hidden
+                  cursor-pointer
+                  group
+                  shadow-sm
+                  hover:shadow-lg
+                  transition
+                  block
+                  w-full
+                "
               >
                 <Image
                   src={villa.images?.[0] || "/images/placeholder.jpg"}
@@ -75,56 +100,56 @@ export default function VillaRentalSection() {
                   width={600}
                   height={350}
                   className="
-            w-full
-            h-56
-            object-cover
-            transition-transform
-            duration-300
-            group-hover:scale-105
-          "
+                    w-full
+                    h-56
+                    object-cover
+                    transition-transform
+                    duration-300
+                    group-hover:scale-105
+                  "
                 />
 
                 {/* Overlay */}
                 <div
                   className="
-            absolute
-            bottom-3
-            right-3
-            left-3
-            flex
-            items-center
-            justify-between
-            bg-white/90
-            dark:bg-[#353535]
-            backdrop-blur-sm
-            rounded-full
-            px-3
-            py-2
-            shadow
-          "
+                    absolute
+                    bottom-3
+                    right-3
+                    left-3
+                    flex
+                    items-center
+                    justify-between
+                    bg-white/90
+                    dark:bg-[#353535]
+                    backdrop-blur-sm
+                    rounded-full
+                    px-3
+                    py-2
+                    shadow
+                  "
                 >
                   <span
                     className="
-              text-gray-800
-              dark:text-white
-              text-xs
-              font-medium
-              truncate
-            "
+                      text-gray-800
+                      dark:text-white
+                      text-xs
+                      font-medium
+                      truncate
+                    "
                   >
-                    {villa.location?.city}
+                    {villa.location?.city || "نامشخص"}
                   </span>
 
                   <span
                     className="
-              bg-primary500
-              text-white
-              text-xs
-              font-semibold
-              rounded-full
-              px-3
-              py-1
-            "
+                      bg-primary500
+                      text-white
+                      text-xs
+                      font-semibold
+                      rounded-full
+                      px-3
+                      py-1
+                    "
                   >
                     {villa.facilities?.capacity ?? 0} نفر
                   </span>
@@ -141,18 +166,13 @@ export default function VillaRentalSection() {
             className="
               border
               border-primary500
-
               rounded-full
-
               px-8
               py-2.5
-
               text-sm
               text-primary500
-
               hover:bg-primary500
               hover:text-white
-
               transition
             "
           >

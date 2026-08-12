@@ -1,14 +1,16 @@
 "use client";
 
 import Link from "next/link";
+
 import PropertyCard from "../../../modules/property/PropertyCard";
-import { useLandingBestProperties } from "@/hooks/useLandingBestProperties.ts";
+import { useLandingBestProperties } from "../../../../../hooks/useLandingBestProperties.ts";
+import type { Property } from "../../../../../hooks/useProperties";
 
 export default function BestSection() {
   const { data: properties = [], isLoading } = useLandingBestProperties();
 
   // فقط 3 مورد برای نمایش در Landing
-  const visibleProperties = properties.slice(0, 3);
+  const visibleProperties: Property[] = properties.slice(0, 3);
 
   return (
     <section className="bg-white dark:bg-[#272727] py-14 px-4">
@@ -48,29 +50,35 @@ export default function BestSection() {
         {!isLoading && visibleProperties.length > 0 && (
           <div
             className="
-      grid
-      grid-cols-1
-      sm:grid-cols-2
-      lg:grid-cols-3
-      gap-5
-      mb-10
-    "
+              grid
+              grid-cols-1
+              sm:grid-cols-2
+              lg:grid-cols-3
+              gap-5
+              mb-10
+            "
           >
-            {visibleProperties.map((property, index) => (
+            {visibleProperties.map((property: Property, index: number) => (
               <div
                 key={property._id}
                 className={`
-          w-full
-          ${
-            index === 2 ? "sm:col-span-2 lg:col-span-1 flex justify-center" : ""
-          }
-        `}
+                    w-full
+                    ${
+                      index === 2
+                        ? "sm:col-span-2 lg:col-span-1 flex justify-center"
+                        : ""
+                    }
+                  `}
               >
                 <div
                   className={`
-            w-full
-            ${index === 2 ? "sm:max-w-[calc(50%-10px)] lg:max-w-none" : ""}
-          `}
+                      w-full
+                      ${
+                        index === 2
+                          ? "sm:max-w-[calc(50%-10px)] lg:max-w-none"
+                          : ""
+                      }
+                    `}
                 >
                   <PropertyCard property={property} />
                 </div>
@@ -78,6 +86,7 @@ export default function BestSection() {
             ))}
           </div>
         )}
+
         {/* More Button */}
         {properties.length > 3 && (
           <div className="flex justify-center">
