@@ -20,13 +20,9 @@ import { useProperties } from "@/hooks/useProperties";
 
 interface Property {
   _id: string;
-
   title: string;
-
   images?: string[];
-
   rating?: number;
-
   views?: number;
 
   location?: {
@@ -83,53 +79,52 @@ export default function ContentReseve({ filters = {} }: Props) {
   return (
     <div className="flex flex-col min-[1200px]:flex-row gap-4">
       {/* LIST */}
-
       <div
         className="
-         flex-1
-  px-3
-  lg:px-4
-  grid
-  grid-cols-1
-  min-[700px]:grid-cols-2
-  min-[1200px]:grid-cols-1
-  gap-3
-  content-start
+          flex-1
+          px-3
+          py-12
+          lg:px-4
+          grid
+          grid-cols-1
+          min-[700px]:grid-cols-2
+          min-[1200px]:grid-cols-1
+          gap-3
+          content-start
         "
       >
         {apiProperties.map((p) => (
           <div
             key={p._id}
             onMouseEnter={() => setActivePin(p._id)}
+            onClick={() => setActivePin(p._id)}
             className={`
-            bg-white
-            dark:bg-[#272727]
-            rounded-2xl
-            border
-            overflow-hidden
-            flex
-            flex-row
-            cursor-pointer
-            min-h-[200px]
+              bg-white
+              dark:bg-[#272727]
+              rounded-2xl
+              border
+              overflow-hidden
+              flex
+              flex-row
+              cursor-pointer
+              min-h-[200px]
 
-
-
-            ${
-              activePin === p._id
-                ? "border-primary500 shadow-md"
-                : "border-gray-100 shadow-sm"
-            }
+              ${
+                activePin === p._id
+                  ? "border-primary500 shadow-md"
+                  : "border-gray-100 shadow-sm"
+              }
             `}
           >
             {/* IMAGE */}
 
             <div
               className="
-              relative
-              w-[150px]
-              lg:w-[180px]
-              min-h-[200px]
-              shrink-0
+                relative
+                w-[150px]
+                lg:w-[180px]
+                min-h-[200px]
+                shrink-0
               "
             >
               <Image
@@ -144,50 +139,55 @@ export default function ContentReseve({ filters = {} }: Props) {
 
             <div
               className="
-              flex-1
-              p-3
-              lg:p-4
-              flex
-              flex-col
-              gap-2.5
+                flex-1
+                min-w-0
+                p-3
+                lg:p-4
+                flex
+                flex-col
+                gap-2.5
               "
             >
               {/* RATING */}
 
               <div
                 className="
-                flex
-                items-center
-                gap-1
-                bg-primary500
-                text-white
-                text-xs
-                px-2
-                py-1
-                rounded-full
-                w-fit
+                  flex
+                  items-center
+                  gap-1
+                  bg-primary500
+                  text-white
+                  text-xs
+                  px-2
+                  py-1
+                  rounded-full
+                  w-fit
                 "
               >
                 <Star size={15} className="fill-white" />
                 {p.rating ?? 0} ستاره
               </div>
 
+              {/* TITLE */}
+
               <h3
                 className="
-                font-bold
-                text-base
-                truncate
+                  font-bold
+                  text-base
+                  truncate
                 "
               >
                 {p.title}
               </h3>
 
+              {/* LOCATION */}
+
               <div
                 className="
-                flex
-                items-center
-                gap-1
-                text-gray-400
+                  flex
+                  items-center
+                  gap-1
+                  text-gray-400
                 "
               >
                 <MapPin size={13} />
@@ -201,11 +201,11 @@ export default function ContentReseve({ filters = {} }: Props) {
 
               <div
                 className="
-                flex
-                flex-wrap
-                gap-2
-                text-xs
-                text-gray-500
+                  flex
+                  flex-wrap
+                  gap-2
+                  text-xs
+                  text-gray-500
                 "
               >
                 <span className="flex gap-1">
@@ -239,11 +239,13 @@ export default function ContentReseve({ filters = {} }: Props) {
                 </span>
               </div>
 
+              {/* SEPARATOR */}
+
               <div
                 className="
-                border-t
-                border-dashed
-                border-gray-200
+                  border-t
+                  border-dashed
+                  border-gray-200
                 "
               />
 
@@ -251,36 +253,31 @@ export default function ContentReseve({ filters = {} }: Props) {
 
               <div
                 className="
-                flex
-                items-center
-                justify-between
+                  flex
+                  items-center
+                  justify-between
                 "
               >
                 <div
                   className="
-                  bg-[#EDEDED]
-                  dark:bg-[#353535]
-                  rounded-full
-                  px-3
-                  h-[38px]
-                  flex
-                  items-center
-                  gap-2
+                    bg-[#EDEDED]
+                    dark:bg-[#353535]
+                    rounded-full
+                    px-3
+                    h-[38px]
+                    flex
+                    items-center
+                    gap-2
                   "
                 >
-                  <span
-                    className="
-                    font-bold
-                    text-sm
-                    "
-                  >
+                  <span className="font-bold text-sm">
                     {formatPrice(p.pricing?.daily ?? 0)}
                   </span>
 
                   <span
                     className="
-                    text-gray-400
-                    text-xs
+                      text-gray-400
+                      text-xs
                     "
                   >
                     تومان / شب
@@ -289,12 +286,13 @@ export default function ContentReseve({ filters = {} }: Props) {
 
                 <Link
                   href={`/properties/${p._id}`}
+                  onClick={(e) => e.stopPropagation()}
                   className="
-                  text-primary500
-                  text-xs
-                  flex
-                  items-center
-                  gap-1
+                    text-primary500
+                    text-xs
+                    flex
+                    items-center
+                    gap-1
                   "
                 >
                   جزئیات
@@ -310,13 +308,14 @@ export default function ContentReseve({ filters = {} }: Props) {
 
       <div
         className="
-        relative
-        w-full
-        h-[350px]
-        rounded-2xl
-        overflow-hidden
-        min-[1200px]:w-[42%]
-        min-[1200px]:h-[700px]
+          relative
+          mt-12
+          w-full
+          h-[350px]
+          rounded-2xl
+          overflow-hidden
+          min-[1200px]:w-[42%]
+          min-[1200px]:h-[700px]
         "
       >
         <Image
@@ -325,6 +324,8 @@ export default function ContentReseve({ filters = {} }: Props) {
           fill
           className="object-cover"
         />
+
+        {/* MAP PINS */}
 
         {apiProperties.map((p) => (
           <div
@@ -342,14 +343,16 @@ export default function ContentReseve({ filters = {} }: Props) {
           </div>
         ))}
 
+        {/* POPUP */}
+
         {activeProp && (
           <div
             className="
-            absolute
-            z-20
-            w-56
-            -translate-x-1/2
-            -translate-y-full
+              absolute
+              z-20
+              w-56
+              -translate-x-1/2
+              -translate-y-full
             "
             style={{
               top: activeProp.mapPosition?.top || "50%",
@@ -358,43 +361,53 @@ export default function ContentReseve({ filters = {} }: Props) {
           >
             <div
               className="
-              bg-white
-              rounded-xl
-              shadow-xl
-              overflow-hidden
+                relative
+                bg-white
+                rounded-xl
+                shadow-xl
+                overflow-hidden
               "
             >
+              {/* POPUP IMAGE */}
+
               <Image
                 src={activeProp.images?.[0] || "/images/placeholder.jpg"}
                 alt={activeProp.title}
                 width={400}
                 height={300}
                 className="
-                w-full
-                h-28
-                object-cover
+                  w-full
+                  h-28
+                  object-cover
                 "
               />
 
+              {/* CLOSE */}
+
               <button
+                type="button"
                 onClick={() => setActivePin(null)}
                 className="
-                absolute
-                top-2
-                left-2
-                bg-white
-                rounded-full
-                p-1
+                  absolute
+                  top-2
+                  left-2
+                  bg-white
+                  rounded-full
+                  p-1
+                  shadow
+                  z-10
                 "
               >
                 <X size={12} />
               </button>
 
+              {/* POPUP CONTENT */}
+
               <div className="p-3">
                 <p
                   className="
-                  text-xs
-                  font-bold
+                    text-xs
+                    font-bold
                   "
                 >
                   {activeProp.title}
@@ -403,11 +416,11 @@ export default function ContentReseve({ filters = {} }: Props) {
                 <Link
                   href={`/properties/${activeProp._id}`}
                   className="
-                  text-primary500
-                  text-xs
-                  mt-2
-                  flex
-                  gap-1
+                    text-primary500
+                    text-xs
+                    mt-2
+                    flex
+                    gap-1
                   "
                 >
                   جزئیات بیشتر

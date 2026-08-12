@@ -17,7 +17,7 @@ export default function Page() {
 
   return (
     <MainLayout>
-      <div className="mt-20">
+      <div className="mt-30 mb-10 w-full px-6">
         <Search
           key={resetKey}
           variant="houseReserve"

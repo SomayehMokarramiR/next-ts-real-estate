@@ -85,17 +85,21 @@ export default function MortgageHouse() {
     <div>
       <div
         className="
-          max-w-[1200px]
-          mx-auto
-          px-4
-          py-8
+        w-full
+    max-w-[1200px]
+    mx-auto
+    px-4
+    pt-8
+    pb-16
         "
       >
-        <div className="py-12">
+        <div className="mb-8">
           <Breadcrumb />
         </div>
 
+        {/* <div className="w-full"> */}
         <Search fields={searchFields} variant="mortgage" />
+       clear {/* </div> */}
 
         <div className="mb-6 mt-8">
           <p className="text-sm text-gray-500 dark:text-white">

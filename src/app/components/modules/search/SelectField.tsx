@@ -21,7 +21,7 @@ export default function SelectField({
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="relative flex flex-col gap-1">
+    <div className="relative flex w-full min-w-0 flex-col gap-1">
       <label
         className="
           text-sm
@@ -39,6 +39,8 @@ export default function SelectField({
         onClick={() => setOpen((prev) => !prev)}
         className="
           flex
+          w-full
+          min-w-0
           items-center
           justify-between
           bg-[#F0F0F3]
@@ -49,12 +51,14 @@ export default function SelectField({
           text-sm
           text-gray-400
           dark:text-gray-300
-          w-full
         "
       >
-        <ChevronDown size={16} className="text-gray-500 dark:text-gray-300" />
+        <ChevronDown
+          size={16}
+          className="shrink-0 text-gray-500 dark:text-gray-300"
+        />
 
-        <span>{value || placeholder}</span>
+        <span className="min-w-0 truncate">{value || placeholder}</span>
       </button>
 
       {open && (
@@ -62,8 +66,10 @@ export default function SelectField({
           className="
             absolute
             top-full
+            right-0
             mt-2
             w-full
+            min-w-0
             bg-white
             dark:bg-[#353535]
             rounded-xl

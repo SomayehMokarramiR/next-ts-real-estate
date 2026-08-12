@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import SelectField from "./SelectField";
 import { SearchField } from "./types";
 
@@ -22,7 +22,9 @@ export default function Search({
   const renderField = (field: SearchField, index: number) => {
     const isSearch = index === 0;
 
+    // =========================
     // BUTTON
+    // =========================
     if (field.type === "button") {
       return (
         <div
@@ -39,6 +41,8 @@ export default function Search({
                   min-[640px]:w-[calc(50%-8px)]
                   min-[988px]:w-[calc(50%-8px)]
                   min-[1148px]:w-[136px]
+
+                  max-[760px]:!w-full
                 `
                 : ""
             }
@@ -87,7 +91,9 @@ export default function Search({
       );
     }
 
+    // =========================
     // INPUT
+    // =========================
     if (field.type === "input") {
       return (
         <div
@@ -106,6 +112,8 @@ export default function Search({
                   min-[988px]:w-[calc(50%-8px)]
                   min-[1148px]:w-[195px]
                   min-[1280px]:w-[208px]
+
+                  max-[760px]:!w-full
                 `
                 : ""
             }
@@ -165,7 +173,9 @@ export default function Search({
       );
     }
 
+    // =========================
     // SELECT
+    // =========================
     return (
       <div
         key={index}
@@ -180,6 +190,8 @@ export default function Search({
                 min-[988px]:w-[calc(50%-8px)]
                 min-[1148px]:w-[195px]
                 min-[1280px]:w-[208px]
+
+                max-[760px]:!w-full
               `
               : ""
           }
@@ -215,6 +227,9 @@ export default function Search({
     );
   };
 
+  // =========================
+  // HOUSE RESERVE
+  // =========================
   if (variant === "houseReserve") {
     return (
       <div
@@ -223,8 +238,10 @@ export default function Search({
           flex-wrap
           gap-4
           items-end
-          max-[987px]:grid
-          max-[987px]:grid-cols-2
+
+          max-[760px]:grid
+          max-[760px]:grid-cols-2
+          max-[760px]:gap-4
         "
       >
         {fields.map(renderField)}
@@ -232,9 +249,15 @@ export default function Search({
     );
   }
 
+  // =========================
+  // MORTGAGE
+  // =========================
   if (variant === "mortgage") {
     return <>{fields.map(renderField)}</>;
   }
 
+  // =========================
+  // DEFAULT
+  // =========================
   return <>{fields.map(renderField)}</>;
 }
