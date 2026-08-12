@@ -1,9 +1,37 @@
 import { MapPin, Bed, Bath, Users, Car, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+
 import type { Property } from "@/hooks/useProperties";
 
 export default function PropertyCard({ property }: { property: Property }) {
+  // ======================================
+  // DEBUG
+  // ======================================
+
+  console.log("property==============:", property);
+
+  // ======================================
+  // TRANSACTION LABEL
+  // ======================================
+
+  const transactionLabel = {
+    rent: "اجاره",
+    mortgage: "رهن کامل",
+    "rent-mortgage": "رهن و اجاره",
+    sale: "فروش",
+  }[property.transactionType];
+
+  // ======================================
+  // PRICE
+  // ======================================
+
+  const monthlyRent = property.pricing?.monthly;
+
+  const mortgage = property.pricing?.mortgage;
+
+  const dailyPrice = property.pricing?.daily;
+
   return (
     <Link
       href={`/properties/${property._id}`}
@@ -31,6 +59,7 @@ export default function PropertyCard({ property }: { property: Property }) {
         }}
       >
         {/* Image */}
+
         <div className="relative h-[172px]">
           <Image
             src={property.images?.[0] || "/images/placeholder.jpg"}
@@ -40,6 +69,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           />
 
           {/* Rating */}
+
           <div
             className="
               absolute
@@ -58,10 +88,12 @@ export default function PropertyCard({ property }: { property: Property }) {
             "
           >
             <Star size={11} fill="white" strokeWidth={0} />
-            <span>{property.rating}</span>
+
+            <span>{property.rating ?? 0}</span>
           </div>
 
           {/* Location */}
+
           <div
             className="
               absolute
@@ -95,6 +127,7 @@ export default function PropertyCard({ property }: { property: Property }) {
         </div>
 
         {/* Body */}
+
         <div
           className="
             px-4
@@ -106,6 +139,7 @@ export default function PropertyCard({ property }: { property: Property }) {
           "
         >
           {/* Title */}
+
           <h3
             className="
               text-gray-900
@@ -119,7 +153,26 @@ export default function PropertyCard({ property }: { property: Property }) {
             {property.title}
           </h3>
 
+          {/* Transaction Type */}
+
+          <div className="flex justify-end">
+            <span
+              className="
+                text-[10px]
+                px-2.5
+                py-1
+                rounded-full
+                bg-primary500/10
+                text-primary500
+                font-medium
+              "
+            >
+              {transactionLabel}
+            </span>
+          </div>
+
           {/* Facilities */}
+
           <div
             className="
               flex
@@ -133,69 +186,175 @@ export default function PropertyCard({ property }: { property: Property }) {
           >
             <span className="flex items-center gap-[3px]">
               <Bed size={12} />
-              {property.facilities?.bedrooms} خواب
+              {property.facilities?.bedrooms ?? 0} خواب
             </span>
 
             <span>|</span>
 
             <span className="flex items-center gap-[3px]">
               <Bath size={12} />
-              {property.facilities?.bathrooms} حمام
+              {property.facilities?.bathrooms ?? 0} حمام
             </span>
 
             <span>|</span>
 
             <span className="flex items-center gap-[3px]">
               <Users size={12} />
-              {property.facilities?.capacity} نفر
+              {property.facilities?.capacity ?? 0} نفر
             </span>
 
             <span>|</span>
 
             <span className="flex items-center gap-[3px]">
               <Car size={12} />
+
               {property.facilities?.parking ? "دارد" : "ندارد"}
             </span>
           </div>
 
-          <div className="border-t border-gray-100 dark:border-gray-600" />
+          {/* Area */}
 
-          {/* Price */}
           <div
             className="
               flex
               items-center
-              justify-between
+              justify-end
+              text-[11px]
+              text-gray-500
+              dark:text-white
+            "
+          >
+            متراژ: {property.area ?? 0} متر
+          </div>
+
+          <div
+            className="
+              border-t
+              border-gray-100
+              dark:border-gray-600
+            "
+          />
+
+          {/* Price */}
+
+          <div
+            className="
+              flex
+              flex-col
+              gap-1.5
               bg-[#EDEDED]
               dark:bg-[#272727]
               rounded-xl
               px-3
+              py-2.5
             "
           >
-            <span
-              className="
-                text-[11px]
-                py-3
-                text-gray-500
-                dark:text-white
-              "
-            >
-              اجاره شبانه
-            </span>
+            {/* Rent */}
 
-            <span
-              className="
-                text-sm
-                font-bold
-                text-gray-800
-                dark:text-white
-              "
-            >
-              {property.pricing?.daily?.toLocaleString()} تومان
-            </span>
+            {(property.transactionType === "rent" ||
+              property.transactionType === "rent-mortgage") && (
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                "
+              >
+                <span
+                  className="
+                    text-[11px]
+                    text-gray-500
+                    dark:text-white
+                  "
+                >
+                  اجاره ماهانه
+                </span>
+
+                <span
+                  className="
+                    text-sm
+                    font-bold
+                    text-gray-800
+                    dark:text-white
+                  "
+                >
+                  {monthlyRent ? monthlyRent.toLocaleString("fa-IR") : "توافقی"}{" "}
+                  {monthlyRent ? "تومان" : ""}
+                </span>
+              </div>
+            )}
+
+            {/* Mortgage */}
+
+            {(property.transactionType === "mortgage" ||
+              property.transactionType === "rent-mortgage") && (
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                "
+              >
+                <span
+                  className="
+                    text-[11px]
+                    text-gray-500
+                    dark:text-white
+                  "
+                >
+                  مبلغ رهن
+                </span>
+
+                <span
+                  className="
+                    text-sm
+                    font-bold
+                    text-gray-800
+                    dark:text-white
+                  "
+                >
+                  {mortgage ? mortgage.toLocaleString("fa-IR") : "توافقی"}{" "}
+                  {mortgage ? "تومان" : ""}
+                </span>
+              </div>
+            )}
+
+            {/* Daily */}
+
+            {!monthlyRent && !mortgage && dailyPrice && (
+              <div
+                className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+              >
+                <span
+                  className="
+                      text-[11px]
+                      text-gray-500
+                      dark:text-white
+                    "
+                >
+                  اجاره شبانه
+                </span>
+
+                <span
+                  className="
+                      text-sm
+                      font-bold
+                      text-gray-800
+                      dark:text-white
+                    "
+                >
+                  {dailyPrice.toLocaleString("fa-IR")} تومان
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Details */}
+
           <span
             className="
               text-center

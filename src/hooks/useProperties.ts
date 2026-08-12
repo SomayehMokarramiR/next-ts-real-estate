@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
+// ======================================
+// PROPERTY TYPE
+// ======================================
+
 export interface Property {
   _id: string;
 
@@ -8,6 +12,8 @@ export interface Property {
   description?: string;
 
   type: "apartment" | "villa" | "house" | "hotel" | "suite";
+
+  transactionType: "rent" | "mortgage" | "rent-mortgage" | "sale";
 
   images: string[];
 
@@ -24,9 +30,12 @@ export interface Property {
     capacity: number;
   };
 
+  area: number;
+
   pricing: {
     daily: number;
     monthly?: number;
+    mortgage?: number;
     oldPrice?: number;
     discount?: number;
   };
@@ -36,20 +45,49 @@ export interface Property {
   views: number;
 
   status: "available" | "reserved" | "inactive";
+
+  isFeatured?: boolean;
+
+  featuredOrder?: number;
 }
+
+// ======================================
+// FILTER TYPE
+// ======================================
+
+export type PropertyFilters = Record<string, string>;
+
+// ======================================
+// SINGLE PROPERTY RESPONSE
+// ======================================
 
 interface PropertyResponse {
   success: boolean;
   property: Property;
 }
 
-interface PropertiesResponse {
+// ======================================
+// LIST RESPONSE
+// ======================================
+
+export interface PropertiesResponse {
   success: boolean;
+
+  count: number;
+
+  total: number;
+
+  page: number;
+
+  limit: number;
+
+  totalPages: number;
+
   properties: Property[];
 }
 
 // ======================================
-// دریافت یک ملک
+// GET SINGLE PROPERTY
 // ======================================
 
 async function getProperty(propertyId: string): Promise<Property> {
@@ -69,7 +107,7 @@ async function getProperty(propertyId: string): Promise<Property> {
 }
 
 // ======================================
-// Hook دریافت یک ملک
+// SINGLE PROPERTY HOOK
 // ======================================
 
 export function useProperty(propertyId?: string) {
@@ -91,16 +129,16 @@ export function useProperty(propertyId?: string) {
 }
 
 // ======================================
-// دریافت لیست املاک
+// GET PROPERTIES
 // ======================================
 
 async function getProperties(
-  filters: Record<string, string> = {},
-): Promise<Property[]> {
+  filters: PropertyFilters = {},
+): Promise<PropertiesResponse> {
   const params = new URLSearchParams();
 
   Object.entries(filters).forEach(([key, value]) => {
-    if (value) {
+    if (value !== undefined && value !== null && value !== "") {
       params.set(key, value);
     }
   });
@@ -121,15 +159,15 @@ async function getProperties(
     throw new Error("اطلاعات املاک دریافت نشد");
   }
 
-  return data.properties ?? [];
+  return data;
 }
 
 // ======================================
-// Hook دریافت لیست املاک
+// PROPERTIES HOOK
 // ======================================
 
-export function useProperties(filters: Record<string, string> = {}) {
-  return useQuery<Property[], Error>({
+export function useProperties(filters: PropertyFilters = {}) {
+  return useQuery<PropertiesResponse, Error>({
     queryKey: ["properties", filters],
 
     queryFn: () => getProperties(filters),

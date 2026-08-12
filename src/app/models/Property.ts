@@ -11,6 +11,9 @@ export interface IProperty extends Document {
 
   type: "apartment" | "villa" | "house" | "hotel" | "suite";
 
+  // نوع معامله
+  transactionType: "rent" | "mortgage" | "rent-mortgage" | "sale";
+
   location: {
     city: string;
     address: string;
@@ -26,9 +29,13 @@ export interface IProperty extends Document {
     capacity: number;
   };
 
+  // متراژ ملک
+  area: number;
+
   pricing: {
     daily: number;
     monthly?: number;
+    mortgage?: number;
     oldPrice?: number;
   };
 
@@ -55,7 +62,9 @@ export interface IProperty extends Document {
 
 const PropertySchema = new Schema<IProperty>(
   {
+    // =========================
     // BASIC
+    // =========================
 
     title: {
       type: String,
@@ -77,7 +86,20 @@ const PropertySchema = new Schema<IProperty>(
       default: "villa",
     },
 
+    // =========================
+    // TRANSACTION TYPE
+    // =========================
+
+    transactionType: {
+      type: String,
+      enum: ["rent", "mortgage", "rent-mortgage", "sale"],
+      default: "rent",
+      required: true,
+    },
+
+    // =========================
     // LOCATION
+    // =========================
 
     location: {
       city: {
@@ -93,14 +115,18 @@ const PropertySchema = new Schema<IProperty>(
       },
     },
 
+    // =========================
     // IMAGES
+    // =========================
 
     images: {
       type: [String],
       default: [],
     },
 
+    // =========================
     // FACILITIES
+    // =========================
 
     facilities: {
       bedrooms: {
@@ -132,81 +158,100 @@ const PropertySchema = new Schema<IProperty>(
       },
     },
 
+    // =========================
+    // AREA
+    // =========================
+
+    area: {
+      type: Number,
+      required: [true, "متراژ ملک الزامی است"],
+      min: 1,
+    },
+
+    // =========================
     // PRICING
+    // =========================
 
     pricing: {
+      // قیمت روزانه
       daily: {
         type: Number,
         required: [true, "قیمت روزانه الزامی است"],
         min: 0,
       },
 
+      // اجاره ماهانه
       monthly: {
         type: Number,
         min: 0,
       },
 
+      // مبلغ رهن
+      mortgage: {
+        type: Number,
+        min: 0,
+      },
+
+      // قیمت قبلی
       oldPrice: {
         type: Number,
         min: 0,
       },
     },
 
+    // =========================
     // RATING
+    // =========================
 
     rating: {
       type: Number,
-
       default: 0,
-
       min: 0,
-
       max: 5,
     },
 
+    // =========================
     // POPULARITY
+    // =========================
 
     views: {
       type: Number,
-
       default: 0,
-
       min: 0,
     },
 
+    // =========================
     // FEATURED
+    // =========================
 
     isFeatured: {
       type: Boolean,
-
       default: false,
     },
 
     featuredOrder: {
       type: Number,
-
       default: 0,
-
       min: 0,
     },
 
+    // =========================
     // STATUS
+    // =========================
 
     status: {
       type: String,
-
       enum: ["available", "reserved", "inactive"],
-
       default: "available",
     },
 
+    // =========================
     // OWNER
+    // =========================
 
     owner: {
       type: Schema.Types.ObjectId,
-
       ref: "User",
-
       default: undefined,
     },
   },
@@ -222,9 +267,7 @@ const PropertySchema = new Schema<IProperty>(
 
 PropertySchema.index({
   title: "text",
-
   "location.city": "text",
-
   "location.address": "text",
 });
 
@@ -237,14 +280,28 @@ PropertySchema.index({
 });
 
 PropertySchema.index({
+  "pricing.monthly": 1,
+});
+
+PropertySchema.index({
+  "pricing.mortgage": 1,
+});
+
+PropertySchema.index({
   "location.city": 1,
 });
 
-// برای صفحه بهترین‌ها
+PropertySchema.index({
+  transactionType: 1,
+});
 
 PropertySchema.index({
-  isFeatured: 1,
+  area: 1,
+});
 
+// برای صفحه بهترین‌ها
+PropertySchema.index({
+  isFeatured: 1,
   featuredOrder: 1,
 });
 

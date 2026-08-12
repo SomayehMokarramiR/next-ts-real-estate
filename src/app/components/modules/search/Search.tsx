@@ -19,12 +19,35 @@ export default function Search({
 }: Props) {
   const [values, setValues] = useState<Record<string, string>>({});
 
+  // ======================================
+  // RESET
+  // ======================================
+
+  const resetSearch = () => {
+    setValues({});
+    onSearch?.({});
+  };
+
+  // ======================================
+  // FIELD KEY
+  // ======================================
+
+  const getFieldKey = (field: SearchField) => {
+    return field.key || field.label;
+  };
+
+  // ======================================
+  // RENDER FIELD
+  // ======================================
+
   const renderField = (field: SearchField, index: number) => {
     const isSearch = index === 0;
+    const fieldKey = getFieldKey(field);
 
-    // =========================
+    // ======================================
     // BUTTON
-    // =========================
+    // ======================================
+
     if (field.type === "button") {
       return (
         <div
@@ -41,7 +64,6 @@ export default function Search({
                   min-[640px]:w-[calc(50%-8px)]
                   min-[988px]:w-[calc(50%-8px)]
                   min-[1148px]:w-[136px]
-
                   max-[760px]:!w-full
                 `
                 : ""
@@ -63,9 +85,8 @@ export default function Search({
           <button
             type="button"
             onClick={() => {
-              if (field.label.includes("حذف")) {
-                setValues({});
-                onSearch?.({});
+              if (field.label.includes("حذف") || field.key === "reset") {
+                resetSearch();
                 return;
               }
 
@@ -82,7 +103,11 @@ export default function Search({
               justify-center
               text-white
 
-              ${field.label.includes("حذف") ? "bg-[#FF220C]" : "bg-primary500"}
+              ${
+                field.label.includes("حذف") || field.key === "reset"
+                  ? "bg-[#FF220C]"
+                  : "bg-primary500"
+              }
             `}
           >
             {field.label}
@@ -91,9 +116,10 @@ export default function Search({
       );
     }
 
-    // =========================
+    // ======================================
     // INPUT
-    // =========================
+    // ======================================
+
     if (field.type === "input") {
       return (
         <div
@@ -112,7 +138,6 @@ export default function Search({
                   min-[988px]:w-[calc(50%-8px)]
                   min-[1148px]:w-[195px]
                   min-[1280px]:w-[208px]
-
                   max-[760px]:!w-full
                 `
                 : ""
@@ -122,8 +147,16 @@ export default function Search({
               variant === "mortgage"
                 ? `
                   w-full
+
+                  max-[639px]:w-full
+
                   min-[640px]:w-[calc(50%-8px)]
+
                   min-[992px]:${isSearch ? "w-[300px]" : "w-[180px]"}
+
+                  min-[1148px]:${isSearch ? "w-[300px]" : "w-[190px]"}
+
+                  min-[1280px]:${isSearch ? "w-[320px]" : "w-[200px]"}
                 `
                 : ""
             }
@@ -145,13 +178,15 @@ export default function Search({
 
           <input
             type="text"
-            value={values[field.label] || ""}
-            onChange={(e) =>
+            value={values[fieldKey] || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+
               setValues((prev) => ({
                 ...prev,
-                [field.label]: e.target.value,
-              }))
-            }
+                [fieldKey]: value,
+              }));
+            }}
             placeholder={field.placeholder}
             className="
               h-10
@@ -173,9 +208,10 @@ export default function Search({
       );
     }
 
-    // =========================
+    // ======================================
     // SELECT
-    // =========================
+    // ======================================
+
     return (
       <div
         key={index}
@@ -190,7 +226,6 @@ export default function Search({
                 min-[988px]:w-[calc(50%-8px)]
                 min-[1148px]:w-[195px]
                 min-[1280px]:w-[208px]
-
                 max-[760px]:!w-full
               `
               : ""
@@ -200,8 +235,16 @@ export default function Search({
             variant === "mortgage"
               ? `
                 w-full
+
+                max-[639px]:w-full
+
                 min-[640px]:w-[calc(50%-8px)]
+
                 min-[992px]:w-[160px]
+
+                min-[1148px]:w-[170px]
+
+                min-[1280px]:w-[180px]
               `
               : ""
           }
@@ -213,13 +256,11 @@ export default function Search({
           label={field.label}
           placeholder={field.placeholder}
           options={field.options}
-          value={values[field.key || field.label] || ""}
+          value={values[fieldKey] || ""}
           onChange={(value) => {
-            const key = field.key || field.label;
-
             setValues((prev) => ({
               ...prev,
-              [key]: value,
+              [fieldKey]: value,
             }));
           }}
         />
@@ -227,9 +268,11 @@ export default function Search({
     );
   };
 
-  // =========================
+  // ======================================
   // HOUSE RESERVE
-  // =========================
+  // ⚠️ بدون تغییر
+  // ======================================
+
   if (variant === "houseReserve") {
     return (
       <div
@@ -249,15 +292,42 @@ export default function Search({
     );
   }
 
-  // =========================
+  // ======================================
   // MORTGAGE
-  // =========================
+  // فقط UI این صفحه
+  // ======================================
+
   if (variant === "mortgage") {
-    return <>{fields.map(renderField)}</>;
+    return (
+      <div
+        className="
+          w-full
+          flex
+          flex-wrap
+          items-end
+          gap-4
+        "
+      >
+        {fields.map(renderField)}
+      </div>
+    );
   }
 
-  // =========================
+  // ======================================
   // DEFAULT
-  // =========================
-  return <>{fields.map(renderField)}</>;
+  // ======================================
+
+  return (
+    <div
+      className="
+        w-full
+        flex
+        flex-wrap
+        items-end
+        gap-4
+      "
+    >
+      {fields.map(renderField)}
+    </div>
+  );
 }
