@@ -23,24 +23,24 @@ export default function Login() {
     router.push("/register");
   };
 
-  const pageTitle = "ورود به حساب کاربری";
-
   return (
-    <div className="flex items-center justify-center p-4 sm:p-6 lg:p-8">
+    <div className="flex items-center justify-center px-4 py-3 sm:px-6">
       <div
         className="
           w-full
           max-w-5xl
           bg-white
+          dark:bg-[#272727]
           rounded-2xl
           shadow-2xl
           overflow-hidden
           flex
           flex-col
           md:flex-row
+          md:h-[450px]
         "
       >
-        {/* Right - Form */}
+        {/* Form */}
         <div
           className="
             bg-white
@@ -51,9 +51,9 @@ export default function Login() {
             flex-col
             justify-center
             px-5
-            py-10
+            py-7
             sm:px-8
-            sm:py-12
+            sm:py-7
             lg:px-10
           "
         >
@@ -66,11 +66,11 @@ export default function Login() {
               text-center
               text-[#1a1a2e]
               dark:text-white
-              mb-5
-              mt-8
+              mt-5
+              mb-4
             "
           >
-            {pageTitle}
+            ورود به حساب کاربری
           </h1>
 
           {/* Tabs */}
@@ -81,16 +81,17 @@ export default function Login() {
               dark:bg-[#353535]
               rounded-full
               p-1
-              mb-6
+              mb-3
               gap-1
             "
           >
             {/* Register */}
             <button
+              type="button"
               onClick={handleRegister}
               className="
                 flex-1
-                h-11
+                h-10
                 flex
                 items-center
                 justify-center
@@ -113,10 +114,11 @@ export default function Login() {
 
             {/* Login */}
             <button
+              type="button"
               onClick={() => setActiveTab("login")}
               className="
                 flex-1
-                h-11
+                h-10
                 flex
                 items-center
                 justify-center
@@ -137,20 +139,17 @@ export default function Login() {
             </button>
           </div>
 
-          {/* Login Form */}
           {activeTab === "login" && <LoginForm />}
         </div>
 
-        {/* Left - Hero Swiper */}
+        {/* Slider */}
         <div
           className="
             relative
             w-full
             md:w-[55%]
             h-56
-            sm:h-72
-            md:h-auto
-            min-h-80
+            md:h-full
             shrink-0
           "
         >
@@ -188,6 +187,7 @@ export default function Login() {
               from-black/40
               to-transparent
               pointer-events-none
+              z-10
             "
           />
         </div>

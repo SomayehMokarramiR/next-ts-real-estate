@@ -17,79 +17,80 @@ export default function ForgetPass() {
     <div className="flex flex-col">
       <main
         className="
-        flex-1
-        flex
-        items-center
-        justify-center
-        p-4
-        sm:p-6
-        lg:p-10
+          flex-1
+          flex
+          items-center
+          justify-center
+          px-4
+          py-4
+          sm:px-6
         "
       >
         <div
           className="
-          w-full
-          max-w-5xl
-          bg-white
-          dark:bg-[#272727]
-          rounded-3xl
-          shadow-xl
-          overflow-hidden
-          flex
-          flex-col
-          sm:flex-row-reverse
-          min-h-[520px]
+            w-full
+            max-w-5xl
+            bg-white
+            dark:bg-[#272727]
+            rounded-2xl
+            shadow-2xl
+            overflow-hidden
+            flex
+            flex-col
+            md:flex-row-reverse
+            md:min-h-[520px]
           "
         >
           {/* Slider - سمت چپ */}
-
           <div
             className="
-            w-full
-            lg:w-[55%]
-            h-64
-            sm:h-auto
-            p-4
+              relative
+              w-full
+              md:w-[55%]
+              min-h-[260px]
+              md:min-h-[520px]
+              shrink-0
             "
           >
             <HouseSlider />
           </div>
 
           {/* Form - سمت راست */}
-
           <div
             className="
-            w-full
-            lg:w-[45%]
-            flex
-            items-center
-            justify-center
-            border-t
-            lg:border-t-0
-            lg:border-l
-            border-gray-100
-            dark:border-[#353535]
+              bg-white
+              dark:bg-[#272727]
+              w-full
+              md:w-[45%]
+              flex
+              flex-col
+              justify-center
+              px-5
+              py-8
+              sm:px-8
+              lg:px-10
+              border-t
+              md:border-t-0
+              md:border-l
+              border-gray-100
+              dark:border-[#353535]
             "
           >
             <div
               className="
-              w-full
-              max-w-sm
-              flex
-              flex-col
-              items-center
+                w-full
+                max-w-sm
+                mx-auto
               "
             >
-              {/* عنوان فرم */}
-
               <h1
                 className="
-                text-xl
-                font-bold
-                text-gray-900
-                dark:text-white
-                mb-8
-                text-center
+                  text-xl
+                  font-bold
+                  text-gray-900
+                  dark:text-white
+                  mb-8
+                  text-center
                 "
               >
                 فراموشی رمز عبور

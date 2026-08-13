@@ -65,6 +65,7 @@ export interface MeResponse {
 
   message?: string;
 }
+
 export interface LogoutResponse {
   success: boolean;
   message: string;
@@ -186,6 +187,7 @@ export function logout() {
     method: "POST",
   });
 }
+
 /* =========================
    Forgot Password - Step 1
 ========================= */
@@ -212,7 +214,11 @@ export function verifyResetCode(data: { email: string; code: string }) {
    Reset Password - Step 3
 ========================= */
 
-export function resetPassword(data: { email: string; password: string }) {
+export function resetPassword(data: {
+  email: string;
+  code: string;
+  password: string;
+}) {
   return apiRequest<ResetPasswordResponse>(`${API_URL}/reset-password`, {
     method: "POST",
     body: JSON.stringify(data),

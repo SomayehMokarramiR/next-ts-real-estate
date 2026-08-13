@@ -22,7 +22,7 @@ export default function LoginForm() {
 
   const loginMutation = useLogin();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     loginMutation.mutate(
@@ -55,20 +55,34 @@ export default function LoginForm() {
       },
     );
   };
+
   return (
-    <div className="flex flex-col gap-4">
-      {/* OAuth buttons */}
+    <div className="flex flex-col gap-2">
+      {/* OAuth */}
       <div className="flex gap-3">
         <button
           type="button"
           className="
-          flex-1 flex items-center justify-center gap-2 py-2.5 px-4
-          border border-gray-200 dark:border-[#444]
-          rounded-full text-sm font-medium
-          text-gray-700 dark:text-white
-          bg-white dark:bg-[#353535]
-          hover:bg-gray-50 dark:hover:bg-[#404040]
-          transition-colors
+            flex-1
+            flex
+            items-center
+            justify-center
+            gap-2
+            py-2
+            px-4
+            border
+            border-gray-200
+            dark:border-[#444]
+            rounded-full
+            text-sm
+            font-medium
+            text-gray-700
+            dark:text-white
+            bg-white
+            dark:bg-[#353535]
+            hover:bg-gray-50
+            dark:hover:bg-[#404040]
+            transition
           "
         >
           <GithubIcon />
@@ -78,13 +92,26 @@ export default function LoginForm() {
         <button
           type="button"
           className="
-          flex-1 flex items-center justify-center gap-2 py-2.5 px-4
-          border border-gray-200 dark:border-[#444]
-          rounded-full text-sm font-medium
-          text-gray-700 dark:text-white
-          bg-white dark:bg-[#353535]
-          hover:bg-gray-50 dark:hover:bg-[#404040]
-          transition-colors
+            flex-1
+            flex
+            items-center
+            justify-center
+            gap-2
+            py-2
+            px-4
+            border
+            border-gray-200
+            dark:border-[#444]
+            rounded-full
+            text-sm
+            font-medium
+            text-gray-700
+            dark:text-white
+            bg-white
+            dark:bg-[#353535]
+            hover:bg-gray-50
+            dark:hover:bg-[#404040]
+            transition
           "
         >
           <GoogleIcon />
@@ -103,7 +130,8 @@ export default function LoginForm() {
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-2" dir="rtl">
+        {/* Email */}
         <div className="relative">
           <input
             type="email"
@@ -111,15 +139,46 @@ export default function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="ایمیل خود را وارد کنید"
             required
-            dir="rtl"
-            className="w-full border border-gray-200 dark:border-[#353535] bg-white dark:bg-[#353535] rounded-full py-3 pr-11 pl-4 text-sm text-gray-700 placeholder-gray-400 dark:placeholder-gray-200 focus:outline-none focus:border-primary500 focus:ring-2 focus:ring-primary500/20 transition-all"
+            autoComplete="email"
+            className="
+              w-full
+              h-11
+              border
+              border-gray-200
+              dark:border-[#353535]
+              bg-white
+              dark:bg-[#353535]
+              rounded-full
+              pr-11
+              pl-4
+              text-sm
+              text-gray-700
+              dark:text-white
+              placeholder-gray-400
+              dark:placeholder-gray-200
+              focus:outline-none
+              focus:border-primary500
+              focus:ring-2
+              focus:ring-primary500/20
+              transition-all
+            "
           />
 
-          <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-            <Mail className="w-4 h-4" />
-          </span>
+          <Mail
+            className="
+              absolute
+              right-3.5
+              top-1/2
+              -translate-y-1/2
+              w-4
+              h-4
+              text-gray-400
+              pointer-events-none
+            "
+          />
         </div>
 
+        {/* Password */}
         <PasswordField
           placeholder="رمز عبور را وارد کنید"
           value={password}
@@ -127,33 +186,60 @@ export default function LoginForm() {
           required
         />
 
+        {/* Error */}
         {loginMutation.error && (
           <p className="text-xs text-red-500 text-center">
             {loginMutation.error.message}
           </p>
         )}
 
-        <div className="flex items-center justify-start gap-1">
+        {/* Forgot Password */}
+        <div
+          className="
+            flex
+            items-center
+            justify-start
+            gap-1
+            mt-1
+          "
+        >
           <Info className="w-3.5 h-3.5 text-primary500 shrink-0" />
 
-          <a
-            href="#"
-            className="text-xs text-primary500 hover:text-primary700 transition-colors"
+          <button
+            type="button"
+            onClick={() => router.push("/forget-password")}
+            className="
+              text-xs
+              text-primary500
+              hover:text-primary700
+              transition
+            "
           >
-            رمز عبور خود را فراموش کرده اید ؟
-          </a>
+            رمز عبور خود را فراموش کرده اید؟
+          </button>
         </div>
 
+        {/* Submit */}
         <button
           type="submit"
           disabled={loginMutation.isPending}
           className="
-          w-full bg-primary500 hover:bg-[#1e3fa0]
-          active:bg-[#173090]
-          text-white font-semibold py-3.5
-          rounded-full transition-colors duration-200
-          text-sm shadow-md hover:shadow-lg mt-1
-          disabled:opacity-60
+            w-full
+            h-11
+            bg-primary500
+            hover:bg-[#1e3fa0]
+            active:bg-[#173090]
+            text-white
+            font-semibold
+            rounded-full
+            transition
+            text-sm
+            shadow-md
+            hover:shadow-lg
+            mt-3
+            mb-3
+            disabled:opacity-60
+            disabled:cursor-not-allowed
           "
         >
           {loginMutation.isPending ? "در حال ورود..." : "ورود به حساب کاربری"}

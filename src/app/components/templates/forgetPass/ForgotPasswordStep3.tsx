@@ -28,21 +28,40 @@ export default function ForgotPasswordStep3({
   const [error, setError] = useState("");
   const [completed, setCompleted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!password.trim()) {
-      setError("لطفا رمز جدید را وارد کنید");
+    const normalizedEmail = email.trim();
+    const normalizedCode = code.trim();
+    const normalizedPassword = password.trim();
+
+    if (!normalizedEmail) {
+      setError("ایمیل وارد نشده است.");
       return;
     }
 
-    if (password.length < 6) {
-      setError("رمز عبور باید حداقل ۶ کاراکتر باشد");
+    if (!normalizedCode) {
+      setError("کد تأیید وارد نشده است.");
       return;
     }
 
-    if (password !== confirmPassword) {
-      setError("تکرار رمز عبور صحیح نیست");
+    if (normalizedCode.length !== 5) {
+      setError("کد تأیید باید ۵ رقم باشد.");
+      return;
+    }
+
+    if (!normalizedPassword) {
+      setError("لطفاً رمز جدید را وارد کنید.");
+      return;
+    }
+
+    if (normalizedPassword.length < 6) {
+      setError("رمز عبور باید حداقل ۶ کاراکتر باشد.");
+      return;
+    }
+
+    if (normalizedPassword !== confirmPassword) {
+      setError("تکرار رمز عبور صحیح نیست.");
       return;
     }
 
@@ -50,8 +69,9 @@ export default function ForgotPasswordStep3({
 
     resetMutation.mutate(
       {
-        email,
-        password,
+        email: normalizedEmail,
+        code: normalizedCode,
+        password: normalizedPassword,
       },
       {
         onSuccess: (res) => {
@@ -63,12 +83,18 @@ export default function ForgotPasswordStep3({
             setTimeout(() => {
               router.push("/login");
             }, 2000);
+
+            return;
           }
+
+          setError(res.message || "تغییر رمز عبور انجام نشد.");
         },
 
         onError: (error) => {
           setError(
-            error instanceof Error ? error.message : "تغییر رمز انجام نشد",
+            error instanceof Error
+              ? error.message
+              : "تغییر رمز عبور انجام نشد.",
           );
         },
       },
@@ -79,24 +105,25 @@ export default function ForgotPasswordStep3({
     return (
       <div
         className="
-        flex
-        flex-col
-        items-center
-        justify-center
-        text-center
-        gap-5
-        py-8
+          flex
+          flex-col
+          items-center
+          justify-center
+          text-center
+          gap-5
+          py-8
         "
+        dir="rtl"
       >
         <CheckCircle2 size={64} className="text-green-500" />
 
         <div className="space-y-2">
           <h2
             className="
-            text-xl
-            font-semibold
-            text-[#1a1a2e]
-            dark:text-white
+              text-xl
+              font-semibold
+              text-[#1a1a2e]
+              dark:text-white
             "
           >
             رمز عبور تغییر کرد
@@ -104,9 +131,9 @@ export default function ForgotPasswordStep3({
 
           <p
             className="
-            text-sm
-            text-gray-500
-            dark:text-gray-300
+              text-sm
+              text-gray-500
+              dark:text-gray-300
             "
           >
             در حال انتقال به صفحه ورود...
@@ -119,14 +146,14 @@ export default function ForgotPasswordStep3({
   return (
     <div
       className="
-      flex
-      flex-col
-      items-center
-      justify-center
-      h-full
-      px-6
-      py-10
-      lg:py-0
+        flex
+        flex-col
+        items-center
+        justify-center
+        h-full
+        px-6
+        py-10
+        lg:py-0
       "
     >
       <Logo />
@@ -134,29 +161,29 @@ export default function ForgotPasswordStep3({
       <div className="w-full max-w-sm mt-8">
         <h1
           className="
-          text-xl
-          font-bold
-          text-gray-900
-          dark:text-white
-          text-center
-          mb-8
+            text-xl
+            font-bold
+            text-gray-900
+            dark:text-white
+            text-center
+            mb-8
           "
         >
           تعیین رمز عبور جدید
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4" dir="rtl">
-          {/* Password */}
-
+          {/* New Password */}
           <div className="relative">
             <Lock
               size={17}
               className="
-              absolute
-              right-4
-              top-1/2
-              -translate-y-1/2
-              text-gray-400
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
+                text-gray-400
+                pointer-events-none
               "
             />
 
@@ -168,40 +195,43 @@ export default function ForgotPasswordStep3({
                 setError("");
               }}
               placeholder="رمز عبور جدید"
+              autoComplete="new-password"
               disabled={resetMutation.isPending}
               className="
-              w-[321px]
-              h-12
-              border
-              border-[#CDCED6]
-              dark:border-[#353535]
-              bg-white
-              dark:bg-[#353535]
-              rounded-full
-              pr-11
-              px-4
-              text-sm
-              text-gray-800
-              dark:text-white
-              outline-none
-              focus:border-2
-              focus:border-primary500
-              focus:ring-0
+                w-[321px]
+                h-12
+                border
+                border-[#CDCED6]
+                dark:border-[#353535]
+                bg-white
+                dark:bg-[#353535]
+                rounded-full
+                pr-11
+                px-4
+                text-sm
+                text-gray-800
+                dark:text-white
+                placeholder:text-gray-400
+                outline-none
+                focus:border-2
+                focus:border-primary500
+                focus:ring-0
+                transition-all
               "
             />
           </div>
 
           {/* Confirm Password */}
-
           <div className="relative">
             <Lock
               size={17}
               className="
-              absolute
-              right-4
-              top-1/2
-              -translate-y-1/2
-              text-gray-400
+                absolute
+                right-4
+                top-1/2
+                -translate-y-1/2
+                text-gray-400
+                pointer-events-none
               "
             />
 
@@ -213,73 +243,82 @@ export default function ForgotPasswordStep3({
                 setError("");
               }}
               placeholder="تکرار رمز عبور"
+              autoComplete="new-password"
               disabled={resetMutation.isPending}
               className="
-              w-[321px]
-              h-12
-              border
-              border-[#CDCED6]
-              dark:border-[#353535]
-              bg-white
-              dark:bg-[#353535]
-              rounded-full
-              pr-11
-              px-4
-              text-sm
-              text-gray-800
-              dark:text-white
-              outline-none
-              focus:border-2
-              focus:border-primary500
-              focus:ring-0
+                w-[321px]
+                h-12
+                border
+                border-[#CDCED6]
+                dark:border-[#353535]
+                bg-white
+                dark:bg-[#353535]
+                rounded-full
+                pr-11
+                px-4
+                text-sm
+                text-gray-800
+                dark:text-white
+                placeholder:text-gray-400
+                outline-none
+                focus:border-2
+                focus:border-primary500
+                focus:ring-0
+                transition-all
               "
             />
           </div>
 
+          {/* Error */}
           {error && (
             <p
               className="
-              text-xs
-              text-red-500
-              px-2
+                text-xs
+                text-red-500
+                px-2
               "
             >
               {error}
             </p>
           )}
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={resetMutation.isPending}
             className="
-            w-[321px]
-            h-12
-            bg-primary500
-            hover:bg-primary600
-            disabled:opacity-60
-            text-white
-            font-medium
-            text-sm
-            rounded-full
-            transition
+              w-[321px]
+              h-12
+              bg-primary500
+              hover:bg-primary600
+              disabled:opacity-60
+              disabled:cursor-not-allowed
+              text-white
+              font-medium
+              text-sm
+              rounded-full
+              transition
             "
           >
             {resetMutation.isPending ? "در حال تغییر رمز..." : "تغییر رمز عبور"}
           </button>
 
+          {/* Back */}
           <button
             type="button"
             onClick={onBack}
             disabled={resetMutation.isPending}
             className="
-            flex
-            items-center
-            justify-center
-            gap-1
-            w-full
-            text-sm
-            text-gray-500
-            hover:text-primary500
+              flex
+              items-center
+              justify-center
+              gap-1
+              w-full
+              text-sm
+              text-gray-500
+              hover:text-primary500
+              disabled:opacity-50
+              transition
             "
           >
             بازگشت
