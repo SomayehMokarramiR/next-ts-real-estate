@@ -5,7 +5,9 @@ function page() {
   return (
     <MainLayout>
       <main className="pt-20">
-        <CategoryBlog />
+        <div className="py-6 sm:py-8">
+          <CategoryBlog />
+        </div>
       </main>
     </MainLayout>
   );
