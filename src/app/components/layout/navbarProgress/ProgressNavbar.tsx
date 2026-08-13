@@ -173,8 +173,8 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
       arrow: true,
     },
     {
-      label: "مهم‌ترین اخبار",
-      href: "#",
+      label: "مقالات",
+      href: "/blog",
       icon: true,
     },
   ];

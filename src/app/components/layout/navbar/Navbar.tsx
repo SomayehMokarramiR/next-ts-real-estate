@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Logo from "@/app/components/modules/logo/Logo";
 
 import {
@@ -28,7 +29,6 @@ type NavLink = {
   label: string;
   href: string;
   arrow?: boolean;
-  highlight?: boolean;
   icon?: boolean;
 };
 
@@ -60,24 +60,11 @@ const userMenu = [
 
 function Avatar() {
   return (
-    <div
-      className="
-      w-9
-      h-9
-      rounded-full
-      overflow-hidden
-      ring-2
-      ring-white
-      "
-    >
+    <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white">
       <img
         src={avatarUrl}
         alt="avatar"
-        className="
-        w-full
-        h-full
-        object-cover
-        "
+        className="w-full h-full object-cover"
       />
     </div>
   );
@@ -88,7 +75,6 @@ export default function Navbar() {
   const pathname = usePathname();
 
   const { data, isLoading } = useMe();
-
   const logoutMutation = useLogout();
 
   const [dark, setDark] = useState<boolean>(() => {
@@ -98,7 +84,6 @@ export default function Navbar() {
   });
 
   const [open, setOpen] = useState(false);
-
   const [userOpen, setUserOpen] = useState(false);
 
   const isLoggedIn = Boolean(data?.user);
@@ -127,8 +112,8 @@ export default function Navbar() {
       arrow: true,
     },
     {
-      label: "مهم‌ترین اخبار",
-      href: "#",
+      label: "مقالات",
+      href: "/blog",
       icon: true,
     },
   ];
@@ -138,14 +123,24 @@ export default function Navbar() {
 
     if (dark) {
       html.classList.add("dark");
-
       localStorage.setItem("theme", "dark");
     } else {
       html.classList.remove("dark");
-
       localStorage.setItem("theme", "light");
     }
   }, [dark]);
+
+  const isActiveLink = (href: string) => {
+    if (href === "/") {
+      return pathname === "/";
+    }
+
+    if (href === "/blog") {
+      return pathname === "/blog" || pathname.startsWith("/blog/");
+    }
+
+    return pathname === href;
+  };
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, {
@@ -166,35 +161,35 @@ export default function Navbar() {
     return (
       <nav
         className="
-        fixed
-        top-0
-        left-0
-        right-0
-        z-[9999]
-        bg-background
-        shadow-sm
+          fixed
+          top-0
+          left-0
+          right-0
+          z-[9999]
+          bg-background
+          shadow-sm
         "
       >
         <div
           className="
-          max-w-7xl
-          mx-auto
-          px-4
-          h-16
-          flex
-          items-center
-          justify-between
+            max-w-7xl
+            mx-auto
+            px-4
+            h-16
+            flex
+            items-center
+            justify-between
           "
         >
           <Logo />
 
           <div
             className="
-            w-24
-            h-8
-            rounded-full
-            bg-gray-200
-            animate-pulse
+              w-24
+              h-8
+              rounded-full
+              bg-gray-200
+              animate-pulse
             "
           />
         </div>
@@ -205,94 +200,89 @@ export default function Navbar() {
   return (
     <nav
       className="
-      fixed
-      top-0
-      left-0
-      right-0
-      z-[9999]
-      bg-background
-      backdrop-blur-md
-      shadow-sm
+        fixed
+        top-0
+        left-0
+        right-0
+        z-[9999]
+        bg-background
+        backdrop-blur-md
+        shadow-sm
       "
     >
       <div
         className="
-        max-w-7xl
-        mx-auto
-        px-4
-        sm:px-6
-        h-16
-        flex
-        items-center
-        justify-between
+          max-w-7xl
+          mx-auto
+          px-4
+          sm:px-6
+          h-16
+          flex
+          items-center
+          justify-between
         "
       >
         <Logo />
 
         {/* Desktop Menu */}
-
         <div
           className="
-          bg-navbar-background
-          rounded-full
-          p-2
-          hidden
-          md:flex
-          items-center
-          gap-6
-          max-[813px]:gap-3
-          text-sm
-          max-[813px]:text-xs
-          font-medium
-          text-foreground
+            bg-navbar-background
+            rounded-full
+            p-2
+            hidden
+            md:flex
+            items-center
+            gap-6
+            max-[813px]:gap-3
+            text-sm
+            max-[813px]:text-xs
+            font-medium
+            text-foreground
           "
         >
-          {navLinks.map((item) => (
-            <a
-              key={item.label}
-              href={item.href}
-              className={`
-flex
-items-center
-gap-1
-transition
+          {navLinks.map((item) => {
+            const active = isActiveLink(item.href);
 
-${
-  pathname === item.href
-    ? "bg-primary500 text-white px-4 py-2 rounded-full"
-    : "hover:text-primary500"
-}
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`
+                  flex
+                  items-center
+                  gap-1
+                  transition
+                  ${
+                    active
+                      ? "bg-primary500 text-white px-4 py-2 rounded-full"
+                      : "hover:text-primary500"
+                  }
+                `}
+              >
+                {item.icon && <NewsIcon />}
 
-`}
-            >
-              {item.icon && <NewsIcon />}
+                {item.label}
 
-              {item.label}
-
-              {item.arrow && <ChevronDown size={14} />}
-            </a>
-          ))}
+                {item.arrow && <ChevronDown size={14} />}
+              </Link>
+            );
+          })}
         </div>
+
         {/* Actions */}
-
-        <div
-          className="
-          flex
-          items-center
-          gap-2
-          "
-        >
+        <div className="flex items-center gap-2">
           {/* Theme */}
-
           <button
+            type="button"
             onClick={() => setDark((prev) => !prev)}
             className="
-            w-9
-            h-9
-            rounded-full
-            flex
-            items-center
-            justify-center
+              w-9
+              h-9
+              rounded-full
+              flex
+              items-center
+              justify-center
             "
             style={{
               backgroundColor: BLUE,
@@ -306,53 +296,31 @@ ${
           </button>
 
           {/* User / Auth */}
-
           {isLoggedIn ? (
-            <div
-              className="
-              relative
-              "
-            >
+            <div className="relative">
               <button
+                type="button"
                 onClick={() => setUserOpen((prev) => !prev)}
                 className="
-                flex
-                items-center
-                gap-2
-                rounded-full
-                border
-                border-gray-200
-                dark:border-[#353535]
-                px-2
-                py-1
+                  flex
+                  items-center
+                  gap-2
+                  rounded-full
+                  border
+                  border-gray-200
+                  dark:border-[#353535]
+                  px-2
+                  py-1
                 "
               >
                 <Avatar />
 
-                <div
-                  className="
-                  hidden
-                  sm:flex
-                  flex-col
-                  text-right
-                  "
-                >
-                  <span
-                    className="
-                    text-xs
-                    font-semibold
-                    dark:text-white
-                    "
-                  >
+                <div className="hidden sm:flex flex-col text-right">
+                  <span className="text-xs font-semibold dark:text-white">
                     {data?.user?.name || "کاربر"}
                   </span>
 
-                  <span
-                    className="
-                    text-[11px]
-                    text-gray-400
-                    "
-                  >
+                  <span className="text-[11px] text-gray-400">
                     {data?.user?.phoneNumber || ""}
                   </span>
                 </div>
@@ -363,23 +331,24 @@ ${
               {userOpen && (
                 <div
                   className="
-                  absolute
-                  left-0
-                  top-12
-                  w-52
-                  bg-white
-                  dark:bg-[#272727]
-                  border
-                  border-gray-200
-                  dark:border-[#353535]
-                  rounded-2xl
-                  shadow-lg
-                  p-2
+                    absolute
+                    left-0
+                    top-12
+                    w-52
+                    bg-white
+                    dark:bg-[#272727]
+                    border
+                    border-gray-200
+                    dark:border-[#353535]
+                    rounded-2xl
+                    shadow-lg
+                    p-2
                   "
                 >
                   {userMenu.map(({ label, icon: Icon }) => (
                     <button
                       key={label}
+                      type="button"
                       onClick={
                         label === "خروج از حساب" ? handleLogout : undefined
                       }
@@ -395,10 +364,9 @@ ${
                         hover:bg-gray-100
                         dark:hover:bg-[#353535]
                         dark:text-white
-                        "
+                      "
                     >
                       <Icon size={16} />
-
                       {label}
                     </button>
                   ))}
@@ -407,17 +375,18 @@ ${
             </div>
           ) : (
             <button
+              type="button"
               onClick={() => router.push("/login")}
               className="
-              hidden
-              sm:block
-              bg-primary500
-              text-white
-              text-xs
-              sm:text-sm
-              px-4
-              py-2
-              rounded-full
+                hidden
+                sm:block
+                bg-primary500
+                text-white
+                text-xs
+                sm:text-sm
+                px-4
+                py-2
+                rounded-full
               "
             >
               ورود / ثبت نام
@@ -425,18 +394,18 @@ ${
           )}
 
           {/* Mobile Menu Button */}
-
           <button
+            type="button"
             onClick={() => setOpen((prev) => !prev)}
             className="
-            md:hidden
-            w-9
-            h-9
-            rounded-xl
-            bg-primary500
-            flex
-            items-center
-            justify-center
+              md:hidden
+              w-9
+              h-9
+              rounded-xl
+              bg-primary500
+              flex
+              items-center
+              justify-center
             "
           >
             <Menu size={18} className="text-white" />
@@ -445,43 +414,44 @@ ${
       </div>
 
       {/* Mobile Menu */}
-
       {open && (
         <div
           className="
-          md:hidden
-          bg-background
-          text-foreground
-          px-5
-          py-4
-          space-y-3
-          shadow-md
+            md:hidden
+            bg-background
+            text-foreground
+            px-5
+            py-4
+            space-y-3
+            shadow-md
           "
         >
           {navLinks.map((item) => (
-            <a
+            <Link
               key={item.label}
               href={item.href}
+              onClick={() => setOpen(false)}
               className="
-              block
-              text-sm
-              hover:text-primary500
+                block
+                text-sm
+                hover:text-primary500
               "
             >
               {item.label}
-            </a>
+            </Link>
           ))}
 
           {!isLoggedIn && (
             <button
+              type="button"
               onClick={() => router.push("/login")}
               className="
-              w-full
-              bg-primary500
-              text-white
-              py-2
-              rounded-full
-              text-sm
+                w-full
+                bg-primary500
+                text-white
+                py-2
+                rounded-full
+                text-sm
               "
             >
               ورود / ثبت نام

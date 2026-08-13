@@ -1,274 +1,382 @@
 "use client";
 
-import { useState } from "react";
-import { Clock, Calendar, Copy, Share2 } from "lucide-react";
-import Navbar from "../../layout/navbar/Navbar";
-import ListingCard from "./ListingCard";
+import { Calendar, Clock, Copy, Eye, Share2 } from "lucide-react";
+import Swal from "sweetalert2";
+
 import Breadcrumb from "../../modules/breadcrumb/Breadcrumb";
+import ListingCard from "./ListingCard";
 
-const RELATED_POSTS = [
-  {
-    id: 1,
-    title: "بهترین کاناپه‌های اداری در سال 140...",
-    excerpt:
-      "در این مقاله به بررسی بهترین کاناپه‌های اداری می‌پردازیم که می‌توانید در سال جاری خریداری کنید.",
-    image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۹ / ۱۵",
-    readTime: "۵ دقیقه",
-    tag: "کاناپه",
-  },
-  {
-    id: 2,
-    title: "بهترین کاناپه‌های گرد‌شکلی در سال 140...",
-    excerpt:
-      "کاناپه‌های گرد به محبوب‌ترین انتخاب طراحی داخلی تبدیل شده‌اند. در این مقاله بهترین مدل‌ها را معرفی می‌کنیم.",
-    image:
-      "https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۸ / ۲۲",
-    readTime: "۴ دقیقه",
-    tag: "دکوراسیون",
-  },
-  {
-    id: 3,
-    title: "بهترین کاناپه کرم‌شکلی در سال 140...",
-    excerpt:
-      "رنگ کرم برای کاناپه‌ها یکی از محبوب‌ترین انتخاب‌ها است. بهترین مدل‌های کرم را با هم بررسی می‌کنیم.",
-    image:
-      "https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۷ / ۱۰",
-    readTime: "۶ دقیقه",
-    tag: "چیدمان",
-  },
-  {
-    id: 4,
-    title: "راهنمای خرید کاناپه برای آپارتمان‌های کوچک",
-    excerpt:
-      "انتخاب کاناپه مناسب برای آپارتمان‌های کوچک نیاز به دقت دارد. در این راهنما نکات مهم را بررسی می‌کنیم.",
-    image:
-      "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۶ / ۰۵",
-    readTime: "۷ دقیقه",
-    tag: "راهنما",
-  },
-  {
-    id: 5,
-    title: "ترکیب رنگ‌های مناسب برای مبلمان منزل",
-    excerpt:
-      "ترکیب رنگ مناسب در مبلمان می‌تواند فضای خانه را متحول کند. با ما همراه باشید.",
-    image:
-      "https://images.unsplash.com/photo-1484101403633-562f891dc89a?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۵ / ۱۸",
-    readTime: "۵ دقیقه",
-    tag: "دکوراسیون",
-  },
-  {
-    id: 6,
-    title: "نگهداری و تمیز کردن کاناپه‌های پارچه‌ای",
-    excerpt:
-      "نگهداری صحیح از کاناپه‌های پارچه‌ای عمر آن‌ها را چندین برابر می‌کند. روش‌های اصولی را بدانید.",
-    image:
-      "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=400&h=250&fit=crop",
-    date: "۱۴۰۳ / ۰۴ / ۲۸",
-    readTime: "۸ دقیقه",
-    tag: "نگهداری",
-  },
-];
+import { useBlog } from "@/hooks/useBlog";
 
-const POSTS_PER_PAGE = 3;
-const TOTAL_PAGES = Math.ceil(RELATED_POSTS.length / POSTS_PER_PAGE);
+interface SingleBlogProps {
+  id: string;
+}
 
-const TAG_COLORS: Record<string, string> = {
-  کاناپه: "bg-primary500/50 text-primary700",
-  دکوراسیون: "bg-emerald-100 text-emerald-700",
-  چیدمان: "bg-sky-100 text-sky-700",
-  راهنما: "bg-violet-100 text-violet-700",
-  نگهداری: "bg-rose-100 text-rose-700",
-};
+function ArticleHero({
+  title,
+  date,
+  minutes,
+  image,
+  views,
+}: {
+  title: string;
+  date: string;
+  minutes: number;
+  image: string;
+  views: number;
+}) {
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
 
-function ArticleHero() {
+      Swal.fire({
+        icon: "success",
+        title: "لینک کپی شد",
+        text: "لینک مقاله با موفقیت کپی شد.",
+        confirmButtonText: "باشه",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch {
+      Swal.fire({
+        icon: "error",
+        title: "خطا",
+        text: "کپی کردن لینک انجام نشد.",
+        confirmButtonText: "باشه",
+      });
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title,
+          text: title,
+          url: window.location.href,
+        });
+
+        return;
+      }
+
+      await navigator.clipboard.writeText(window.location.href);
+
+      Swal.fire({
+        icon: "success",
+        title: "لینک کپی شد",
+        text: "امکان اشتراک‌گذاری مستقیم وجود ندارد؛ لینک مقاله کپی شد.",
+        confirmButtonText: "باشه",
+        timer: 1800,
+        showConfirmButton: false,
+      });
+    } catch {
+      // لغو Share توسط کاربر
+    }
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 mb-8">
-      <div className="flex items-center justify-between gap-4 mb-6 pb-4">
-        <div className="mt-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4 leading-relaxed">
-            بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
+    <div className="max-w-6xl mx-auto px-4 mb-8" dir="rtl">
+      <div
+        className="
+          flex
+          flex-col
+          sm:flex-row
+          items-start
+          sm:items-center
+          justify-between
+          gap-5
+          mb-6
+          pb-4
+        "
+      >
+        {/* Article info */}
+        <div className="mt-4 sm:mt-8 flex-1">
+          <h1
+            className="
+              text-xl
+              sm:text-2xl
+              md:text-3xl
+              font-bold
+              text-gray-900
+              dark:text-white
+              mb-4
+              leading-relaxed
+            "
+          >
+            {title}
           </h1>
-          {/* Right - Meta info */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-[#80838D]">
+
+          <div
+            className="
+              flex
+              flex-wrap
+              items-center
+              gap-4
+              text-sm
+              text-[#80838D]
+            "
+          >
             <span className="flex items-center gap-1.5">
               <Calendar className="w-4 h-4" />
-              ۱۲ مرداد - ۱۴۰۱ / ۱۲:۳۳
+              {date}
+            </span>
+
+            <span className="flex items-center gap-1.5">
+              <Eye className="w-4 h-4" />
+              {views.toLocaleString("fa-IR")} بازدید
             </span>
           </div>
         </div>
-        {/* Left - Actions */}
+
+        {/* Actions */}
         <div className="flex flex-col items-center gap-3">
-          {/* Reading time */}
-          <button
+          <div
             className="
-    h-7
-    w-[80px]
-    sm:h-8
-    sm:w-[100px]
-    rounded-full
-    bg-primary500
-    text-white
-    text-[11px]
-    sm:text-xs
-    font-medium
-    flex
-    items-center
-    justify-center
-    gap-1
-  "
+              h-7
+              w-[80px]
+              sm:h-8
+              sm:w-[100px]
+              rounded-full
+              bg-primary500
+              text-white
+              text-[11px]
+              sm:text-xs
+              font-medium
+              flex
+              items-center
+              justify-center
+              gap-1
+            "
           >
             <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-            ۳۰ دقیقه
-          </button>
+            {minutes} دقیقه
+          </div>
 
-          {/* Copy & Share */}
           <div className="flex items-center gap-2">
-            {/* Copy */}
             <button
+              type="button"
+              onClick={handleCopy}
+              aria-label="کپی لینک مقاله"
               className="
-    w-8
-    h-8
-    sm:w-10
-    sm:h-10
-    rounded-full
-    border
-    border-primary500
-    flex
-    items-center
-    justify-center
-    text-primary500
-  "
+                w-8
+                h-8
+                sm:w-10
+                sm:h-10
+                rounded-full
+                border
+                border-primary500
+                flex
+                items-center
+                justify-center
+                text-primary500
+                hover:bg-primary500/10
+                transition-colors
+              "
             >
               <Copy className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
 
-            {/* Share */}
             <button
+              type="button"
+              onClick={handleShare}
+              aria-label="اشتراک‌گذاری مقاله"
               className="
-    w-8
-    h-8
-    sm:w-10
-    sm:h-10
-    rounded-full
-    bg-primary500
-    flex
-    items-center
-    justify-center
-    text-white
-  "
+                w-8
+                h-8
+                sm:w-10
+                sm:h-10
+                rounded-full
+                bg-primary500
+                flex
+                items-center
+                justify-center
+                text-white
+                hover:bg-primary600
+                transition-colors
+              "
             >
               <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </button>
           </div>
         </div>
       </div>
+
+      {/* Hero */}
       <div className="rounded-2xl overflow-hidden shadow-lg">
         <img
-          src="/images/ImgSingleBlog.png"
-          alt="کاناپه مدرن در دکوراسیون داخلی"
-          className="w-full h-52 sm:h-72 md:h-96 object-cover"
+          src={image}
+          alt={title}
+          className="
+            w-full
+            h-52
+            sm:h-72
+            md:h-96
+            object-cover
+          "
         />
       </div>
     </div>
   );
 }
 
-function ArticleContent() {
+function ArticleContent({
+  title,
+  content,
+}: {
+  title: string;
+  content: string;
+}) {
+  const paragraphs = content
+    .split(/\n{2,}/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
   return (
     <article className="max-w-6xl mx-auto px-4 mb-12" dir="rtl">
-      <div className="prose prose-lg max-w-none">
-        <section className="mb-8">
-          <h2 className="text-lg lg:text-[24px] font-semibold text-[#80838D] dark:text-white mb-4 pb-2 inline-block">
-            بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
-          </h2>
-          <p className="text-[#80838D] dark:text-[#CDCED6] leading-9 text-sm sm:text-base mb-4">
-            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
-            استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در
-            ستون و سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی
-            نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و
-            متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم
-            ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
-            طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
-            سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم
-            از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه
-            روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم ایپسوم متن
-            ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
-            گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان
-            که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت
-            چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و
-            مجله در ستون و سطرآنچنان که لازم است .
-          </p>
-        </section>
+      <div className="max-w-none">
+        <h2
+          className="
+            text-lg
+            lg:text-[24px]
+            font-semibold
+            text-[#80838D]
+            dark:text-white
+            mb-6
+          "
+        >
+          {title}
+        </h2>
 
-        <section className="mb-8">
-          <h2 className="text-lg lg:text-[24px] font-semibold text-[#80838D] dark:text-white mb-4 pb-2 inline-block">
-            بهترین قیمت های کادیلاک 2024 در سال میلادی جدید ؟
-          </h2>
-          <p className="text-[#80838D] dark:text-[#CDCED6] leading-9 text-sm sm:text-base mb-4">
-            لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با
-            استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در
-            ستون و سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی
-            نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و
-            متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم
-            ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از
-            طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و
-            سطرآنچنان که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم
-            از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه
-            روزنامه و مجله در ستون و سطرآنچنان که لازم است .لورم ایپسوم متن
-            ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
-            گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان
-            که لازم است .لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت
-            چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و
-            مجله در ستون و سطرآنچنان که لازم است .
+        {paragraphs.length > 0 ? (
+          paragraphs.map((paragraph, index) => (
+            <p
+              key={`${index}-${paragraph.slice(0, 10)}`}
+              className="
+                text-[#80838D]
+                dark:text-[#CDCED6]
+                leading-9
+                text-sm
+                sm:text-base
+                mb-5
+              "
+            >
+              {paragraph}
+            </p>
+          ))
+        ) : (
+          <p className="text-[#80838D] dark:text-[#CDCED6] leading-9">
+            محتوای این مقاله در دسترس نیست.
           </p>
-        </section>
+        )}
       </div>
     </article>
   );
 }
 
-export default function SingleBlog() {
-  const [page, setPage] = useState(1);
-
-  const visiblePosts = RELATED_POSTS.slice(
-    (page - 1) * POSTS_PER_PAGE,
-    page * POSTS_PER_PAGE,
-  );
-
+function LoadingState() {
   return (
-    <div>
-      <Navbar />
-      <main className="pb-12">
-        <div className="py-5">
-          <Breadcrumb />
-        </div>
-        <ArticleHero />
-        <ArticleContent />
+    <main className="pb-12">
+      <div className="max-w-6xl mx-auto px-4 py-5">
+        <Breadcrumb />
+      </div>
 
-        {/* Related Articles */}
-        <section className="max-w-6xl mx-auto px-4" dir="rtl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-1 h-6 bg-primary500 rounded-full" />
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
-              مقالات مشابه
-            </h2>
+      <div className="max-w-6xl mx-auto px-4 animate-pulse">
+        <div className="flex flex-col sm:flex-row justify-between gap-5 mb-6">
+          <div className="flex-1 space-y-4">
+            <div className="h-8 w-3/4 bg-gray-200 dark:bg-[#353535] rounded-lg" />
+            <div className="h-4 w-1/3 bg-gray-200 dark:bg-[#353535] rounded-lg" />
           </div>
 
-          {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {visiblePosts.map((post) => (
-              <RelatedCard key={post.id} post={post} />
-            ))}
-          
-          </div> */}
-          <ListingCard />
-        </section>
-      </main>
-    </div>
+          <div className="w-[100px] h-8 bg-gray-200 dark:bg-[#353535] rounded-full" />
+        </div>
+
+        <div className="h-52 sm:h-72 md:h-96 bg-gray-200 dark:bg-[#353535] rounded-2xl" />
+
+        <div className="mt-10 space-y-4">
+          <div className="h-7 w-1/3 bg-gray-200 dark:bg-[#353535] rounded-lg" />
+          <div className="h-4 w-full bg-gray-200 dark:bg-[#353535] rounded-lg" />
+          <div className="h-4 w-full bg-gray-200 dark:bg-[#353535] rounded-lg" />
+          <div className="h-4 w-4/5 bg-gray-200 dark:bg-[#353535] rounded-lg" />
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function ErrorState({
+  message,
+  onRetry,
+}: {
+  message: string;
+  onRetry: () => void;
+}) {
+  return (
+    <main className="pb-12">
+      <div className="max-w-6xl mx-auto px-4 py-5">
+        <Breadcrumb />
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-24 text-center" dir="rtl">
+        <p className="text-sm text-red-500 mb-5">{message}</p>
+
+        <button
+          type="button"
+          onClick={onRetry}
+          className="
+            px-6
+            py-2.5
+            rounded-full
+            bg-primary500
+            text-white
+            text-sm
+            hover:bg-primary600
+            transition-colors
+          "
+        >
+          تلاش مجدد
+        </button>
+      </div>
+    </main>
+  );
+}
+
+export default function SingleBlog({ id }: SingleBlogProps) {
+  const { data: blog, isLoading, isError, error, refetch } = useBlog(id);
+
+  if (isLoading) {
+    return <LoadingState />;
+  }
+
+  if (isError || !blog) {
+    return (
+      <ErrorState
+        message={
+          error instanceof Error ? error.message : "مقاله موردنظر پیدا نشد."
+        }
+        onRetry={() => refetch()}
+      />
+    );
+  }
+
+  return (
+    <main className="pb-12">
+      <div className="max-w-6xl mx-auto px-4 py-5">
+        <Breadcrumb />
+      </div>
+
+      <ArticleHero
+        title={blog.title}
+        date={blog.date}
+        minutes={blog.minutes}
+        image={blog.image}
+        views={blog.views}
+      />
+
+      <ArticleContent title={blog.title} content={blog.content} />
+
+      <section className="max-w-6xl mx-auto px-4" dir="rtl">
+        <ListingCard category={blog.category} currentBlogId={blog._id} />
+      </section>
+    </main>
   );
 }
