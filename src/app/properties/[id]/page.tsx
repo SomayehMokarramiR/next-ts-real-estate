@@ -1,13 +1,13 @@
-import MainLayout from "@/app/components/layout/MainLayout";
-import PropertyDetails from "@/app/components/templates/propertyDetails/propertyDetails";
+import MainLayout from "../../components/layout/MainLayout";
+import PropertyDetails from "../../components/templates/propertyDetails/propertyDetails";
 
-type Props = {
+interface PropertyPageProps {
   params: Promise<{
     id: string;
   }>;
-};
+}
 
-export default async function PropertyPage({ params }: Props) {
+export default async function PropertyPage({ params }: PropertyPageProps) {
   const { id } = await params;
 
   return (

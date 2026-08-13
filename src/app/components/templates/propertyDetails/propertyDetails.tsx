@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+
 import {
   MapPin,
   Star,
@@ -13,46 +14,192 @@ import {
   CheckCircle2,
   ChevronLeft,
 } from "lucide-react";
+
 import { useProperty } from "@/hooks/useProperties";
+import Breadcrumb from "@/app/components/modules/breadcrumb/Breadcrumb";
 
 type Props = {
   propertyId: string;
 };
 
+const PROPERTY_TYPE_LABELS: Record<string, string> = {
+  villa: "ویلا",
+  apartment: "آپارتمان",
+  house: "خانه",
+  hotel: "هتل",
+  suite: "سوئیت",
+};
+
+function getPropertyType(type?: string) {
+  if (!type) return "ملک";
+
+  return PROPERTY_TYPE_LABELS[type] ?? type;
+}
+
+function getPropertyImage(images: string[] | undefined, index: number) {
+  const fallbacks = [
+    "/images/galary1.png",
+    "/images/galary2.png",
+    "/images/galary3.png",
+    "/images/galary4.png",
+    "/images/galary5.png",
+  ];
+
+  return images?.[index] || fallbacks[index];
+}
+
+function getStatusLabel(status?: string) {
+  switch (status) {
+    case "available":
+      return "قابل رزرو";
+
+    case "reserved":
+      return "رزرو شده";
+
+    case "inactive":
+      return "غیرفعال";
+
+    default:
+      return "نامشخص";
+  }
+}
+
+function getStatusClass(status?: string) {
+  switch (status) {
+    case "available":
+      return "bg-primary500/10 text-primary500";
+
+    case "reserved":
+      return "bg-amber-100 text-amber-600 dark:bg-amber-950/30 dark:text-amber-400";
+
+    case "inactive":
+      return "bg-red-100 text-red-500 dark:bg-red-950/30 dark:text-red-400";
+
+    default:
+      return "bg-gray-100 text-gray-500 dark:bg-[#353535] dark:text-gray-400";
+  }
+}
+
 export default function PropertyDetails({ propertyId }: Props) {
-  const { data: property, isLoading, error } = useProperty(propertyId);
+  const {
+    data: property,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useProperty(propertyId);
+
+  // =========================
+  // Loading
+  // =========================
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="rounded-3xl bg-[#F0F0F3] p-10 text-center dark:bg-[#272727]">
-          <p className="text-gray-500 dark:text-gray-300">
-            در حال دریافت اطلاعات ملک...
-          </p>
+      <div className="max-w-7xl mx-auto px-4 py-8" dir="rtl">
+        <div className="animate-pulse">
+          <div className="h-5 w-56 rounded bg-gray-200 dark:bg-[#353535] mb-8" />
+
+          <div className="h-9 w-2/3 rounded bg-gray-200 dark:bg-[#353535] mb-4" />
+
+          <div className="h-[280px] md:h-[520px] rounded-3xl bg-gray-200 dark:bg-[#353535] mb-8" />
+
+          <div className="grid lg:grid-cols-[1fr_360px] gap-6">
+            <div className="space-y-6">
+              <div className="h-36 rounded-3xl bg-gray-200 dark:bg-[#353535]" />
+              <div className="h-56 rounded-3xl bg-gray-200 dark:bg-[#353535]" />
+              <div className="h-48 rounded-3xl bg-gray-200 dark:bg-[#353535]" />
+            </div>
+
+            <div className="h-80 rounded-3xl bg-gray-200 dark:bg-[#353535]" />
+          </div>
         </div>
       </div>
     );
   }
 
-  if (error || !property) {
-    return (
-      <div className="container mx-auto px-4 py-10">
-        <div className="rounded-3xl bg-red-50 p-10 text-center text-red-500">
-          <p>خطا در دریافت اطلاعات ملک</p>
+  // =========================
+  // Error
+  // =========================
 
-          <Link
-            href="/"
-            className="mt-5 inline-flex items-center gap-1 text-primary500"
-          >
-            بازگشت به صفحه اصلی
-            <ChevronLeft size={16} />
-          </Link>
+  if (isError || !property) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-10" dir="rtl">
+        <div className="mb-8">
+          <Breadcrumb
+            items={[
+              {
+                label: "املاک",
+                href: "/properties",
+              },
+              {
+                label: "جزئیات ملک",
+              },
+            ]}
+          />
+        </div>
+
+        <div className="rounded-3xl bg-red-50 dark:bg-red-950/20 p-10 text-center">
+          <h2 className="text-lg font-bold text-red-500">
+            ملک موردنظر پیدا نشد
+          </h2>
+
+          <p className="mt-2 text-sm text-red-400">
+            {error instanceof Error
+              ? error.message
+              : "اطلاعات این ملک در دسترس نیست."}
+          </p>
+
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="
+                rounded-full
+                bg-primary500
+                px-5
+                py-2.5
+                text-sm
+                text-white
+                hover:bg-primary600
+                transition-colors
+              "
+            >
+              تلاش مجدد
+            </button>
+
+            <Link
+              href="/properties"
+              className="
+                rounded-full
+                border
+                border-primary500
+                px-5
+                py-2.5
+                text-sm
+                text-primary500
+                hover:bg-primary500/10
+                transition-colors
+              "
+            >
+              بازگشت به املاک
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   const dailyPrice = property.pricing?.daily ?? 0;
+
+  const oldPrice = property.pricing?.oldPrice ?? 0;
+
+  const isAvailable = property.status === "available";
+
+  const typeLabel = getPropertyType(property.type);
+
+  const statusLabel = getStatusLabel(property.status);
+
+  const statusClass = getStatusClass(property.status);
 
   const facilities = [
     {
@@ -83,27 +230,40 @@ export default function PropertyDetails({ propertyId }: Props) {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-6 md:py-8">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-8" dir="rtl">
       {/* Breadcrumb */}
-      <div className="mb-5 flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/" className="hover:text-primary500">
-          صفحه اصلی
-        </Link>
-
-        <ChevronLeft size={15} />
-
-        <span className="text-gray-600 dark:text-gray-300">جزئیات ملک</span>
+      <div className="mb-6">
+        <Breadcrumb
+          items={[
+            {
+              label: "املاک",
+              href: "/properties",
+            },
+            {
+              label: property.title,
+            },
+          ]}
+        />
       </div>
 
       {/* Header */}
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+          <h1
+            className="
+              text-2xl
+              md:text-3xl
+              font-bold
+              text-gray-900
+              dark:text-white
+              leading-relaxed
+            "
+          >
             {property.title}
           </h1>
 
-          <div className="mt-3 flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-1 text-gray-500">
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-300">
               <MapPin size={17} className="text-primary500" />
 
               <span>
@@ -113,20 +273,50 @@ export default function PropertyDetails({ propertyId }: Props) {
               </span>
             </div>
 
-            <div className="flex items-center gap-1 rounded-full bg-primary500 px-3 py-1 text-sm text-white">
+            <span className="rounded-full bg-primary500/10 px-3 py-1 text-sm text-primary500">
+              {typeLabel}
+            </span>
+
+            <span className="flex items-center gap-1 rounded-full bg-primary500 px-3 py-1 text-sm text-white">
               <Star size={15} className="fill-white" />
 
               <span>{property.rating ?? 0}</span>
-            </div>
+            </span>
           </div>
         </div>
+
+        <Link
+          href="/properties"
+          className="
+            inline-flex
+            items-center
+            gap-1.5
+            text-sm
+            text-gray-500
+            hover:text-primary500
+            transition-colors
+          "
+        >
+          بازگشت به املاک
+          <ChevronLeft size={16} />
+        </Link>
       </div>
 
-      {/* Images */}
+      {/* Gallery */}
       <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2">
-        <div className="relative h-[260px] overflow-hidden rounded-3xl md:col-span-2 md:row-span-2 md:h-[520px]">
+        <div
+          className="
+            relative
+            h-[280px]
+            overflow-hidden
+            rounded-3xl
+            md:col-span-2
+            md:row-span-2
+            md:h-[520px]
+          "
+        >
           <Image
-            src={property.images?.[0] || "/images/placeholder.jpg"}
+            src={getPropertyImage(property.images, 0)}
             alt={property.title}
             fill
             priority
@@ -134,69 +324,46 @@ export default function PropertyDetails({ propertyId }: Props) {
           />
         </div>
 
-        <div className="relative hidden h-[250px] overflow-hidden rounded-3xl md:block">
-          <Image
-            src={property.images?.[1] || "/images/galary1.png"}
-            alt={property.title}
-            fill
-            className="object-cover"
-          />
-        </div>
+        {[1, 2, 3, 4].map((index) => (
+          <div
+            key={index}
+            className="
+              relative
+              hidden
+              h-[250px]
+              overflow-hidden
+              rounded-3xl
+              md:block
+            "
+          >
+            <Image
+              src={getPropertyImage(property.images, index)}
+              alt={property.title}
+              fill
+              className="object-cover"
+            />
 
-        <div className="relative hidden h-[250px] overflow-hidden rounded-3xl md:block">
-          <Image
-            src={property.images?.[2] || "/images/galary2.png"}
-            alt={property.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-
-        <div className="relative hidden h-[250px] overflow-hidden rounded-3xl md:block">
-          <Image
-            src={property.images?.[3] || "/images/galary3.png"}
-            alt={property.title}
-            fill
-            className="object-cover"
-          />
-        </div>
-
-        <div className="relative hidden h-[250px] overflow-hidden rounded-3xl md:block">
-          <Image
-            src={property.images?.[4] || "/images/galary4.png"}
-            alt={property.title}
-            fill
-            className="object-cover"
-          />
-
-          {property.images?.length > 5 && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/40">
-              <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-gray-800">
-                مشاهده همه تصاویر
-              </span>
-            </div>
-          )}
-        </div>
+            {index === 4 && (property.images?.length ?? 0) > 5 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/40">
+                <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-gray-800">
+                  مشاهده همه تصاویر
+                </span>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* Main Content */}
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
-        {/* Right / Main */}
+        {/* Main */}
         <div className="space-y-6">
-          {/* Property Type */}
+          {/* Status */}
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-xl font-bold dark:text-white">
-                  {property.type === "villa"
-                    ? "ویلا"
-                    : property.type === "apartment"
-                      ? "آپارتمان"
-                      : property.type === "house"
-                        ? "خانه"
-                        : property.type === "hotel"
-                          ? "هتل"
-                          : "سوئیت"}
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  {typeLabel}
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-400">
@@ -204,15 +371,26 @@ export default function PropertyDetails({ propertyId }: Props) {
                 </p>
               </div>
 
-              <div className="rounded-full bg-primary500/10 px-4 py-2 text-sm text-primary500">
-                {property.status === "available" ? "قابل رزرو" : "غیرقابل رزرو"}
-              </div>
+              <span
+                className={`
+                  inline-flex
+                  w-fit
+                  rounded-full
+                  px-4
+                  py-2
+                  text-sm
+                  font-medium
+                  ${statusClass}
+                `}
+              >
+                {statusLabel}
+              </span>
             </div>
           </div>
 
           {/* Facilities */}
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
-            <h2 className="text-xl font-bold dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               امکانات و ویژگی‌ها
             </h2>
 
@@ -223,7 +401,15 @@ export default function PropertyDetails({ propertyId }: Props) {
                 return (
                   <div
                     key={item.label}
-                    className="flex items-center gap-3 rounded-2xl bg-[#F0F0F3] p-4 dark:bg-[#353535]"
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      rounded-2xl
+                      bg-[#F0F0F3]
+                      p-4
+                      dark:bg-[#353535]
+                    "
                   >
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary500/10 text-primary500">
                       <Icon size={19} />
@@ -232,7 +418,7 @@ export default function PropertyDetails({ propertyId }: Props) {
                     <div>
                       <p className="text-xs text-gray-400">{item.label}</p>
 
-                      <p className="mt-1 text-sm font-bold dark:text-white">
+                      <p className="mt-1 text-sm font-bold text-gray-800 dark:text-white">
                         {item.value}
                       </p>
                     </div>
@@ -244,7 +430,7 @@ export default function PropertyDetails({ propertyId }: Props) {
 
           {/* Description */}
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
-            <h2 className="text-xl font-bold dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               درباره این اقامتگاه
             </h2>
 
@@ -255,7 +441,7 @@ export default function PropertyDetails({ propertyId }: Props) {
 
           {/* Location */}
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
-            <h2 className="text-xl font-bold dark:text-white">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               موقعیت اقامتگاه
             </h2>
 
@@ -263,7 +449,7 @@ export default function PropertyDetails({ propertyId }: Props) {
               <MapPin className="mt-1 shrink-0 text-primary500" size={20} />
 
               <div>
-                <p className="font-medium dark:text-white">
+                <p className="font-medium text-gray-900 dark:text-white">
                   {property.location?.city || "شهر ثبت نشده"}
                 </p>
 
@@ -276,7 +462,7 @@ export default function PropertyDetails({ propertyId }: Props) {
         </div>
 
         {/* Booking Card */}
-        <div className="lg:relative">
+        <aside className="lg:relative">
           <div className="sticky top-24 rounded-3xl bg-white p-6 shadow-md dark:bg-[#272727]">
             <p className="text-sm text-gray-400">قیمت اقامت</p>
 
@@ -288,61 +474,107 @@ export default function PropertyDetails({ propertyId }: Props) {
               <span className="mb-1 text-sm text-gray-400">تومان / شب</span>
             </div>
 
-            {property.pricing?.oldPrice &&
-              property.pricing.oldPrice > dailyPrice && (
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="text-sm text-gray-400 line-through">
-                    {property.pricing.oldPrice.toLocaleString("fa-IR")}
-                  </span>
+            {oldPrice > dailyPrice && (
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="text-sm text-gray-400 line-through">
+                  {oldPrice.toLocaleString("fa-IR")}
+                </span>
 
-                  {property.pricing.discount && (
-                    <span className="rounded-full bg-red-100 px-2 py-1 text-xs text-red-500">
-                      {property.pricing.discount}٪ تخفیف
-                    </span>
-                  )}
-                </div>
-              )}
+                {dailyPrice > 0 && (
+                  <span className="rounded-full bg-red-100 px-2 py-1 text-xs text-red-500">
+                    تخفیف ویژه
+                  </span>
+                )}
+              </div>
+            )}
 
             <div className="my-6 border-t border-dashed border-gray-200 dark:border-gray-600" />
 
             <div className="space-y-4">
-              <div className="flex justify-between text-sm">
+              <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">ظرفیت</span>
 
-                <span className="font-medium dark:text-white">
+                <span className="font-medium text-gray-900 dark:text-white">
                   {property.facilities?.capacity ?? 0} نفر
                 </span>
               </div>
 
-              <div className="flex justify-between text-sm">
+              <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">وضعیت</span>
 
-                <span className="font-medium text-primary500">
-                  {property.status === "available"
-                    ? "آماده رزرو"
-                    : "فعلاً قابل رزرو نیست"}
+                <span
+                  className={
+                    property.status === "available"
+                      ? "font-medium text-primary500"
+                      : property.status === "reserved"
+                        ? "font-medium text-amber-600"
+                        : "font-medium text-red-500"
+                  }
+                >
+                  {statusLabel}
                 </span>
               </div>
             </div>
 
-            <Link
-              href={`/single-reserve-house/${property._id}`}
-              className={`mt-7 flex h-12 w-full items-center justify-center gap-2 rounded-full text-sm font-bold text-white transition ${
-                property.status === "available"
-                  ? "bg-primary500 hover:opacity-90"
-                  : "pointer-events-none bg-gray-300"
-              }`}
-            >
-              رزرو اقامتگاه
-              <ChevronLeft size={18} />
-            </Link>
+            {/* Booking Button */}
+            {isAvailable ? (
+              <>
+                <Link
+                  href={`/single-reserve-house/${property._id}`}
+                  className="
+                    mt-7
+                    flex
+                    h-12
+                    w-full
+                    items-center
+                    justify-center
+                    gap-2
+                    rounded-full
+                    bg-primary500
+                    text-sm
+                    font-bold
+                    text-white
+                    transition-colors
+                    hover:bg-primary600
+                  "
+                >
+                  رزرو اقامتگاه
+                  <ChevronLeft size={18} />
+                </Link>
 
-            <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
-              <CheckCircle2 size={15} className="text-primary500" />
-              رزرو امن و آنلاین
-            </div>
+                <div className="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
+                  <CheckCircle2 size={15} className="text-primary500" />
+                  رزرو امن و آنلاین
+                </div>
+              </>
+            ) : (
+              <div
+                className={`
+                  mt-7
+                  flex
+                  min-h-12
+                  w-full
+                  items-center
+                  justify-center
+                  rounded-full
+                  px-4
+                  text-center
+                  text-sm
+                  font-bold
+                  ${
+                    property.status === "reserved"
+                      ? "bg-amber-50 text-amber-600 dark:bg-amber-950/20 dark:text-amber-400"
+                      : "bg-gray-200 text-gray-500 dark:bg-[#353535] dark:text-gray-400"
+                  }
+                `}
+              >
+                {property.status === "reserved"
+                  ? "این اقامتگاه قبلاً رزرو شده است"
+                  : "این اقامتگاه فعلاً قابل رزرو نیست"}
+              </div>
+            )}
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );

@@ -94,6 +94,11 @@ export default function Navbar() {
       href: "/",
     },
     {
+      label: "املاک",
+      href: "/properties",
+      arrow: true,
+    },
+    {
       label: "رهن و اجاره",
       href: "/mortgage-house",
     },
@@ -102,19 +107,14 @@ export default function Navbar() {
       href: "/house-reserve",
     },
     {
-      label: "بررسی سریع",
-      href: "/properties",
-      arrow: true,
+      label: "مقالات",
+      href: "/blog",
+      // icon: true,
     },
     {
       label: "تماس با ما",
       href: "/contact-us",
       arrow: true,
-    },
-    {
-      label: "مقالات",
-      href: "/blog",
-      icon: true,
     },
   ];
 
@@ -264,7 +264,7 @@ export default function Navbar() {
 
                 {item.label}
 
-                {item.arrow && <ChevronDown size={14} />}
+                {/* {item.arrow && <ChevronDown size={14} />} */}
               </Link>
             );
           })}

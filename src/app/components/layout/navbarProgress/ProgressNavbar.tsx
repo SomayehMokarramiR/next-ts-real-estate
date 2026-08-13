@@ -154,6 +154,11 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
       href: "/",
     },
     {
+      label: "املاک",
+      href: "/properties",
+      arrow: true,
+    },
+    {
       label: "رهن و اجاره",
       href: "/mortgage-house",
     },
@@ -163,19 +168,14 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
       highlight: pathname.startsWith("/single-reserve-house"),
     },
     {
-      label: "بررسی سریع",
-      href: "/properties",
-      arrow: true,
+      label: "مقالات",
+      href: "/blog",
+      // icon: true,
     },
     {
       label: "تماس با ما",
       href: "/contact-us",
       arrow: true,
-    },
-    {
-      label: "مقالات",
-      href: "/blog",
-      icon: true,
     },
   ];
   return (
@@ -245,7 +245,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
 
               {item.label}
 
-              {item.arrow && <ChevronDown size={14} />}
+              {/* {item.arrow && <ChevronDown size={14} />} */}
             </a>
           ))}
         </div>

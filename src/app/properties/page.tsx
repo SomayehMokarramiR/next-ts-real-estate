@@ -1,11 +1,10 @@
 import MainLayout from "../components/layout/MainLayout";
-import ContentReseve from "../components/templates/houseReserve/contentReseve/ContentReseve";
+import Breadcrumb from "../components/modules/breadcrumb/Breadcrumb";
+import Properties from "../components/templates/properties/Properties";
 
 type Props = {
   searchParams: Promise<{
     destination?: string;
-    checkIn?: string;
-    checkOut?: string;
     guests?: string;
     type?: string;
   }>;
@@ -23,7 +22,11 @@ export default async function PropertiesPage({ searchParams }: Props) {
   return (
     <MainLayout>
       <main className="pt-30 pb-16">
-        <ContentReseve filters={filters} />
+        <div className="mb-6">
+          <Breadcrumb />
+        </div>
+
+        <Properties filters={filters} />
       </main>
     </MainLayout>
   );
