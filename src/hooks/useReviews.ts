@@ -7,19 +7,28 @@ import {
 } from "../services/reviewService";
 
 // =========================
-// GET REVIEWS HOOK
+// REVIEW QUERY KEYS
+// =========================
+
+export const reviewKeys = {
+  all: ["reviews"] as const,
+  approved: ["reviews", "approved"] as const,
+  admin: ["reviews", "admin"] as const,
+};
+
+// =========================
+// GET REVIEWS
 // =========================
 
 export function useReviews() {
   return useQuery({
-    queryKey: ["reviews"],
-
+    queryKey: reviewKeys.approved,
     queryFn: getReviews,
 
     // کش تا 5 دقیقه معتبر باشد
     staleTime: 1000 * 60 * 5,
 
-    // هنگام برگشت کاربر دوباره خودکار چک کند
+    // با برگشت به تب دوباره خودکار درخواست ندهد
     refetchOnWindowFocus: false,
 
     // در صورت خطا 2 بار تلاش کند
@@ -28,7 +37,7 @@ export function useReviews() {
 }
 
 // =========================
-// CREATE REVIEW HOOK
+// CREATE REVIEW
 // =========================
 
 export function useCreateReview() {
@@ -38,10 +47,9 @@ export function useCreateReview() {
     mutationFn: (data: CreateReviewPayload) => createReview(data),
 
     onSuccess: () => {
-      // بعد از ثبت نظر، کش قبلی پاک شود
-      // و لیست جدید از API گرفته شود
+      // cache تمام queryهای reviews را stale می‌کند
       queryClient.invalidateQueries({
-        queryKey: ["reviews"],
+        queryKey: reviewKeys.all,
       });
     },
   });

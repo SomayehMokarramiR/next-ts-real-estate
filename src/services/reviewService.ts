@@ -1,9 +1,12 @@
+export type ReviewStatus = "pending" | "approved" | "rejected";
+
 export interface Review {
   _id: string;
   text: string;
   author: string;
   date: string;
   time: string;
+  status: ReviewStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -67,13 +70,15 @@ export async function createReview(
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    throw new Error("خطا در ثبت نظر");
+  let data: CreateReviewResponse;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("پاسخ نامعتبر از سرور دریافت شد.");
   }
 
-  const data: CreateReviewResponse = await response.json();
-
-  if (!data.success) {
+  if (!response.ok || !data.success) {
     throw new Error(data.message || "خطا در ثبت نظر");
   }
 
