@@ -21,6 +21,7 @@ import { useProperties } from "@/hooks/useProperties";
 interface Property {
   _id: string;
   title: string;
+  status?: "available" | "reserved" | "inactive";
   images?: string[];
   rating?: number;
   views?: number;
@@ -59,25 +60,64 @@ function formatPrice(price: number) {
 export default function ContentReseve({ filters = {} }: Props) {
   const [activePin, setActivePin] = useState<string | null>(null);
 
-  const { data, isLoading, error } = useProperties(filters);
+  const { data, isLoading, error } = useProperties({
+    ...filters,
+    status: "available",
+  });
 
-  const apiProperties: Property[] = data?.properties ?? [];
+  // فقط املاک قابل رزرو
+  const apiProperties: Property[] = (data?.properties ?? []).filter(
+    (property) => property.status === "available",
+  );
 
   const activeProp = apiProperties.find((item) => item._id === activePin);
 
-  console.log("FILTERS ===>", filters);
-  console.log("PROPERTIES ===>", apiProperties);
-
   if (isLoading) {
-    return <div>در حال دریافت اطلاعات...</div>;
+    return (
+      <div
+        className="
+          flex
+          min-h-[300px]
+          items-center
+          justify-center
+          text-sm
+          text-gray-500
+        "
+        dir="rtl"
+      >
+        در حال دریافت اقامتگاه‌های قابل رزرو...
+      </div>
+    );
   }
 
   if (error) {
-    return <div>خطا در دریافت اطلاعات املاک</div>;
+    return (
+      <div
+        className="
+          flex
+          min-h-[300px]
+          items-center
+          justify-center
+          text-sm
+          text-red-500
+        "
+        dir="rtl"
+      >
+        خطا در دریافت اقامتگاه‌های قابل رزرو
+      </div>
+    );
   }
 
   return (
-    <div className="flex flex-col min-[1200px]:flex-row gap-4">
+    <div
+      className="
+        flex
+        flex-col
+        min-[1200px]:flex-row
+        gap-4
+      "
+      dir="rtl"
+    >
       {/* LIST */}
       <div
         className="
@@ -93,219 +133,231 @@ export default function ContentReseve({ filters = {} }: Props) {
           content-start
         "
       >
-        {apiProperties.map((p) => (
+        {apiProperties.length === 0 ? (
           <div
-            key={p._id}
-            onMouseEnter={() => setActivePin(p._id)}
-            onClick={() => setActivePin(p._id)}
-            className={`
-              bg-white
-              dark:bg-[#272727]
-              rounded-2xl
-              border
-              overflow-hidden
+            className="
+              min-[1200px]:col-span-1
               flex
-              flex-row
-              cursor-pointer
-              min-h-[200px]
-
-              ${
-                activePin === p._id
-                  ? "border-primary500 shadow-md"
-                  : "border-gray-100 shadow-sm"
-              }
-            `}
+              min-h-[300px]
+              items-center
+              justify-center
+              text-center
+            "
           >
-            {/* IMAGE */}
+            <div>
+              <h2 className="text-lg font-bold text-gray-700 dark:text-white">
+                اقامتگاه قابل رزروی پیدا نشد
+              </h2>
 
-            <div
-              className="
-                relative
-                w-[150px]
-                lg:w-[180px]
-                min-h-[200px]
-                shrink-0
-              "
-            >
-              <Image
-                src={p.images?.[0] || "/images/placeholder.jpg"}
-                alt={p.title}
-                fill
-                className="object-cover"
-              />
+              <p className="mt-2 text-sm text-gray-400">
+                با تغییر مقصد یا فیلترهای جستجو دوباره امتحان کنید.
+              </p>
             </div>
-
-            {/* CONTENT */}
-
+          </div>
+        ) : (
+          apiProperties.map((property) => (
             <div
-              className="
-                flex-1
-                min-w-0
-                p-3
-                lg:p-4
+              key={property._id}
+              onMouseEnter={() => setActivePin(property._id)}
+              onClick={() => setActivePin(property._id)}
+              className={`
+                bg-white
+                dark:bg-[#272727]
+                rounded-2xl
+                border
+                overflow-hidden
                 flex
-                flex-col
-                gap-2.5
-              "
+                flex-row
+                cursor-pointer
+                min-h-[200px]
+
+                ${
+                  activePin === property._id
+                    ? "border-primary500 shadow-md"
+                    : "border-gray-100 shadow-sm"
+                }
+              `}
             >
-              {/* RATING */}
-
+              {/* IMAGE */}
               <div
                 className="
-                  flex
-                  items-center
-                  gap-1
-                  bg-primary500
-                  text-white
-                  text-xs
-                  px-2
-                  py-1
-                  rounded-full
-                  w-fit
+                  relative
+                  w-[150px]
+                  lg:w-[180px]
+                  min-h-[200px]
+                  shrink-0
                 "
               >
-                <Star size={15} className="fill-white" />
-                {p.rating ?? 0} ستاره
+                <Image
+                  src={property.images?.[0] || "/images/placeholder.jpg"}
+                  alt={property.title}
+                  fill
+                  className="object-cover"
+                />
               </div>
 
-              {/* TITLE */}
-
-              <h3
-                className="
-                  font-bold
-                  text-base
-                  truncate
-                "
-              >
-                {p.title}
-              </h3>
-
-              {/* LOCATION */}
-
+              {/* CONTENT */}
               <div
                 className="
+                  flex-1
+                  min-w-0
+                  p-3
+                  lg:p-4
                   flex
-                  items-center
-                  gap-1
-                  text-gray-400
+                  flex-col
+                  gap-2.5
                 "
               >
-                <MapPin size={13} />
-
-                <span className="text-xs truncate">
-                  {p.location?.address || p.location?.city || "بدون آدرس"}
-                </span>
-              </div>
-
-              {/* FEATURES */}
-
-              <div
-                className="
-                  flex
-                  flex-wrap
-                  gap-2
-                  text-xs
-                  text-gray-500
-                "
-              >
-                <span className="flex gap-1">
-                  <Home size={13} />
-                  {p.facilities?.bedrooms ?? 0}
-                  اتاق
-                </span>
-
-                <span>|</span>
-
-                <span className="flex gap-1">
-                  <Bath size={13} />
-                  {p.facilities?.bathrooms ?? 0}
-                  حمام
-                </span>
-
-                <span>|</span>
-
-                <span className="flex gap-1">
-                  <Users size={13} />
-                  {p.facilities?.capacity ?? 0}
-                  نفر
-                </span>
-
-                <span>|</span>
-
-                <span className="flex gap-1">
-                  <Car size={13} />
-
-                  {p.facilities?.parking ? "پارکینگ" : "بدون پارکینگ"}
-                </span>
-              </div>
-
-              {/* SEPARATOR */}
-
-              <div
-                className="
-                  border-t
-                  border-dashed
-                  border-gray-200
-                "
-              />
-
-              {/* PRICE */}
-
-              <div
-                className="
-                  flex
-                  items-center
-                  justify-between
-                "
-              >
+                {/* RATING */}
                 <div
                   className="
-                    bg-[#EDEDED]
-                    dark:bg-[#353535]
-                    rounded-full
-                    px-3
-                    h-[38px]
-                    flex
-                    items-center
-                    gap-2
-                  "
-                >
-                  <span className="font-bold text-sm">
-                    {formatPrice(p.pricing?.daily ?? 0)}
-                  </span>
-
-                  <span
-                    className="
-                      text-gray-400
-                      text-xs
-                    "
-                  >
-                    تومان / شب
-                  </span>
-                </div>
-
-                <Link
-                  href={`/properties/${p._id}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="
-                    text-primary500
-                    text-xs
                     flex
                     items-center
                     gap-1
+                    bg-primary500
+                    text-white
+                    text-xs
+                    px-2
+                    py-1
+                    rounded-full
+                    w-fit
                   "
                 >
-                  جزئیات
-                  <ChevronLeft size={14} />
-                </Link>
+                  <Star size={15} className="fill-white" />
+                  {property.rating ?? 0} ستاره
+                </div>
+
+                {/* TITLE */}
+                <h3
+                  className="
+                    font-bold
+                    text-base
+                    truncate
+                    text-gray-900
+                    dark:text-white
+                  "
+                >
+                  {property.title}
+                </h3>
+
+                {/* LOCATION */}
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    text-gray-400
+                  "
+                >
+                  <MapPin size={13} />
+
+                  <span className="text-xs truncate">
+                    {property.location?.address ||
+                      property.location?.city ||
+                      "بدون آدرس"}
+                  </span>
+                </div>
+
+                {/* FEATURES */}
+                <div
+                  className="
+                    flex
+                    flex-wrap
+                    gap-2
+                    text-xs
+                    text-gray-500
+                    dark:text-gray-300
+                  "
+                >
+                  <span className="flex gap-1 items-center">
+                    <Home size={13} />
+                    {property.facilities?.bedrooms ?? 0} اتاق
+                  </span>
+
+                  <span>|</span>
+
+                  <span className="flex gap-1 items-center">
+                    <Bath size={13} />
+                    {property.facilities?.bathrooms ?? 0} حمام
+                  </span>
+
+                  <span>|</span>
+
+                  <span className="flex gap-1 items-center">
+                    <Users size={13} />
+                    {property.facilities?.capacity ?? 0} نفر
+                  </span>
+
+                  <span>|</span>
+
+                  <span className="flex gap-1 items-center">
+                    <Car size={13} />
+
+                    {property.facilities?.parking ? "پارکینگ" : "بدون پارکینگ"}
+                  </span>
+                </div>
+
+                {/* SEPARATOR */}
+                <div
+                  className="
+                    border-t
+                    border-dashed
+                    border-gray-200
+                    dark:border-gray-600
+                  "
+                />
+
+                {/* PRICE */}
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                    gap-2
+                  "
+                >
+                  <div
+                    className="
+                      bg-[#EDEDED]
+                      dark:bg-[#353535]
+                      rounded-full
+                      px-3
+                      h-[38px]
+                      flex
+                      items-center
+                      gap-2
+                    "
+                  >
+                    <span className="font-bold text-sm text-gray-900 dark:text-white">
+                      {formatPrice(property.pricing?.daily ?? 0)}
+                    </span>
+
+                    <span className="text-gray-400 text-xs">تومان / شب</span>
+                  </div>
+
+                  <Link
+                    href={`/single-reserve-house/${property._id}`}
+                    onClick={(event) => event.stopPropagation()}
+                    className="
+                      text-primary500
+                      text-xs
+                      flex
+                      items-center
+                      gap-1
+                      whitespace-nowrap
+                    "
+                  >
+                    رزرو
+                    <ChevronLeft size={14} />
+                  </Link>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* MAP */}
-
       <div
         className="
           relative
@@ -326,25 +378,23 @@ export default function ContentReseve({ filters = {} }: Props) {
         />
 
         {/* MAP PINS */}
-
-        {apiProperties.map((p) => (
+        {apiProperties.map((property) => (
           <div
-            key={p._id}
+            key={property._id}
             className="absolute z-10"
             style={{
-              top: p.mapPosition?.top || "50%",
-              left: p.mapPosition?.left || "50%",
+              top: property.mapPosition?.top || "50%",
+              left: property.mapPosition?.left || "50%",
             }}
           >
             <MapPinCmp
-              active={activePin === p._id}
-              onClick={() => setActivePin(p._id)}
+              active={activePin === property._id}
+              onClick={() => setActivePin(property._id)}
             />
           </div>
         ))}
 
         {/* POPUP */}
-
         {activeProp && (
           <div
             className="
@@ -368,8 +418,7 @@ export default function ContentReseve({ filters = {} }: Props) {
                 overflow-hidden
               "
             >
-              {/* POPUP IMAGE */}
-
+              {/* IMAGE */}
               <Image
                 src={activeProp.images?.[0] || "/images/placeholder.jpg"}
                 alt={activeProp.title}
@@ -383,7 +432,6 @@ export default function ContentReseve({ filters = {} }: Props) {
               />
 
               {/* CLOSE */}
-
               <button
                 type="button"
                 onClick={() => setActivePin(null)}
@@ -397,33 +445,29 @@ export default function ContentReseve({ filters = {} }: Props) {
                   shadow
                   z-10
                 "
+                aria-label="بستن"
               >
                 <X size={12} />
               </button>
 
               {/* POPUP CONTENT */}
+              <div className="p-3" dir="rtl">
+                <p className="text-xs font-bold">{activeProp.title}</p>
 
-              <div className="p-3">
-                <p
-                  className="
-                    text-xs
-                    font-bold
-                  "
-                >
-                  {activeProp.title}
-                </p>
+                <p className="mt-1 text-[11px] text-primary500">قابل رزرو</p>
 
                 <Link
-                  href={`/properties/${activeProp._id}`}
+                  href={`/single-reserve-house/${activeProp._id}`}
                   className="
                     text-primary500
                     text-xs
                     mt-2
                     flex
                     gap-1
+                    items-center
                   "
                 >
-                  جزئیات بیشتر
+                  رزرو اقامتگاه
                   <ChevronLeft size={12} />
                 </Link>
               </div>
