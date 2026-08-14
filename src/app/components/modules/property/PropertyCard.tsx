@@ -4,33 +4,48 @@ import Link from "next/link";
 
 import type { Property } from "@/hooks/useProperties";
 
-export default function PropertyCard({ property }: { property: Property }) {
-  // ======================================
-  // DEBUG
-  // ======================================
+type Props = {
+  property: Property;
+};
 
+export default function PropertyCard({ property }: Props) {
   console.log("property==============:", property);
 
   // ======================================
   // TRANSACTION LABEL
   // ======================================
 
-  const transactionLabel = {
+  const transactionLabels: Record<
+    NonNullable<Property["transactionType"]>,
+    string
+  > = {
     rent: "اجاره",
     mortgage: "رهن کامل",
     "rent-mortgage": "رهن و اجاره",
     sale: "فروش",
-  }[property.transactionType];
+  };
+
+  const transactionLabel = property.transactionType
+    ? transactionLabels[property.transactionType]
+    : "";
 
   // ======================================
   // PRICE
   // ======================================
 
   const monthlyRent = property.pricing?.monthly;
-
   const mortgage = property.pricing?.mortgage;
-
   const dailyPrice = property.pricing?.daily;
+
+  const showMonthlyRent =
+    property.transactionType === "rent" ||
+    property.transactionType === "rent-mortgage";
+
+  const showMortgage =
+    property.transactionType === "mortgage" ||
+    property.transactionType === "rent-mortgage";
+
+  const showDailyPrice = !monthlyRent && !mortgage && Boolean(dailyPrice);
 
   return (
     <Link
@@ -58,13 +73,16 @@ export default function PropertyCard({ property }: { property: Property }) {
           boxShadow: "0 2px 20px rgba(0,0,0,0.09)",
         }}
       >
-        {/* Image */}
+        {/* ======================================
+            IMAGE
+        ====================================== */}
 
         <div className="relative h-[172px]">
           <Image
             src={property.images?.[0] || "/images/placeholder.jpg"}
-            alt={property.title}
+            alt={property.title || "اقامتگاه"}
             fill
+            sizes="(max-width: 768px) 100vw, 400px"
             className="object-cover"
           />
 
@@ -119,14 +137,16 @@ export default function PropertyCard({ property }: { property: Property }) {
                 truncate
               "
             >
-              {property.location?.city}
+              {property.location?.city || "نامشخص"}
             </p>
 
             <MapPin size={11} className="text-white shrink-0" />
           </div>
         </div>
 
-        {/* Body */}
+        {/* ======================================
+            BODY
+        ====================================== */}
 
         <div
           className="
@@ -150,28 +170,32 @@ export default function PropertyCard({ property }: { property: Property }) {
               line-clamp-2
             "
           >
-            {property.title}
+            {property.title || "اقامتگاه بدون عنوان"}
           </h3>
 
           {/* Transaction Type */}
 
-          <div className="flex justify-end">
-            <span
-              className="
-                text-[10px]
-                px-2.5
-                py-1
-                rounded-full
-                bg-primary500/10
-                text-primary500
-                font-medium
-              "
-            >
-              {transactionLabel}
-            </span>
-          </div>
+          {transactionLabel && (
+            <div className="flex justify-end">
+              <span
+                className="
+                  text-[10px]
+                  px-2.5
+                  py-1
+                  rounded-full
+                  bg-primary500/10
+                  text-primary500
+                  font-medium
+                "
+              >
+                {transactionLabel}
+              </span>
+            </div>
+          )}
 
-          {/* Facilities */}
+          {/* ======================================
+              FACILITIES
+          ====================================== */}
 
           <div
             className="
@@ -182,6 +206,7 @@ export default function PropertyCard({ property }: { property: Property }) {
               text-gray-500
               dark:text-white
               text-[11px]
+              flex-wrap
             "
           >
             <span className="flex items-center gap-[3px]">
@@ -207,25 +232,11 @@ export default function PropertyCard({ property }: { property: Property }) {
 
             <span className="flex items-center gap-[3px]">
               <Car size={12} />
-
               {property.facilities?.parking ? "دارد" : "ندارد"}
             </span>
           </div>
 
-          {/* Area */}
-
-          <div
-            className="
-              flex
-              items-center
-              justify-end
-              text-[11px]
-              text-gray-500
-              dark:text-white
-            "
-          >
-            متراژ: {property.area ?? 0} متر
-          </div>
+          {/* Divider */}
 
           <div
             className="
@@ -235,7 +246,9 @@ export default function PropertyCard({ property }: { property: Property }) {
             "
           />
 
-          {/* Price */}
+          {/* ======================================
+              PRICE
+          ====================================== */}
 
           <div
             className="
@@ -249,15 +262,15 @@ export default function PropertyCard({ property }: { property: Property }) {
               py-2.5
             "
           >
-            {/* Rent */}
+            {/* Monthly Rent */}
 
-            {(property.transactionType === "rent" ||
-              property.transactionType === "rent-mortgage") && (
+            {showMonthlyRent && (
               <div
                 className="
                   flex
                   items-center
                   justify-between
+                  gap-2
                 "
               >
                 <span
@@ -265,6 +278,7 @@ export default function PropertyCard({ property }: { property: Property }) {
                     text-[11px]
                     text-gray-500
                     dark:text-white
+                    shrink-0
                   "
                 >
                   اجاره ماهانه
@@ -276,23 +290,25 @@ export default function PropertyCard({ property }: { property: Property }) {
                     font-bold
                     text-gray-800
                     dark:text-white
+                    text-left
                   "
                 >
-                  {monthlyRent ? monthlyRent.toLocaleString("fa-IR") : "توافقی"}{" "}
-                  {monthlyRent ? "تومان" : ""}
+                  {monthlyRent
+                    ? `${monthlyRent.toLocaleString("fa-IR")} تومان`
+                    : "توافقی"}
                 </span>
               </div>
             )}
 
             {/* Mortgage */}
 
-            {(property.transactionType === "mortgage" ||
-              property.transactionType === "rent-mortgage") && (
+            {showMortgage && (
               <div
                 className="
                   flex
                   items-center
                   justify-between
+                  gap-2
                 "
               >
                 <span
@@ -300,6 +316,7 @@ export default function PropertyCard({ property }: { property: Property }) {
                     text-[11px]
                     text-gray-500
                     dark:text-white
+                    shrink-0
                   "
                 >
                   مبلغ رهن
@@ -311,49 +328,56 @@ export default function PropertyCard({ property }: { property: Property }) {
                     font-bold
                     text-gray-800
                     dark:text-white
+                    text-left
                   "
                 >
-                  {mortgage ? mortgage.toLocaleString("fa-IR") : "توافقی"}{" "}
-                  {mortgage ? "تومان" : ""}
+                  {mortgage
+                    ? `${mortgage.toLocaleString("fa-IR")} تومان`
+                    : "توافقی"}
                 </span>
               </div>
             )}
 
-            {/* Daily */}
+            {/* Daily Price */}
 
-            {!monthlyRent && !mortgage && dailyPrice && (
+            {showDailyPrice && (
               <div
                 className="
-                    flex
-                    items-center
-                    justify-between
-                  "
+                  flex
+                  items-center
+                  justify-between
+                  gap-2
+                "
               >
                 <span
                   className="
-                      text-[11px]
-                      text-gray-500
-                      dark:text-white
-                    "
+                    text-[11px]
+                    text-gray-500
+                    dark:text-white
+                    shrink-0
+                  "
                 >
                   اجاره شبانه
                 </span>
 
                 <span
                   className="
-                      text-sm
-                      font-bold
-                      text-gray-800
-                      dark:text-white
-                    "
+                    text-sm
+                    font-bold
+                    text-gray-800
+                    dark:text-white
+                    text-left
+                  "
                 >
-                  {dailyPrice.toLocaleString("fa-IR")} تومان
+                  {dailyPrice!.toLocaleString("fa-IR")} تومان
                 </span>
               </div>
             )}
           </div>
 
-          {/* Details */}
+          {/* ======================================
+              DETAILS
+          ====================================== */}
 
           <span
             className="

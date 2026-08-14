@@ -71,6 +71,20 @@ export interface LogoutResponse {
   message: string;
 }
 
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+
+  user?: {
+    id: string;
+    name: string;
+    lastName: string;
+    email: string;
+    phoneNumber: string;
+    role?: "admin" | "user";
+  };
+}
+
 /* =========================
    API Request
 ========================= */
@@ -175,6 +189,21 @@ export function completeRegistration(data: {
 export function getMe() {
   return apiRequest<MeResponse>(`${API_URL}/me`, {
     method: "GET",
+  });
+}
+
+/* =========================
+   Update Current User
+========================= */
+
+export function updateProfile(data: {
+  name: string;
+  lastName: string;
+  phoneNumber: string;
+}) {
+  return apiRequest<UpdateProfileResponse>(`${API_URL}/me`, {
+    method: "PUT",
+    body: JSON.stringify(data),
   });
 }
 

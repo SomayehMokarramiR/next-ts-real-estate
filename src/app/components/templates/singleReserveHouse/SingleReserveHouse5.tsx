@@ -2,17 +2,26 @@
 
 import { CheckCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useReserveProgress } from "@/app/context/ReserveProgressContext";
 import Stepper from "./Stepper";
 
 type ReservationData = {
   _id: string;
+
   amount: number;
+
   propertyId: {
     _id: string;
     title: string;
   };
+
+  contact: {
+    phone: string;
+    email: string;
+  };
+
   status: "pending" | "paid" | "cancelled";
 };
 
@@ -21,6 +30,8 @@ export default function SingleReserveHouse5({
 }: {
   prevStep: () => void;
 }) {
+  const router = useRouter();
+
   const { reservationId, step } = useReserveProgress();
 
   const [reservation, setReservation] = useState<ReservationData | null>(null);
@@ -28,54 +39,61 @@ export default function SingleReserveHouse5({
   useEffect(() => {
     if (!reservationId) return;
 
-    fetch(`/api/reservations/${reservationId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setReservation(data.reservation);
-      });
+    const getReservation = async () => {
+      try {
+        const res = await fetch(`/api/reservations/${reservationId}`);
+
+        const data = await res.json();
+
+        if (data.success) {
+          setReservation(data.reservation);
+        }
+      } catch (error) {
+        console.error("GET RESERVATION ERROR:", error);
+      }
+    };
+
+    getReservation();
   }, [reservationId]);
 
   return (
     <div
       className="
-max-w-3xl
-mx-auto
-mt-6
-"
+      max-w-3xl
+      mx-auto
+      mt-6
+      "
+      dir="rtl"
     >
-      {/* Stepper */}
-
       <div className="mb-6">
         <Stepper active={step} />
       </div>
 
-      {/* فرم بلیط */}
-
       <div
         className="
-bg-white
-dark:bg-[#222]
-rounded-3xl
-shadow-sm
-p-6
-"
+        bg-white
+        dark:bg-[#222]
+        rounded-3xl
+        shadow-sm
+        p-6
+        "
       >
         <div
           className="
-flex
-flex-col
-items-center
-gap-3
-"
+          flex
+          flex-col
+          items-center
+          gap-3
+          "
         >
           <CheckCircle size={60} className="text-green-500" />
 
           <h1
             className="
-text-2xl
-font-bold
-dark:text-white
-"
+            text-2xl
+            font-bold
+            dark:text-white
+            "
           >
             رزرو با موفقیت انجام شد
           </h1>
@@ -85,18 +103,18 @@ dark:text-white
 
         <div
           className="
-mt-8
-bg-[#F0F0F3]
-dark:bg-[#333]
-rounded-2xl
-p-5
-space-y-4
-"
+          mt-8
+          bg-[#F0F0F3]
+          dark:bg-[#333]
+          rounded-2xl
+          p-5
+          space-y-4
+          "
         >
           <div className="flex justify-between">
             <span>شماره رزرو</span>
 
-            <span>{reservation?._id ?? "-"}</span>
+            <span className="font-bold">{reservation?._id ?? "-"}</span>
           </div>
 
           <div className="flex justify-between">
@@ -111,22 +129,39 @@ space-y-4
             <span>مبلغ پرداختی</span>
 
             <span>
-              {reservation?.amount ? reservation.amount.toLocaleString() : "-"}
+              {reservation?.amount
+                ? reservation.amount.toLocaleString("fa-IR")
+                : "-"}{" "}
               تومان
             </span>
           </div>
         </div>
 
         <button
+          onClick={() => router.push("/account/reservations")}
+          className="
+          mt-6
+          w-full
+          h-12
+          rounded-full
+          bg-primary500
+          text-white
+          font-bold
+          "
+        >
+          مشاهده رزروهای من
+        </button>
+
+        <button
           onClick={prevStep}
           className="
-mt-6
-w-full
-h-11
-rounded-full
-border
-dark:text-white
-"
+          mt-3
+          w-full
+          h-11
+          rounded-full
+          border
+          dark:text-white
+          "
         >
           مرحله قبل
         </button>

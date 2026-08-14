@@ -1,45 +1,59 @@
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  Dispatch,
+  SetStateAction,
+} from "react";
 
 import { Passenger } from "../components/templates/singleReserveHouse/types";
 import { Property } from "../../hooks/useProperties";
 import { emptyPassenger } from "../components/templates/singleReserveHouse/constants";
 
+export type Contact = {
+  phone: string;
+  email: string;
+};
+
 type ReserveContextType = {
+  // STEP
   step: number;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
+  setStep: Dispatch<SetStateAction<number>>;
 
   progress: number;
-  setProgress: React.Dispatch<React.SetStateAction<number>>;
+  setProgress: Dispatch<SetStateAction<number>>;
 
+  // PROPERTY
   propertyId: string;
-  setPropertyId: React.Dispatch<React.SetStateAction<string>>;
+  setPropertyId: Dispatch<SetStateAction<string>>;
 
   property: Property | null;
-  setProperty: React.Dispatch<React.SetStateAction<Property | null>>;
+  setProperty: Dispatch<SetStateAction<Property | null>>;
 
+  // DATE
   checkIn: string;
-  setCheckIn: React.Dispatch<React.SetStateAction<string>>;
+  setCheckIn: Dispatch<SetStateAction<string>>;
 
   checkOut: string;
-  setCheckOut: React.Dispatch<React.SetStateAction<string>>;
+  setCheckOut: Dispatch<SetStateAction<string>>;
 
   nights: number;
-  setNights: React.Dispatch<React.SetStateAction<number>>;
+  setNights: Dispatch<SetStateAction<number>>;
 
+  // PASSENGERS
   passengers: Passenger[];
-  setPassengers: React.Dispatch<React.SetStateAction<Passenger[]>>;
+  setPassengers: Dispatch<SetStateAction<Passenger[]>>;
 
-  phone: string;
-  setPhone: React.Dispatch<React.SetStateAction<string>>;
+  // CONTACT
+  contact: Contact;
+  setContact: Dispatch<SetStateAction<Contact>>;
 
-  email: string;
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-
-  // شناسه رزرو برای پرداخت و مرحله 5
+  // RESERVATION
   reservationId: string;
-  setReservationId: React.Dispatch<React.SetStateAction<string>>;
+  setReservationId: Dispatch<SetStateAction<string>>;
 };
 
 const ReserveProgressContext = createContext<ReserveContextType | null>(null);
@@ -53,37 +67,39 @@ export function ReserveProgressProvider({ children }: { children: ReactNode }) {
 
   const [property, setProperty] = useState<Property | null>(null);
 
-  const [checkIn, setCheckIn] = useState<string>("1405/05/20");
+  const [checkIn, setCheckIn] = useState<string>("");
 
-  const [checkOut, setCheckOut] = useState<string>("1405/05/23");
+  const [checkOut, setCheckOut] = useState<string>("");
 
-  const [nights, setNights] = useState<number>(3);
+  const [nights, setNights] = useState<number>(0);
 
   const [passengers, setPassengers] = useState<Passenger[]>([emptyPassenger()]);
 
-  const [phone, setPhone] = useState<string>("");
+  const [contact, setContact] = useState<Contact>({
+    phone: "",
+    email: "",
+  });
 
-  const [email, setEmail] = useState<string>("");
-
-  // بعد از ساخت رزرو ذخیره می‌شود
-  // برای پرداخت و برگشت از درگاه
   const [reservationId, setReservationId] = useState<string>("");
 
   return (
     <ReserveProgressContext.Provider
       value={{
+        // STEP
         step,
         setStep,
 
         progress,
         setProgress,
 
+        // PROPERTY
         propertyId,
         setPropertyId,
 
         property,
         setProperty,
 
+        // DATE
         checkIn,
         setCheckIn,
 
@@ -93,15 +109,15 @@ export function ReserveProgressProvider({ children }: { children: ReactNode }) {
         nights,
         setNights,
 
+        // PASSENGERS
         passengers,
         setPassengers,
 
-        phone,
-        setPhone,
+        // CONTACT
+        contact,
+        setContact,
 
-        email,
-        setEmail,
-
+        // RESERVATION
         reservationId,
         setReservationId,
       }}

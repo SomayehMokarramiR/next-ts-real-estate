@@ -16,38 +16,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 import MapPinCmp from "./MapPinCmp";
-import { useProperties } from "@/hooks/useProperties";
-
-interface Property {
-  _id: string;
-  title: string;
-  status?: "available" | "reserved" | "inactive";
-  images?: string[];
-  rating?: number;
-  views?: number;
-
-  location?: {
-    address?: string;
-    city?: string;
-  };
-
-  facilities?: {
-    bedrooms?: number;
-    bathrooms?: number;
-    parking?: boolean;
-    pool?: boolean;
-    capacity?: number;
-  };
-
-  pricing?: {
-    daily?: number;
-  };
-
-  mapPosition?: {
-    top?: string;
-    left?: string;
-  };
-}
+import { useProperties, type Property } from "@/hooks/useProperties";
 
 type Props = {
   filters?: Record<string, string>;
@@ -62,14 +31,14 @@ export default function ContentReseve({ filters = {} }: Props) {
 
   const { data, isLoading, error } = useProperties({
     ...filters,
-    status: "available",
   });
-
   // فقط املاک قابل رزرو
   const apiProperties: Property[] = (data?.properties ?? []).filter(
-    (property) => property.status === "available",
+    (property) =>
+      property.status === "available" &&
+      property.bookingType === "daily" &&
+      Number(property.pricing?.daily ?? 0) > 0,
   );
-
   const activeProp = apiProperties.find((item) => item._id === activePin);
 
   if (isLoading) {

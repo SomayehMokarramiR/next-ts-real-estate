@@ -5,6 +5,11 @@ import { UserPlus, Users, Ticket } from "lucide-react";
 import Field from "./Field";
 import { Passenger } from "./types";
 
+type Contact = {
+  phone: string;
+  email: string;
+};
+
 type Props = {
   passenger: Passenger;
   index: number;
@@ -13,11 +18,9 @@ type Props = {
 
   onAddPassenger: () => void;
 
-  phone: string;
-  setPhone: (value: string) => void;
+  contact: Contact;
 
-  email: string;
-  setEmail: (value: string) => void;
+  setContact: React.Dispatch<React.SetStateAction<Contact>>;
 
   onUpdateContact: () => void;
 
@@ -29,10 +32,8 @@ export default function PassengerForm({
   index,
   onChange,
   onAddPassenger,
-  phone,
-  setPhone,
-  email,
-  setEmail,
+  contact,
+  setContact,
   onUpdateContact,
   contactSaved,
 }: Props) {
@@ -69,7 +70,7 @@ export default function PassengerForm({
         />
 
         <div>
-          <label className="block text-xs text-gray-500 dark:text-white mb-1.5 font-medium">
+          <label className="block text-xs text-gray-500 dark:text-white mb-1.5">
             جنسیت شما
           </label>
 
@@ -91,9 +92,7 @@ export default function PassengerForm({
             "
           >
             <option value="">انتخاب کنید</option>
-
             <option value="male">آقا</option>
-
             <option value="female">خانم</option>
           </select>
         </div>
@@ -112,14 +111,7 @@ export default function PassengerForm({
           onChange={(v) => onChange("birthDate", v)}
         />
 
-        <div
-          className="
-          grid
-          grid-cols-2
-          gap-2
-          items-end
-          "
-        >
+        <div className="grid grid-cols-2 gap-2 items-end">
           <button
             type="button"
             onClick={onAddPassenger}
@@ -127,7 +119,6 @@ export default function PassengerForm({
             h-[42px]
             w-full
             bg-primary500
-            hover:bg-primary700
             text-white
             text-xs
             rounded-full
@@ -164,7 +155,6 @@ export default function PassengerForm({
         </div>
       </div>
 
-      {/* فقط مسافر اول و فقط تا قبل از ثبت */}
       {index === 0 && !contactSaved && (
         <div
           className="
@@ -208,15 +198,25 @@ export default function PassengerForm({
             <Field
               label="شماره تلفن"
               placeholder="09xx xxx xxxx"
-              value={phone}
-              onChange={setPhone}
+              value={contact.phone}
+              onChange={(value) =>
+                setContact({
+                  ...contact,
+                  phone: value,
+                })
+              }
             />
 
             <Field
               label="ایمیل"
               placeholder="example@email.com"
-              value={email}
-              onChange={setEmail}
+              value={contact.email}
+              onChange={(value) =>
+                setContact({
+                  ...contact,
+                  email: value,
+                })
+              }
             />
           </div>
 

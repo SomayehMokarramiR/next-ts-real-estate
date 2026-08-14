@@ -11,6 +11,7 @@ import {
   forgotPassword,
   verifyResetCode,
   resetPassword,
+  updateProfile,
 } from "@/services/auth";
 
 export function useMe() {
@@ -85,5 +86,23 @@ export function useVerifyResetCode() {
 export function useResetPassword() {
   return useMutation({
     mutationFn: resetPassword,
+  });
+}
+
+// =========================
+// Profile
+// =========================
+
+export function useUpdateProfile() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateProfile,
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["me"],
+      });
+    },
   });
 }

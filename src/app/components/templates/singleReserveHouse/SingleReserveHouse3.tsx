@@ -45,15 +45,24 @@ export default function SingleReserveHouse3({ prevStep, nextStep }: Props) {
 
     nights,
 
-    phone,
-    email,
+    contact,
   } = useReserveProgress();
 
   const [editPassengers, setEditPassengers] = useState(false);
+
   const createReservationMutation = useCreateReservation();
 
   const handlePayment = () => {
     console.log("HANDLE PAYMENT START");
+
+    if (!property?._id) {
+      Swal.fire({
+        icon: "warning",
+        title: "خطا",
+        text: "اقامتگاه انتخاب نشده است",
+      });
+      return;
+    }
 
     const reservationPassengers = passengers
       .filter(
@@ -67,57 +76,47 @@ export default function SingleReserveHouse3({ prevStep, nextStep }: Props) {
         birthDate: p.birthDate,
       }));
 
-    console.log("PAYLOAD", {
-      propertyId: property?._id,
-      checkIn,
-      checkOut,
-      nights,
-      phone,
-      email,
+    const payload = {
+      propertyId: property._id,
+
+      checkIn: checkIn || "",
+      checkOut: checkOut || "",
+
+      nights: nights || 1,
+
+      contact,
+
       passengers: reservationPassengers,
-      amount: (property?.pricing?.daily ?? 0) * nights,
-    });
 
-    createReservationMutation.mutate(
-      {
-        propertyId: property?._id as string,
-        checkIn,
-        checkOut,
-        nights,
+      amount: (property.pricing?.daily ?? 0) * (nights || 1),
+    };
 
-        contact: {
-          phone,
-          email,
-        },
+    console.log("PAYLOAD", payload);
 
-        passengers: reservationPassengers,
+    createReservationMutation.mutate(payload, {
+      onSuccess: (data) => {
+        console.log("SUCCESS", data);
 
-        amount: (property?.pricing?.daily ?? 0) * nights,
-      },
-      {
-        onSuccess: (data) => {
-          console.log("SUCCESS", data);
-
+        if (data.reservation?._id) {
           setReservationId(data.reservation._id);
+        }
 
-          setProgress(80);
+        setProgress(80);
 
-          nextStep();
-        },
-
-        onError: (error) => {
-          console.log("ERROR", error);
-
-          Swal.fire({
-            icon: "error",
-            title: "خطا",
-            text: error.message,
-          });
-        },
+        nextStep();
       },
-    );
-  };
 
+      onError: (error) => {
+        console.log("ERROR", error);
+
+        Swal.fire({
+          icon: "error",
+          title: "خطا",
+          text: error.message,
+        });
+      },
+    });
+  };
   const updatePassenger = (
     index: number,
     field: keyof Passenger,
@@ -398,12 +397,12 @@ export default function SingleReserveHouse3({ prevStep, nextStep }: Props) {
                 >
                   <span className="flex items-center gap-2">
                     <Phone size={15} />
-                    {phone}
+                    {contact.phone}
                   </span>
 
                   <span className="flex items-center gap-2">
                     <Mail size={15} />
-                    {email}
+                    {contact.email}
                   </span>
                 </div>
               </div>

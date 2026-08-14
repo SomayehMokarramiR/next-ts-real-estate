@@ -1,20 +1,21 @@
-export function validateContact(phone: string, email: string): string | null {
-  if (!phone.trim()) {
+export type Contact = {
+  phone: string;
+  email: string;
+};
+
+export function contactValidator(contact: Contact): string | null {
+  if (!contact.phone.trim()) {
     return "شماره تلفن را وارد کنید";
   }
 
-  if (!/^09\d{9}$/.test(phone)) {
-    return "شماره تلفن باید ۱۱ رقم و با 09 شروع شود";
-  }
-
-  if (!email.trim()) {
+  if (!contact.email.trim()) {
     return "ایمیل را وارد کنید";
   }
 
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  if (!emailRegex.test(email)) {
-    return "فرمت ایمیل صحیح نیست";
+  if (!emailRegex.test(contact.email.trim())) {
+    return "ایمیل معتبر نیست";
   }
 
   return null;

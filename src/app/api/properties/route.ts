@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
     const guests = searchParams.get("guests")?.trim() || "";
     const type = searchParams.get("type")?.trim() || "";
 
+    // اضافه شد
+    const transactionType = searchParams.get("transactionType")?.trim() || "";
+
     const pageParam = Number(searchParams.get("page"));
     const limitParam = Number(searchParams.get("limit"));
 
@@ -41,6 +44,11 @@ export async function GET(request: NextRequest) {
     // نوع ملک
     if (type) {
       filter.type = type;
+    }
+
+    // نوع معامله (رزرو، رهن، فروش و ...)
+    if (transactionType) {
+      filter.transactionType = transactionType;
     }
 
     // ظرفیت

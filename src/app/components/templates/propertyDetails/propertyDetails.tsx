@@ -89,9 +89,9 @@ export default function PropertyDetails({ propertyId }: Props) {
     refetch,
   } = useProperty(propertyId);
 
-  // =========================
-  // Loading
-  // =========================
+  // ======================================
+  // LOADING
+  // ======================================
 
   if (isLoading) {
     return (
@@ -117,9 +117,9 @@ export default function PropertyDetails({ propertyId }: Props) {
     );
   }
 
-  // =========================
-  // Error
-  // =========================
+  // ======================================
+  // ERROR
+  // ======================================
 
   if (isError || !property) {
     return (
@@ -189,6 +189,10 @@ export default function PropertyDetails({ propertyId }: Props) {
     );
   }
 
+  // ======================================
+  // DATA
+  // ======================================
+
   const dailyPrice = property.pricing?.daily ?? 0;
 
   const oldPrice = property.pricing?.oldPrice ?? 0;
@@ -229,9 +233,14 @@ export default function PropertyDetails({ propertyId }: Props) {
     },
   ];
 
+  // ======================================
+  // UI
+  // ======================================
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 md:py-8" dir="rtl">
       {/* Breadcrumb */}
+
       <div className="mb-6">
         <Breadcrumb
           items={[
@@ -247,6 +256,7 @@ export default function PropertyDetails({ propertyId }: Props) {
       </div>
 
       {/* Header */}
+
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1
@@ -303,6 +313,7 @@ export default function PropertyDetails({ propertyId }: Props) {
       </div>
 
       {/* Gallery */}
+
       <div className="grid gap-3 md:grid-cols-4 md:grid-rows-2">
         <div
           className="
@@ -355,10 +366,13 @@ export default function PropertyDetails({ propertyId }: Props) {
       </div>
 
       {/* Main Content */}
+
       <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
         {/* Main */}
+
         <div className="space-y-6">
           {/* Status */}
+
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
@@ -389,6 +403,7 @@ export default function PropertyDetails({ propertyId }: Props) {
           </div>
 
           {/* Facilities */}
+
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               امکانات و ویژگی‌ها
@@ -429,6 +444,7 @@ export default function PropertyDetails({ propertyId }: Props) {
           </div>
 
           {/* Description */}
+
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               درباره این اقامتگاه
@@ -440,6 +456,7 @@ export default function PropertyDetails({ propertyId }: Props) {
           </div>
 
           {/* Location */}
+
           <div className="rounded-3xl bg-white p-6 shadow-sm dark:bg-[#272727]">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               موقعیت اقامتگاه
@@ -462,6 +479,7 @@ export default function PropertyDetails({ propertyId }: Props) {
         </div>
 
         {/* Booking Card */}
+
         <aside className="lg:relative">
           <div className="sticky top-24 rounded-3xl bg-white p-6 shadow-md dark:bg-[#272727]">
             <p className="text-sm text-gray-400">قیمت اقامت</p>
@@ -516,7 +534,10 @@ export default function PropertyDetails({ propertyId }: Props) {
               </div>
             </div>
 
-            {/* Booking Button */}
+            {/* ======================================
+                BOOKING BUTTON
+            ====================================== */}
+
             {isAvailable ? (
               <>
                 <Link

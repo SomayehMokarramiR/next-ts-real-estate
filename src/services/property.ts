@@ -6,8 +6,24 @@ const API_URL = "/api/properties";
 // GET ALL PROPERTIES
 // =========================
 
-export async function getProperties() {
-  const response = await fetch(API_URL, {
+// =========================
+// GET ALL PROPERTIES
+// =========================
+
+export async function getProperties(filters: Record<string, string> = {}) {
+  const params = new URLSearchParams();
+
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value) {
+      params.append(key, value);
+    }
+  });
+
+  const query = params.toString();
+
+  const url = query ? `/api/properties?${query}` : "/api/properties";
+
+  const response = await fetch(url, {
     credentials: "include",
   });
 
@@ -19,7 +35,6 @@ export async function getProperties() {
 
   return data;
 }
-
 // =========================
 // GET SINGLE PROPERTY
 // =========================
@@ -35,7 +50,7 @@ export async function getPropertyById(id: string) {
     throw new Error(data.message || "خطا در دریافت ملک");
   }
 
-  return data;
+  return data.property;
 }
 
 // =========================

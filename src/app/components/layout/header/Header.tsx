@@ -133,23 +133,23 @@ export default function App() {
   const wrapRef = useRef<HTMLDivElement>(null);
 
   // close on outside click
-  useEffect(() => {
-    if (!open) return;
-    const h = (e: MouseEvent) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target as Node))
-        setOpen(false);
-    };
-    document.addEventListener("mousedown", h);
-    return () => document.removeEventListener("mousedown", h);
-  }, [open]);
+  // useEffect(() => {
+  //   if (!open) return;
+  //   const h = (e: MouseEvent) => {
+  //     if (wrapRef.current && !wrapRef.current.contains(e.target as Node))
+  //       setOpen(false);
+  //   };
+  //   document.addEventListener("mousedown", h);
+  //   return () => document.removeEventListener("mousedown", h);
+  // }, [open]);
 
   // lock scroll on mobile drawer
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [open]);
+  // useEffect(() => {
+  //   document.body.style.overflow = open ? "hidden" : "";
+  //   return () => {
+  //     document.body.style.overflow = "";
+  //   };
+  // }, [open]);
 
   return (
     <div
