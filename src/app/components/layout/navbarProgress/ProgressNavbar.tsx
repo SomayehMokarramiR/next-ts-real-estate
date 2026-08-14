@@ -14,8 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { useEffect, useRef, useState } from "react";
-import type { Dispatch, SetStateAction } from "react";
+import { useRef, useState } from "react";
 
 import NewsIcon from "./NewsIcon";
 import { BLUE } from "./constants";
@@ -25,10 +24,9 @@ import { useLockBodyScroll } from "./hooks/useLockBodyScroll";
 import { useMe, useLogout } from "@/hooks/useAuth";
 import Swal from "sweetalert2";
 import { useRouter, usePathname } from "next/navigation";
+import { useTheme } from "@/app/context/ThemeContext";
 
 type Props = {
-  dark: boolean;
-  setDark: Dispatch<SetStateAction<boolean>>;
   progress: number;
 };
 
@@ -47,22 +45,27 @@ const userMenu = [
   {
     label: "پروفایل من",
     icon: User,
+    href: "/account/profile",
   },
   {
     label: "علاقه‌مندی‌ها",
     icon: Heart,
+    href: "/account/favorites",
   },
   {
     label: "رزروهای من",
     icon: FileText,
+    href: "/account/reservations",
   },
   {
     label: "تنظیمات",
     icon: Settings,
+    href: "/account/settings",
   },
   {
     label: "خروج از حساب",
     icon: LogOut,
+    action: "logout",
   },
 ];
 
@@ -91,12 +94,13 @@ function Avatar() {
   );
 }
 
-export default function ProgressNavbar({ dark, setDark, progress }: Props) {
+export default function ProgressNavbar({ progress }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
   const { data } = useMe();
   const logoutMutation = useLogout();
+  const { dark, toggleTheme } = useTheme();
 
   const isLoggedIn = Boolean(data?.success && data?.user);
   const [open, setOpen] = useState(false);
@@ -115,28 +119,6 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
         });
       },
     });
-  };
-
-  useEffect(() => {
-    if (dark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [dark]);
-
-  const toggleTheme = () => {
-    const newTheme = !dark;
-
-    setDark(newTheme);
-
-    if (newTheme) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
   };
 
   const wrapRef = useRef<HTMLDivElement | null>(null);
@@ -264,13 +246,13 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
           <button
             onClick={toggleTheme}
             className="
-            w-9
-            h-9
-            rounded-full
-            flex
-            items-center
-            justify-center
-            "
+    w-9
+    h-9
+    rounded-full
+    flex
+    items-center
+    justify-center
+  "
             style={{
               backgroundColor: BLUE,
             }}
@@ -281,7 +263,6 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
               <Moon size={15} className="text-white" />
             )}
           </button>
-
           {/* User */}
 
           {isLoggedIn ? (
@@ -326,7 +307,7 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
                     text-gray-400
                     "
                   >
-                    09373808890
+                    {data?.user?.phoneNumber || ""}
                   </span>
                 </div>
 
@@ -350,25 +331,34 @@ export default function ProgressNavbar({ dark, setDark, progress }: Props) {
                   p-2
                   "
                 >
-                  {userMenu.map(({ label, icon: Icon }) => (
+                  {userMenu.map(({ label, icon: Icon, href, action }) => (
                     <button
                       key={label}
-                      onClick={
-                        label === "خروج از حساب" ? handleLogout : undefined
-                      }
+                      onClick={() => {
+                        setUserOpen(false);
+
+                        if (action === "logout") {
+                          handleLogout();
+                          return;
+                        }
+
+                        if (href) {
+                          router.push(href);
+                        }
+                      }}
                       className="
-                        w-full
-                        flex
-                        items-center
-                        gap-3
-                        px-3
-                        py-2
-                        rounded-xl
-                        text-sm
-                        hover:bg-gray-100
-                        dark:hover:bg-[#353535]
-                        dark:text-white
-                        "
+      w-full
+      flex
+      items-center
+      gap-3
+      px-3
+      py-2
+      rounded-xl
+      text-sm
+      hover:bg-gray-100
+      dark:hover:bg-[#353535]
+      dark:text-white
+    "
                     >
                       <Icon size={16} />
 

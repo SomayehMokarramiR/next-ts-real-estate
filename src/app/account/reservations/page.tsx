@@ -93,9 +93,9 @@ export default function ReservationsPage() {
     return (
       <div className="space-y-6" dir="rtl">
         <div>
-          <div className="h-8 w-40 rounded-lg bg-gray-200 dark:bg-[#353535] animate-pulse" />
+          <div className="h-8 w-40 rounded-lg bg-muted animate-pulse" />
 
-          <div className="mt-2 h-4 w-72 rounded bg-gray-200 dark:bg-[#353535] animate-pulse" />
+          <div className="mt-2 h-4 w-72 rounded bg-muted animate-pulse" />
         </div>
 
         <div className="grid grid-cols-1 gap-5">
@@ -106,25 +106,22 @@ export default function ReservationsPage() {
               key={index}
               className="
                 overflow-hidden
-                rounded-2xl
-                border
-                border-gray-100
-                bg-white
+                rounded-2xl              
+                border border-border bg-background               
                 p-5
                 shadow-sm
-                dark:border-[#353535]
-                dark:bg-[#272727]
+                
                 animate-pulse
               "
             >
               <div className="flex flex-col gap-5 md:flex-row">
-                <div className="h-48 w-full rounded-xl bg-gray-200 dark:bg-[#353535] md:w-64" />
+                <div className="h-48 w-full rounded-xl bg-muted md:w-64" />
 
                 <div className="flex-1 space-y-4">
-                  <div className="h-5 w-1/2 rounded bg-gray-200 dark:bg-[#353535]" />
-                  <div className="h-4 w-1/3 rounded bg-gray-200 dark:bg-[#353535]" />
-                  <div className="h-4 w-2/3 rounded bg-gray-200 dark:bg-[#353535]" />
-                  <div className="h-10 w-36 rounded-xl bg-gray-200 dark:bg-[#353535]" />
+                  <div className="h-5 w-1/2 rounded bg-muted" />
+                  <div className="h-4 w-1/3 rounded bg-muted" />
+                  <div className="h-4 w-2/3 rounded bg-muted" />
+                  <div className="h-10 w-36 rounded-xl bg-muted" />
                 </div>
               </div>
             </div>
@@ -168,11 +165,9 @@ export default function ReservationsPage() {
     <div className="space-y-6" dir="rtl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-          رزروهای من
-        </h1>
+        <h1 className="text-2xl font-bold text-foreground">رزروهای من</h1>
 
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-muted-foreground">
           لیست تمام رزروهای ثبت‌شده شما
         </p>
       </div>
@@ -203,8 +198,8 @@ export default function ReservationsPage() {
             rounded-2xl
             border
             border-dashed
-            border-gray-200
-            bg-white
+           border-border
+bg-background
             px-6
             py-20
             text-center
@@ -214,11 +209,11 @@ export default function ReservationsPage() {
         >
           <CalendarDays className="mx-auto h-12 w-12 text-gray-300" />
 
-          <h2 className="mt-4 text-lg font-bold text-gray-800 dark:text-white">
+          <h2 className="mt-4 text-lg font-bold text-foreground">
             هنوز رزروی ندارید
           </h2>
 
-          <p className="mt-2 text-sm text-gray-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             اقامتگاه موردنظر خود را انتخاب کنید و رزروتان را ثبت کنید.
           </p>
 
@@ -258,7 +253,7 @@ export default function ReservationsPage() {
                     rounded-2xl
                     border
                     border-gray-100
-                    bg-white
+                    bg-background
                     p-5
                     shadow-sm
                     transition
@@ -281,11 +276,11 @@ export default function ReservationsPage() {
                   <div className="flex min-w-0 flex-1 flex-col">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+                        <h2 className="text-lg font-bold text-foreground">
                           {property?.title || "اقامتگاه"}
                         </h2>
 
-                        <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+                        <div className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
                           <MapPin className="h-3.5 w-3.5 text-primary500" />
 
                           <span>
@@ -316,32 +311,40 @@ export default function ReservationsPage() {
 
                     {/* Reservation Info */}
                     <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                      <div className="rounded-xl bg-[#F7F8FA] p-3 dark:bg-[#353535]">
-                        <p className="text-[11px] text-gray-400">ورود</p>
+                      <div className="rounded-xl  p-3 bg-muted">
+                        <p className="text-[11px] text-muted-foreground">
+                          ورود
+                        </p>
 
-                        <p className="mt-1 text-sm font-semibold text-gray-800 dark:text-white">
+                        <p className="mt-1 text-sm font-semibold text-foreground">
                           {reservation.checkIn}
                         </p>
                       </div>
 
-                      <div className="rounded-xl bg-[#F7F8FA] p-3 dark:bg-[#353535]">
-                        <p className="text-[11px] text-gray-400">خروج</p>
+                      <div className="rounded-xl  p-3 bg-muted">
+                        <p className="text-[11px] text-muted-foreground">
+                          خروج
+                        </p>
 
-                        <p className="mt-1 text-sm font-semibold text-gray-800 dark:text-white">
+                        <p className="mt-1 text-sm font-semibold text-foreground">
                           {reservation.checkOut}
                         </p>
                       </div>
 
                       <div className="rounded-xl bg-[#F7F8FA] p-3 dark:bg-[#353535]">
-                        <p className="text-[11px] text-gray-400">تعداد شب</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          تعداد شب
+                        </p>
 
-                        <p className="mt-1 text-sm font-semibold text-gray-800 dark:text-white">
+                        <p className="mt-1 text-sm font-semibold text-foreground">
                           {reservation.nights} شب
                         </p>
                       </div>
 
                       <div className="rounded-xl bg-[#F7F8FA] p-3 dark:bg-[#353535]">
-                        <p className="text-[11px] text-gray-400">مبلغ</p>
+                        <p className="text-[11px] text-muted-foreground">
+                          مبلغ
+                        </p>
 
                         <p className="mt-1 text-sm font-semibold text-primary500">
                           {formatAmount(reservation.amount || 0)} تومان
@@ -350,8 +353,8 @@ export default function ReservationsPage() {
                     </div>
 
                     {/* Footer */}
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-4 dark:border-[#353535]">
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t pt-4 border-border">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <CreditCard className="h-4 w-4" />
                         {(reservation.passengers?.length ?? 0).toLocaleString(
                           "fa-IR",

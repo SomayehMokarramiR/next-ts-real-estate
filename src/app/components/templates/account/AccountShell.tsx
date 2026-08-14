@@ -10,7 +10,12 @@ interface AccountShellProps {
 export default function AccountShell({ children }: AccountShellProps) {
   return (
     <div
-      className="h-screen overflow-hidden bg-[#F7F8FA] dark:bg-[#1F1F1F]"
+      className="
+        h-screen
+        overflow-hidden
+        bg-background
+        text-foreground
+      "
       dir="rtl"
     >
       <div className="flex h-full">
@@ -18,13 +23,30 @@ export default function AccountShell({ children }: AccountShellProps) {
         <AccountSidebar />
 
         {/* Main */}
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* Header - ثابت */}
+        <div
+          className="
+            flex
+            min-w-0
+            flex-1
+            flex-col
+          "
+        >
+          {/* Header */}
           <AccountHeader />
 
-          {/* فقط محتوای صفحه اسکرول می‌شود */}
-          <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl">{children}</div>
+          {/* Content */}
+          <main
+            className="
+              min-h-0
+              flex-1
+              overflow-y-auto
+              px-4
+              py-6
+              sm:px-6
+              lg:px-8
+            "
+          >
+            <div className="mx-auto w-full max-w-7xl">{children}</div>
           </main>
         </div>
       </div>

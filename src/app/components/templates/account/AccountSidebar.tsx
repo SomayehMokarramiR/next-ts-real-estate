@@ -44,6 +44,7 @@ const menuItems = [
 
 export default function AccountSidebar() {
   const pathname = usePathname();
+
   const logoutMutation = useLogout();
 
   const handleLogout = () => {
@@ -52,6 +53,7 @@ export default function AccountSidebar() {
 
   return (
     <aside
+      dir="rtl"
       className="
         hidden
         h-full
@@ -59,24 +61,35 @@ export default function AccountSidebar() {
         shrink-0
         flex-col
         border-l
-        border-gray-100
-        bg-white
-        dark:border-[#353535]
-        dark:bg-[#272727]
+        border-border
+        bg-background
         lg:flex
       "
     >
-      {/* Logo / Title */}
-      <div className="shrink-0 border-b border-gray-100 px-5 py-6 dark:border-[#353535]">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          پنل کاربری
-        </h2>
+      {/* Header */}
+      <div
+        className="
+          shrink-0
+          border-b
+          border-border
+          px-5
+          py-6
+        "
+      >
+        <h2 className="text-lg font-bold text-foreground">پنل کاربری</h2>
 
-        <p className="mt-1 text-xs text-gray-400">مدیریت حساب کاربری</p>
+        <p className="mt-1 text-xs text-muted-foreground">مدیریت حساب کاربری</p>
       </div>
 
       {/* Menu */}
-      <nav className="min-h-0 flex-1 overflow-y-auto p-4">
+      <nav
+        className="
+          min-h-0
+          flex-1
+          overflow-y-auto
+          p-4
+        "
+      >
         <div className="space-y-1.5">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -99,10 +112,11 @@ export default function AccountSidebar() {
                   py-3
                   text-sm
                   transition-all
+
                   ${
                     isActive
                       ? "bg-primary500 text-white shadow-sm"
-                      : "text-gray-500 hover:bg-primary500/10 hover:text-primary500 dark:text-gray-300"
+                      : "text-muted-foreground hover:bg-primary500/10 hover:text-primary500"
                   }
                 `}
               >
@@ -116,7 +130,14 @@ export default function AccountSidebar() {
       </nav>
 
       {/* Logout */}
-      <div className="shrink-0 border-t border-gray-100 p-4 dark:border-[#353535]">
+      <div
+        className="
+          shrink-0
+          border-t
+          border-border
+          p-4
+        "
+      >
         <button
           type="button"
           onClick={handleLogout}
@@ -132,9 +153,8 @@ export default function AccountSidebar() {
             text-sm
             text-red-500
             transition
-            hover:bg-red-50
+            hover:bg-red-500/10
             disabled:opacity-50
-            dark:hover:bg-red-950/20
           "
         >
           <LogOut className="h-5 w-5 shrink-0" />

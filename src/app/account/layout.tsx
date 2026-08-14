@@ -21,17 +21,16 @@ export default function AccountLayout({
     }
   }, [data, isError, isLoading, router]);
 
-  // Loading
   if (isLoading) {
     return (
       <div
         className="
           flex
-          h-screen
+          min-h-screen
           items-center
           justify-center
-          bg-[#F7F8FA]
-          dark:bg-[#1F1F1F]
+          bg-background
+          text-foreground
         "
         dir="rtl"
       >
@@ -50,10 +49,20 @@ export default function AccountLayout({
     );
   }
 
-  // Not authenticated
   if (isError || !data?.user) {
     return null;
   }
 
-  return <AccountShell>{children}</AccountShell>;
+  return (
+    <div
+      dir="rtl"
+      className="
+      min-h-screen
+      bg-background
+      text-foreground
+    "
+    >
+      <AccountShell>{children}</AccountShell>
+    </div>
+  );
 }

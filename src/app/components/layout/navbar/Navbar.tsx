@@ -22,7 +22,7 @@ import Swal from "sweetalert2";
 
 import { BLUE } from "../constants";
 import NewsIcon from "./NewsIcon";
-
+import { useTheme } from "@/app/context/ThemeContext";
 import { useMe, useLogout } from "@/hooks/useAuth";
 
 type NavLink = {
@@ -39,25 +39,29 @@ const userMenu = [
   {
     label: "پروفایل من",
     icon: User,
+    href: "/account/profile",
   },
   {
     label: "علاقه‌مندی‌ها",
     icon: Heart,
+    href: "/account/favorites",
   },
   {
     label: "رزروهای من",
     icon: FileText,
+    href: "/account/reservations",
   },
   {
     label: "تنظیمات",
     icon: Settings,
+    href: "/account/settings",
   },
   {
     label: "خروج از حساب",
     icon: LogOut,
+    action: "logout",
   },
 ];
-
 function Avatar() {
   return (
     <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white">
@@ -76,12 +80,7 @@ export default function Navbar() {
 
   const { data, isLoading } = useMe();
   const logoutMutation = useLogout();
-
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return false;
-
-    return localStorage.getItem("theme") === "dark";
-  });
+  const { dark, toggleTheme } = useTheme();
 
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
@@ -117,18 +116,6 @@ export default function Navbar() {
       arrow: true,
     },
   ];
-
-  useEffect(() => {
-    const html = document.documentElement;
-
-    if (dark) {
-      html.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      html.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [dark]);
 
   const isActiveLink = (href: string) => {
     if (href === "/") {
@@ -275,7 +262,7 @@ export default function Navbar() {
           {/* Theme */}
           <button
             type="button"
-            onClick={() => setDark((prev) => !prev)}
+            onClick={toggleTheme}
             className="
               w-9
               h-9
@@ -345,26 +332,35 @@ export default function Navbar() {
                     p-2
                   "
                 >
-                  {userMenu.map(({ label, icon: Icon }) => (
+                  {userMenu.map(({ label, icon: Icon, href, action }) => (
                     <button
                       key={label}
                       type="button"
-                      onClick={
-                        label === "خروج از حساب" ? handleLogout : undefined
-                      }
+                      onClick={() => {
+                        setUserOpen(false);
+
+                        if (action === "logout") {
+                          handleLogout();
+                          return;
+                        }
+
+                        if (href) {
+                          router.push(href);
+                        }
+                      }}
                       className="
-                        w-full
-                        flex
-                        items-center
-                        gap-3
-                        px-3
-                        py-2
-                        rounded-xl
-                        text-sm
-                        hover:bg-gray-100
-                        dark:hover:bg-[#353535]
-                        dark:text-white
-                      "
+      w-full
+      flex
+      items-center
+      gap-3
+      px-3
+      py-2
+      rounded-xl
+      text-sm
+      hover:bg-gray-100
+      dark:hover:bg-[#353535]
+      dark:text-white
+    "
                     >
                       <Icon size={16} />
                       {label}

@@ -111,43 +111,51 @@ export default function EditReservationPage() {
     );
   }
   return (
-    <div className="space-y-8" dir="rtl">
-      <h1 className="text-2xl font-bold">ویرایش رزرو</h1>
+    <div className="space-y-8 text-foreground" dir="rtl">
+      <h1 className="text-2xl font-bold text-foreground">ویرایش رزرو</h1>
 
       {/* CURRENT */}
 
       <section>
-        <h2 className="mb-4 font-bold text-lg">اقامتگاه فعلی</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">
+          اقامتگاه فعلی
+        </h2>
 
         <div
           className="
-flex
-gap-5
-rounded-2xl
-border
-p-5
-bg-white
-"
+        flex
+        gap-5
+        rounded-2xl
+        border
+        border-border
+        bg-background
+        p-5
+        shadow-sm
+        "
         >
           <img
             src={currentProperty?.images?.[0] || "/images/galary1.png"}
             className="
-w-64
-h-48
-rounded-xl
-object-cover
-"
+          h-48
+          w-64
+          rounded-xl
+          object-cover
+          "
+            alt={currentProperty?.title || "اقامتگاه"}
           />
 
           <div className="space-y-3">
-            <h3 className="font-bold text-xl">{currentProperty?.title}</h3>
+            <h3 className="text-xl font-bold text-foreground">
+              {currentProperty?.title}
+            </h3>
 
-            <p className="text-gray-400 flex gap-2">
+            <p className="flex items-center gap-2 text-muted-foreground">
               <MapPin size={16} />
+
               {currentProperty?.location?.city}
             </p>
 
-            <p className="text-primary500 font-bold">
+            <p className="font-bold text-primary500">
               {formatPrice(currentProperty?.pricing?.daily ?? 0)}
               تومان / شب
             </p>
@@ -158,53 +166,67 @@ object-cover
       {/* LIST */}
 
       <section>
-        <h2 className="mb-4 font-bold text-lg">انتخاب اقامتگاه جدید</h2>
+        <h2 className="mb-4 text-lg font-bold text-foreground">
+          انتخاب اقامتگاه جدید
+        </h2>
 
         <div
           className="
-grid
-grid-cols-1
-md:grid-cols-2
-gap-5
-"
+        grid
+        grid-cols-1
+        gap-5
+        md:grid-cols-2
+        "
         >
           {properties.map((property) => (
             <button
               key={property._id}
               onClick={() => setSelectedProperty(property._id)}
               className={`
-text-right
-rounded-2xl
-overflow-hidden
-border
-bg-white
+            overflow-hidden
+            rounded-2xl
+            border
+            bg-background
+            text-right
+            shadow-sm
+            transition
 
-${
-  selectedProperty === property._id
-    ? "border-primary500 ring-2 ring-primary500/30"
-    : "border-gray-200"
-}
+            ${
+              selectedProperty === property._id
+                ? "border-primary500 ring-2 ring-primary500/30"
+                : "border-border"
+            }
 
-`}
+            `}
             >
               <img
                 src={property.images?.[0] || "/images/galary1.png"}
+                alt={property.title}
                 className="
-h-48
-w-full
-object-cover
-"
+              h-48
+              w-full
+              object-cover
+              "
               />
 
-              <div className="p-4 space-y-3">
-                <h3 className="font-bold">{property.title}</h3>
+              <div className="space-y-3 p-4">
+                <h3 className="font-bold text-foreground">{property.title}</h3>
 
-                <p className="text-sm text-gray-400 flex gap-2">
+                <p className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin size={14} />
+
                   {property.location?.city}
                 </p>
 
-                <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                <div
+                  className="
+                flex
+                flex-wrap
+                gap-3
+                text-xs
+                text-muted-foreground
+                "
+                >
                   <span>
                     <Home size={13} className="inline" />{" "}
                     {property.facilities?.bedrooms ?? 0}
@@ -229,7 +251,15 @@ object-cover
                   </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-primary500 font-bold">
+                <div
+                  className="
+                flex
+                items-center
+                gap-2
+                font-bold
+                text-primary500
+                "
+                >
                   <Star size={14} />
                   {formatPrice(property.pricing?.daily ?? 0)}
                   تومان / شب
@@ -240,24 +270,30 @@ object-cover
         </div>
       </section>
 
-      <div className="flex items-center gap-3" dir="rtl">
+      {/* ACTIONS */}
+
+      <div
+        className="
+      flex
+      items-center
+      gap-3
+      "
+        dir="rtl"
+      >
         <button
           type="button"
           onClick={() => router.push(`/account/reservations/${id}`)}
           className="
-      rounded-xl
-      border
-      border-gray-200
-      bg-white
-      px-8
-      py-3
-      text-gray-600
-      transition
-      hover:bg-gray-100
-      dark:border-[#444]
-      dark:bg-[#272727]
-      dark:text-gray-300
-    "
+        rounded-xl
+        border
+        border-border
+        bg-background
+        px-8
+        py-3
+        text-muted-foreground
+        transition
+        hover:bg-muted
+        "
         >
           انصراف
         </button>
@@ -267,15 +303,15 @@ object-cover
           onClick={saveChange}
           disabled={updateMutation.isPending}
           className="
-      rounded-xl
-      bg-primary500
-      px-8
-      py-3
-      text-white
-      transition
-      hover:bg-primary600
-      disabled:opacity-50
-    "
+        rounded-xl
+        bg-primary500
+        px-8
+        py-3
+        text-white
+        transition
+        hover:bg-primary600
+        disabled:opacity-50
+        "
         >
           {updateMutation.isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
         </button>
