@@ -2,13 +2,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IReservationPassenger {
   name: string;
-
   family: string;
-
   gender: "male" | "female";
-
   nationalId: string;
-
   birthDate: string;
 }
 
@@ -25,7 +21,6 @@ export interface IReservation extends Document {
 
   contact: {
     phone: string;
-
     email: string;
   };
 
@@ -46,60 +41,47 @@ const ReservationSchema = new Schema<IReservation>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-
       ref: "User",
-
       required: true,
-
       index: true,
     },
 
     propertyId: {
       type: Schema.Types.ObjectId,
-
       ref: "Property",
-
       required: true,
-
       index: true,
     },
 
     checkIn: {
       type: String,
-
       required: true,
+      trim: true,
     },
 
     checkOut: {
       type: String,
-
       required: true,
+      trim: true,
     },
 
     nights: {
       type: Number,
-
       required: true,
-
       min: 1,
     },
 
     contact: {
       phone: {
         type: String,
-
         required: true,
-
         trim: true,
       },
 
       email: {
         type: String,
-
         required: true,
-
         trim: true,
-
         lowercase: true,
       },
     },
@@ -108,65 +90,52 @@ const ReservationSchema = new Schema<IReservation>(
       {
         name: {
           type: String,
-
           required: true,
-
           trim: true,
         },
 
         family: {
           type: String,
-
           required: true,
-
           trim: true,
         },
 
         gender: {
           type: String,
-
           enum: ["male", "female"],
-
           required: true,
         },
 
         nationalId: {
           type: String,
-
           required: true,
-
           trim: true,
         },
 
         birthDate: {
           type: String,
-
           required: true,
+          trim: true,
         },
       },
     ],
 
     amount: {
       type: Number,
-
       required: true,
-
       min: 0,
     },
 
     paymentAuthority: {
       type: String,
-
       default: null,
+      trim: true,
     },
 
     status: {
       type: String,
-
       enum: ["pending", "paid", "cancelled"],
-
       default: "pending",
-
       index: true,
     },
   },
@@ -176,10 +145,22 @@ const ReservationSchema = new Schema<IReservation>(
   },
 );
 
+// ===============================
+// Indexes
+// ===============================
+
+// رزروهای یک کاربر جدیدترین اول
 ReservationSchema.index({
   userId: 1,
-
   createdAt: -1,
+});
+
+// برای چک سریع تداخل تاریخ یک ملک
+ReservationSchema.index({
+  propertyId: 1,
+  checkIn: 1,
+  checkOut: 1,
+  status: 1,
 });
 
 const Reservation: Model<IReservation> =

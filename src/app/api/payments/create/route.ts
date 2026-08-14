@@ -1,22 +1,70 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import mongoose from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
 import Reservation from "@/app/models/Reservation";
+import { verifyToken } from "@/app/lib/auth";
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const body = await req.json();
+    // =========================
+    // Authentication
+    // =========================
 
-    const { reservationId, amount } = body;
+    const cookieStore = await cookies();
 
-    console.log("CREATE PAYMENT BODY:", body);
+    const token = cookieStore.get("token")?.value;
 
-    if (!reservationId || !amount) {
+    if (!token) {
       return NextResponse.json(
         {
-          message: "اطلاعات پرداخت ناقص است",
+          success: false,
+          message: "ابتدا وارد حساب شوید",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
+    let decoded: {
+      id: string;
+      email: string;
+    };
+
+    try {
+      decoded = verifyToken(token) as {
+        id: string;
+        email: string;
+      };
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "توکن نامعتبر است",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
+    // =========================
+    // Body
+    // =========================
+
+    const body = await req.json();
+
+    const { reservationId } = body;
+
+    if (!reservationId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه رزرو الزامی است",
         },
         {
           status: 400,
@@ -24,11 +72,31 @@ export async function POST(req: Request) {
       );
     }
 
-    const reservation = await Reservation.findById(reservationId);
+    if (!mongoose.Types.ObjectId.isValid(reservationId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه رزرو نامعتبر است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // =========================
+    // Find Reservation
+    // =========================
+
+    const reservation = await Reservation.findOne({
+      _id: reservationId,
+      userId: decoded.id,
+    });
 
     if (!reservation) {
       return NextResponse.json(
         {
+          success: false,
           message: "رزرو پیدا نشد",
         },
         {
@@ -37,21 +105,51 @@ export async function POST(req: Request) {
       );
     }
 
-    // ایجاد شماره پیگیری تستی درگاه
-    const paymentAuthority = "MOCK-" + Date.now();
+    // =========================
+    // Status Check
+    // =========================
 
-    reservation.paymentAuthority = paymentAuthority;
+    if (reservation.status === "paid") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این رزرو قبلاً پرداخت شده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-    reservation.amount = amount;
+    if (reservation.status === "cancelled") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این رزرو لغو شده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
-    await reservation.save();
+    // =========================
+    // Existing Authority
+    // =========================
 
-    console.log("PAYMENT AUTHORITY SAVED:", {
-      reservationId: reservation._id,
-      paymentAuthority: reservation.paymentAuthority,
-      amount: reservation.amount,
-      status: reservation.status,
-    });
+    let paymentAuthority = reservation.paymentAuthority;
+
+    if (!paymentAuthority) {
+      paymentAuthority = "MOCK-" + Date.now();
+
+      reservation.paymentAuthority = paymentAuthority;
+
+      await reservation.save();
+    }
+
+    // =========================
+    // Response
+    // =========================
 
     return NextResponse.json(
       {
@@ -61,18 +159,22 @@ export async function POST(req: Request) {
 
         paymentAuthority,
 
-        // ارسال شناسه رزرو برای برگشت
-        paymentUrl: `/payment/mock?authority=${paymentAuthority}&reservationId=${reservation._id}`,
+        paymentUrl: `/payment/mock?authority=${encodeURIComponent(
+          paymentAuthority,
+        )}&reservationId=${reservation._id}`,
+
+        amount: reservation.amount,
       },
       {
         status: 200,
       },
     );
   } catch (error) {
-    console.log("CREATE PAYMENT ERROR:", error);
+    console.error("CREATE PAYMENT ERROR:", error);
 
     return NextResponse.json(
       {
+        success: false,
         message: "خطا در ایجاد پرداخت",
       },
       {

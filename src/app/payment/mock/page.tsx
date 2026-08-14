@@ -6,21 +6,36 @@ import Swal from "sweetalert2";
 
 function MockPaymentContent() {
   const searchParams = useSearchParams();
+
   const router = useRouter();
 
   const authority = searchParams.get("authority");
 
+  const reservationId = searchParams.get("reservationId");
+
   const [loading, setLoading] = useState(false);
 
   const handlePaymentSuccess = async () => {
+    if (!authority || !reservationId) {
+      Swal.fire({
+        icon: "error",
+        title: "خطا",
+        text: "اطلاعات پرداخت ناقص است",
+      });
+
+      return;
+    }
+
     try {
       setLoading(true);
 
       const res = await fetch("/api/payments/verify", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           authority,
         }),
@@ -30,24 +45,32 @@ function MockPaymentContent() {
 
       console.log("VERIFY RESPONSE:", data);
 
-      if (!res.ok) {
+      if (!res.ok || !data.success) {
         throw new Error(data.message || "خطا در تایید پرداخت");
       }
 
-      if (data.success && data.propertyId && data.reservationId) {
-        router.push(
-          `/single-reserve-house/${data.propertyId}?payment=success&reservationId=${data.reservationId}`,
-        );
-      }
+      await Swal.fire({
+        icon: "success",
+
+        title: "پرداخت موفق",
+
+        text: "رزرو شما با موفقیت تایید شد",
+
+        timer: 1500,
+
+        showConfirmButton: false,
+      });
+
+      router.push(`/account/reservations/${data.reservationId}`);
     } catch (error: unknown) {
       const message =
-        error instanceof Error
-          ? error.message
-          : "خطایی در تایید پرداخت رخ داد.";
+        error instanceof Error ? error.message : "خطایی در تایید پرداخت رخ داد";
 
       Swal.fire({
         icon: "error",
+
         title: "خطا",
+
         text: message,
       });
     } finally {
@@ -57,41 +80,61 @@ function MockPaymentContent() {
 
   return (
     <div
+      dir="rtl"
       className="
-        min-h-screen
-        flex
-        items-center
-        justify-center
-        bg-gray-100
-        dark:bg-[#111]
+      min-h-screen
+      flex
+      items-center
+      justify-center
+      bg-gray-100
+      dark:bg-[#111]
       "
     >
       <div
         className="
-          bg-white
-          dark:bg-[#272727]
-          rounded-2xl
-          p-8
-          shadow
-          text-center
+        w-full
+        max-w-sm
+        rounded-2xl
+        bg-white
+        dark:bg-[#272727]
+        p-8
+        text-center
+        shadow
         "
       >
-        <h1 className="text-xl font-bold dark:text-white">درگاه پرداخت تستی</h1>
+        <h1
+          className="
+          text-xl
+          font-bold
+          text-gray-900
+          dark:text-white
+          "
+        >
+          درگاه پرداخت تستی
+        </h1>
 
-        <p className="mt-4 text-sm text-gray-500">مبلغ رزرو آماده پرداخت است</p>
+        <p
+          className="
+          mt-4
+          text-sm
+          text-gray-500
+          dark:text-gray-300
+          "
+        >
+          تایید پرداخت رزرو
+        </p>
 
         <button
           onClick={handlePaymentSuccess}
           disabled={loading}
           className="
-            mt-6
-            w-full
-            h-11
-            rounded-full
-            bg-primary500
-            text-white
-            disabled:opacity-60
-            disabled:cursor-not-allowed
+          mt-6
+          h-11
+          w-full
+          rounded-full
+          bg-primary500
+          text-white
+          disabled:opacity-60
           "
         >
           {loading ? "در حال بررسی..." : "پرداخت موفق"}
@@ -105,10 +148,17 @@ export default function MockPaymentPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-[#111]">
-          <div className="text-sm text-gray-500 dark:text-gray-300">
-            در حال بارگذاری...
-          </div>
+        <div
+          className="
+          min-h-screen
+          flex
+          items-center
+          justify-center
+          bg-gray-100
+          dark:bg-[#111]
+          "
+        >
+          <span className="text-sm text-gray-500">در حال بارگذاری...</span>
         </div>
       }
     >

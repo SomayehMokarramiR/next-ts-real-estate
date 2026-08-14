@@ -4,23 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
 type Passenger = {
-  name?: string;
-  family?: string;
-  gender?: string;
-  nationalId?: string;
-  birthDate?: string;
+  name: string;
+  family: string;
+  gender: "male" | "female";
+  nationalId: string;
+  birthDate: string;
 };
 
 type Property = {
-  _id?: string;
-  title?: string;
+  _id: string;
+  title: string;
   description?: string;
   images?: string[];
   location?: {
     city?: string;
     address?: string;
   };
-  type?: string;
   pricing?: {
     daily?: number;
   };
@@ -28,26 +27,36 @@ type Property = {
 
 type Reservation = {
   _id: string;
+
   checkIn: string;
   checkOut: string;
-  nights: number;
-  amount: number;
-  status: string;
 
-  contact?: {
-    phone?: string;
-    email?: string;
+  nights: number;
+
+  amount: number;
+
+  status: "pending" | "paid" | "cancelled";
+
+  contact: {
+    phone: string;
+    email: string;
   };
 
-  passengers?: Passenger[];
+  passengers: Passenger[];
 
-  propertyId?: Property;
+  propertyId: Property;
 };
 
 type ApiResponse = {
   success: boolean;
   message?: string;
   reservation?: Reservation;
+};
+
+const statusText = {
+  pending: "در انتظار پرداخت",
+  paid: "پرداخت شده",
+  cancelled: "لغو شده",
 };
 
 export default function ReservationDetailsPage() {
@@ -62,76 +71,44 @@ export default function ReservationDetailsPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id) {
-      return;
-    }
+    if (!id) return;
 
-    const getReservation = async () => {
+    async function fetchReservation() {
       try {
         setLoading(true);
-        setError("");
 
-        const response = await fetch(`/api/reservations/${id}`, {
-          method: "GET",
+        const res = await fetch(`/api/reservations/${id}`, {
           credentials: "include",
           cache: "no-store",
         });
 
-        const data = (await response.json()) as ApiResponse;
+        const data: ApiResponse = await res.json();
 
-        if (!response.ok || !data.success) {
-          setError(data.message || "خطا در دریافت جزئیات رزرو");
-
-          return;
+        if (!res.ok || !data.success) {
+          throw new Error(data.message || "خطا در دریافت رزرو");
         }
 
-        if (!data.reservation) {
-          setError("رزرو موردنظر پیدا نشد");
+        setReservation(data.reservation || null);
+      } catch (err) {
+        console.log(err);
 
-          return;
-        }
-
-        setReservation(data.reservation);
-      } catch (error) {
-        console.error("GET RESERVATION DETAILS ERROR:", error);
-
-        setError("خطا در دریافت جزئیات رزرو");
+        setError(err instanceof Error ? err.message : "خطا در دریافت رزرو");
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    getReservation();
+    fetchReservation();
   }, [id]);
-
-  /* =========================
-     Loading
-  ========================= */
 
   if (loading) {
     return (
-      <main dir="rtl" className="mx-auto w-full max-w-6xl px-4 py-10">
-        <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm dark:border-[#353535] dark:bg-[#272727]">
-          <p className="text-sm text-gray-500 dark:text-gray-300">
-            در حال دریافت جزئیات رزرو...
-          </p>
-        </div>
-      </main>
+      <div className="p-10 text-center">در حال دریافت اطلاعات رزرو...</div>
     );
   }
 
-  /* =========================
-     Error
-  ========================= */
-
   if (error || !reservation) {
-    return (
-      <main dir="rtl" className="mx-auto w-full max-w-6xl px-4 py-10">
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-red-600">
-          {error || "رزرو موردنظر پیدا نشد"}
-        </div>
-      </main>
-    );
+    return <div className="p-10 text-red-500">{error || "رزرو پیدا نشد"}</div>;
   }
 
   const property = reservation.propertyId;
@@ -139,265 +116,166 @@ export default function ReservationDetailsPage() {
   return (
     <main
       dir="rtl"
-      className="mx-auto w-full max-w-6xl px-4 py-10 text-foreground"
+      className="
+      max-w-6xl
+      mx-auto
+      px-4
+      py-10
+      "
     >
-      {/* عنوان */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-foreground">جزئیات رزرو</h1>
+      <h1
+        className="
+      text-2xl
+      font-bold
+      mb-6
+      "
+      >
+        جزئیات رزرو
+      </h1>
 
-        <p className="mt-2 text-sm text-muted-foreground">
-          شناسه رزرو:
-          <span className="mr-2 font-mono">{reservation._id}</span>
-        </p>
-      </div>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        {/* ستون اصلی */}
-        <div className="space-y-6 md:col-span-2">
-          {/* اطلاعات اقامتگاه */}
+      <div
+        className="
+      grid
+      md:grid-cols-3
+      gap-6
+      "
+      >
+        <div
+          className="
+        md:col-span-2
+        space-y-6
+        "
+        >
           <section
             className="
+          bg-white
+          dark:bg-[#272727]
           rounded-2xl
-          border
-          border-border
-          bg-background
           p-6
-          shadow-sm
+          border
           "
           >
-            <h2 className="mb-5 text-lg font-bold text-foreground">
-              اطلاعات اقامتگاه
-            </h2>
+            <h2 className="font-bold mb-4">اطلاعات اقامتگاه</h2>
 
-            {property?.images && property.images.length > 0 && (
+            {property.images?.[0] && (
               <img
                 src={property.images[0]}
-                alt={property.title || "اقامتگاه"}
                 className="
-                mb-5
-                h-56
-                w-full
-                rounded-xl
-                object-cover
-                "
+              w-full
+              h-56
+              object-cover
+              rounded-xl
+              mb-4
+              "
               />
             )}
 
-            <h3 className="text-base font-bold text-foreground">
-              {property?.title || "اقامتگاه"}
-            </h3>
+            <h3 className="font-bold">{property.title}</h3>
 
-            {property?.location?.city && (
-              <p className="mt-2 text-sm text-muted-foreground">
-                شهر: {property.location.city}
-              </p>
-            )}
+            <p className="text-sm mt-2">شهر: {property.location?.city}</p>
 
-            {property?.location?.address && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                آدرس: {property.location.address}
-              </p>
-            )}
+            <p className="text-sm">آدرس: {property.location?.address}</p>
           </section>
 
-          {/* تاریخ اقامت */}
           <section
             className="
+          bg-white
+          dark:bg-[#272727]
           rounded-2xl
-          border
-          border-border
-          bg-background
           p-6
-          shadow-sm
+          border
           "
           >
-            <h2 className="mb-5 text-lg font-bold text-foreground">
-              تاریخ اقامت
-            </h2>
+            <h2 className="font-bold mb-4">تاریخ اقامت</h2>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {[
-                {
-                  title: "تاریخ ورود",
-                  value: reservation.checkIn,
-                },
-                {
-                  title: "تاریخ خروج",
-                  value: reservation.checkOut,
-                },
-                {
-                  title: "مدت اقامت",
-                  value: `${reservation.nights} شب`,
-                },
-              ].map((item) => (
-                <div
-                  key={item.title}
-                  className="
-                rounded-xl
-                bg-muted
-                p-4
-                "
-                >
-                  <p className="text-xs text-muted-foreground">{item.title}</p>
+            <div
+              className="
+            grid
+            sm:grid-cols-3
+            gap-3
+            "
+            >
+              <div className="bg-gray-100 dark:bg-[#353535] p-4 rounded-xl">
+                ورود:
+                <br />
+                {reservation.checkIn}
+              </div>
 
-                  <p
-                    className="
-                  mt-2
-                  font-semibold
-                  text-foreground
-                  "
-                  >
-                    {item.value}
-                  </p>
-                </div>
-              ))}
+              <div className="bg-gray-100 dark:bg-[#353535] p-4 rounded-xl">
+                خروج:
+                <br />
+                {reservation.checkOut}
+              </div>
+
+              <div className="bg-gray-100 dark:bg-[#353535] p-4 rounded-xl">
+                مدت:
+                <br />
+                {reservation.nights} شب
+              </div>
             </div>
           </section>
 
-          {/* مسافران */}
           <section
             className="
+          bg-white
+          dark:bg-[#272727]
           rounded-2xl
-          border
-          border-border
-          bg-background
           p-6
-          shadow-sm
+          border
           "
           >
-            <h2 className="mb-5 text-lg font-bold text-foreground">مسافران</h2>
+            <h2 className="font-bold mb-4">مسافران</h2>
 
-            {reservation.passengers && reservation.passengers.length > 0 ? (
-              <div className="space-y-3">
-                {reservation.passengers.map((passenger, index) => (
-                  <div
-                    key={index}
-                    className="
-                        rounded-xl
-                        bg-muted
-                        p-4
-                        "
-                  >
-                    <p className="font-semibold text-foreground">
-                      {passenger.name} {passenger.family}
-                    </p>
-
-                    {passenger.nationalId && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        کد ملی: {passenger.nationalId}
-                      </p>
-                    )}
-
-                    {passenger.gender && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        جنسیت: {passenger.gender}
-                      </p>
-                    )}
-
-                    {passenger.birthDate && (
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        تاریخ تولد: {passenger.birthDate}
-                      </p>
-                    )}
-                  </div>
-                ))}
+            {reservation.passengers.map((p, index) => (
+              <div
+                key={index}
+                className="
+                bg-gray-100
+                dark:bg-[#353535]
+                rounded-xl
+                p-4
+                mb-3
+                "
+              >
+                {p.name} {p.family}
+                <div className="text-xs mt-2">کد ملی: {p.nationalId}</div>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                اطلاعات مسافران ثبت نشده است.
-              </p>
-            )}
+            ))}
           </section>
         </div>
 
-        {/* ستون کناری */}
-        <div className="md:sticky md:top-24 md:self-start">
-          <div className="space-y-6">
-            {/* خلاصه رزرو */}
-            <section
-              className="
-            rounded-2xl
-            border
-            border-border
-            bg-background
-            p-6
-            shadow-sm
-            "
-            >
-              <h2 className="mb-5 text-lg font-bold text-foreground">
-                خلاصه رزرو
-              </h2>
+        <aside>
+          <section
+            className="
+          bg-white
+          dark:bg-[#272727]
+          rounded-2xl
+          p-6
+          border
+          "
+          >
+            <h2 className="font-bold mb-5">خلاصه رزرو</h2>
 
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">تعداد شب</span>
+            <p>مبلغ: {reservation.amount.toLocaleString("fa-IR")} تومان</p>
 
-                  <span className="font-semibold text-foreground">
-                    {reservation.nights} شب
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">مبلغ رزرو</span>
-
-                  <span className="font-bold text-primary500">
-                    {Number(reservation.amount).toLocaleString("fa-IR")} تومان
-                  </span>
-                </div>
-
-                <div className="border-t border-border pt-4">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">وضعیت</span>
-
-                    <span
-                      className="
-                    rounded-full
-                    bg-primary500/10
-                    px-3
-                    py-1
-                    text-xs
-                    font-semibold
-                    text-primary500
-                    "
-                    >
-                      {reservation.status}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* اطلاعات تماس */}
-            {reservation.contact && (
-              <section
+            <p className="mt-4">
+              وضعیت:
+              <span
                 className="
-                rounded-2xl
-                border
-                border-border
-                bg-background
-                p-6
-                shadow-sm
-                "
+              mr-2
+              rounded-full
+              bg-primary500/10
+              px-3
+              py-1
+              text-primary500
+              text-xs
+              "
               >
-                <h2 className="mb-5 text-base font-bold text-foreground">
-                  اطلاعات تماس
-                </h2>
-
-                {reservation.contact.phone && (
-                  <p className="text-sm text-muted-foreground">
-                    تلفن: {reservation.contact.phone}
-                  </p>
-                )}
-
-                {reservation.contact.email && (
-                  <p className="mt-2 break-all text-sm text-muted-foreground">
-                    ایمیل: {reservation.contact.email}
-                  </p>
-                )}
-              </section>
-            )}
-          </div>
-        </div>
+                {statusText[reservation.status]}
+              </span>
+            </p>
+          </section>
+        </aside>
       </div>
     </main>
   );

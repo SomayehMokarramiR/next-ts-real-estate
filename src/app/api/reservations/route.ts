@@ -50,7 +50,7 @@ export async function POST(req: Request) {
     }
 
     // =========================
-    // Get Current User
+    // User
     // =========================
 
     const user = await User.findById(decoded.id).lean();
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     }
 
     // =========================
-    // Request Body
+    // Body
     // =========================
 
     const body = await req.json();
@@ -77,21 +77,11 @@ export async function POST(req: Request) {
     // Validation
     // =========================
 
-    if (!propertyId) {
+    if (!propertyId || !checkIn || !checkOut) {
       return NextResponse.json(
         {
           success: false,
-          message: "شناسه اقامتگاه الزامی است",
-        },
-        { status: 400 },
-      );
-    }
-
-    if (!checkIn || !checkOut) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "تاریخ ورود و خروج الزامی است",
+          message: "اطلاعات رزرو ناقص است",
         },
         { status: 400 },
       );
@@ -99,11 +89,7 @@ export async function POST(req: Request) {
 
     const normalizedNights = Number(nights);
 
-    if (
-      !Number.isFinite(normalizedNights) ||
-      normalizedNights <= 0 ||
-      !Number.isInteger(normalizedNights)
-    ) {
+    if (!Number.isInteger(normalizedNights) || normalizedNights <= 0) {
       return NextResponse.json(
         {
           success: false,
@@ -124,7 +110,7 @@ export async function POST(req: Request) {
     }
 
     // =========================
-    // Get Property
+    // Property
     // =========================
 
     const property = await Property.findById(propertyId).lean();
@@ -139,25 +125,70 @@ export async function POST(req: Request) {
       );
     }
 
-    // =========================
-    // Check Status
-    // =========================
+    // =================================================
+    // جلوگیری از رزرو دوباره همین کاربر
+    // =================================================
 
-    if (property.status !== "available") {
+    const userDuplicateReservation = await Reservation.findOne({
+      userId: decoded.id,
+
+      propertyId,
+
+      status: {
+        $in: ["pending", "paid"],
+      },
+    });
+
+    if (userDuplicateReservation) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            property.status === "reserved"
-              ? "این اقامتگاه قبلاً رزرو شده است"
-              : "این اقامتگاه فعلاً قابل رزرو نیست",
+          message: "شما قبلاً این اقامتگاه را رزرو کرده‌اید",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // =================================================
+    // جلوگیری از تداخل تاریخ با رزرو دیگران
+    // =================================================
+
+    const conflictReservation = await Reservation.findOne({
+      propertyId,
+
+      status: {
+        $in: ["pending", "paid"],
+      },
+
+      $or: [
+        {
+          checkIn: {
+            $lt: checkOut,
+          },
+
+          checkOut: {
+            $gt: checkIn,
+          },
+        },
+      ],
+    });
+
+    if (conflictReservation) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این اقامتگاه در تاریخ انتخاب شده رزرو شده است",
+        },
+        {
+          status: 400,
+        },
       );
     }
 
     // =========================
-    // Calculate Amount
+    // Price
     // =========================
 
     const dailyPrice = Number(property.pricing?.daily ?? 0);
@@ -166,13 +197,15 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: "قیمت روزانه اقامتگاه معتبر نیست",
+          message: "قیمت اقامتگاه معتبر نیست",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
-    const calculatedAmount = dailyPrice * normalizedNights;
+    const amount = dailyPrice * normalizedNights;
 
     // =========================
     // Create Reservation
@@ -189,15 +222,15 @@ export async function POST(req: Request) {
 
       nights: normalizedNights,
 
-      // اطلاعات تماس از حساب کاربر
       contact: {
         phone: user.phoneNumber,
+
         email: user.email,
       },
 
       passengers,
 
-      amount: calculatedAmount,
+      amount,
 
       status: "pending",
     });
@@ -205,10 +238,14 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: true,
+
         message: "رزرو با موفقیت ثبت شد",
+
         reservation,
       },
-      { status: 201 },
+      {
+        status: 201,
+      },
     );
   } catch (error) {
     console.error("CREATE RESERVATION ERROR:", error);
@@ -216,9 +253,12 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
+
         message: "خطای سرور در ثبت رزرو",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

@@ -11,11 +11,10 @@ export async function POST(req: Request) {
 
     const { authority } = body;
 
-    console.log("VERIFY AUTHORITY:", authority);
-
     if (!authority) {
       return NextResponse.json(
         {
+          success: false,
           message: "شناسه پرداخت ارسال نشده است",
         },
         {
@@ -28,11 +27,10 @@ export async function POST(req: Request) {
       paymentAuthority: authority,
     });
 
-    console.log("FOUND RESERVATION:", reservation);
-
     if (!reservation) {
       return NextResponse.json(
         {
+          success: false,
           message: "رزرو مربوط به پرداخت پیدا نشد",
         },
         {
@@ -41,16 +39,50 @@ export async function POST(req: Request) {
       );
     }
 
+    // =========================
+    // Status Check
+    // =========================
+
+    if (reservation.status === "paid") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این پرداخت قبلاً تایید شده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    if (reservation.status === "cancelled") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این رزرو لغو شده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // =========================
+    // Verify Payment (Mock)
+    // =========================
+
     reservation.status = "paid";
-    reservation.paidAt = new Date();
 
     await reservation.save();
 
     return NextResponse.json(
       {
         success: true,
+
         message: "پرداخت با موفقیت تایید شد",
+
         reservationId: reservation._id,
+
         propertyId: reservation.propertyId,
       },
       {
@@ -58,10 +90,11 @@ export async function POST(req: Request) {
       },
     );
   } catch (error) {
-    console.log("VERIFY PAYMENT ERROR:", error);
+    console.error("VERIFY PAYMENT ERROR:", error);
 
     return NextResponse.json(
       {
+        success: false,
         message: "خطا در تایید پرداخت",
       },
       {

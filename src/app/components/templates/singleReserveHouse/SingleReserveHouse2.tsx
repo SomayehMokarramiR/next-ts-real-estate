@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Users, ChevronLeft, ChevronRight } from "lucide-react";
 import PropertyCard from "./PropertyCard";
 import Stepper from "./Stepper";
@@ -50,6 +50,34 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
 
     setNights,
   } = useReserveProgress();
+  const [reservedRanges, setReservedRanges] = useState<
+    {
+      checkIn: string;
+      checkOut: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    if (!property?._id) return;
+
+    const getReservedDates = async () => {
+      try {
+        const res = await fetch(
+          `/api/properties/${property._id}/reserved-dates`,
+        );
+
+        const data = await res.json();
+
+        if (data.success) {
+          setReservedRanges(data.reservedRanges || []);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getReservedDates();
+  }, [property?._id]);
 
   const [activePassenger, setActivePassenger] = useState(0);
   const [contactSaved, setContactSaved] = useState(false);
@@ -103,6 +131,14 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
       date: new Date(year, month - 1, day),
       calendar: persian,
       locale: persian_fa,
+    });
+  };
+
+  const isReservedDate = (date: DateObject) => {
+    const current = date.format("YYYY/MM/DD");
+
+    return reservedRanges.some((range) => {
+      return current >= range.checkIn && current < range.checkOut;
     });
   };
 
@@ -440,6 +476,11 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
                     calendarPosition="bottom-start"
                     format="YYYY/MM/DD"
                     value={checkIn}
+                    mapDays={({ date }) => {
+                      return {
+                        disabled: isReservedDate(date),
+                      };
+                    }}
                     onChange={(date) => {
                       if (!date) {
                         setCheckIn("");
@@ -495,6 +536,11 @@ export default function SingleReserveHouse2({ nextStep, prevStep }: Props) {
                     calendarPosition="bottom-start"
                     format="YYYY/MM/DD"
                     value={checkOut || ""}
+                    mapDays={({ date }) => {
+                      return {
+                        disabled: isReservedDate(date),
+                      };
+                    }}
                     onChange={(value) => {
                       if (!value || Array.isArray(value)) {
                         setCheckOut("");
