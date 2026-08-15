@@ -348,7 +348,131 @@ export default function ProfilePage() {
             md:grid-cols-2
             "
             >
-              {/* Inputs همان قبلی فقط کلاس‌ها اصلاح شوند */}
+              <div
+                className="
+  grid
+  grid-cols-1
+  gap-4
+  md:grid-cols-2
+  "
+              >
+                {/* Name */}
+
+                <div>
+                  <label className="mb-2 block text-sm text-muted-foreground">
+                    نام
+                  </label>
+
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      setError("");
+                    }}
+                    className="
+      h-12
+      w-full
+      rounded-xl
+      border
+      border-border
+      bg-background
+      px-4
+      text-sm
+      text-foreground
+      outline-none
+      focus:border-primary500
+      "
+                    placeholder="نام"
+                  />
+                </div>
+
+                {/* Last Name */}
+
+                <div>
+                  <label className="mb-2 block text-sm text-muted-foreground">
+                    نام خانوادگی
+                  </label>
+
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => {
+                      setLastName(e.target.value);
+                      setError("");
+                    }}
+                    className="
+      h-12
+      w-full
+      rounded-xl
+      border
+      border-border
+      bg-background
+      px-4
+      text-sm
+      text-foreground
+      outline-none
+      focus:border-primary500
+      "
+                    placeholder="نام خانوادگی"
+                  />
+                </div>
+
+                {/* Phone */}
+
+                <div>
+                  <label className="mb-2 block text-sm text-muted-foreground">
+                    شماره تماس
+                  </label>
+
+                  <input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                    className="
+      h-12
+      w-full
+      rounded-xl
+      border
+      border-border
+      bg-background
+      px-4
+      text-sm
+      text-foreground
+      outline-none
+      focus:border-primary500
+      "
+                    placeholder="09123456789"
+                    maxLength={11}
+                  />
+                </div>
+
+                {/* Email فقط نمایش */}
+
+                <div>
+                  <label className="mb-2 block text-sm text-muted-foreground">
+                    ایمیل
+                  </label>
+
+                  <input
+                    type="email"
+                    value={user.email || ""}
+                    disabled
+                    className="
+      h-12
+      w-full
+      rounded-xl
+      border
+      border-border
+      bg-muted
+      px-4
+      text-sm
+      text-muted-foreground
+      cursor-not-allowed
+      "
+                  />
+                </div>
+              </div>
             </div>
 
             {error && <p className="mt-4 text-sm text-red-500">{error}</p>}

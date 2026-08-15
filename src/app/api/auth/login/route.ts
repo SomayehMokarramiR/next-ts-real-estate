@@ -90,3 +90,9 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function GET() {
+  return NextResponse.json({
+    message: "LOGIN ROUTE OK",
+  });
+}

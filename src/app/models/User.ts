@@ -13,6 +13,8 @@ export interface IUser extends Document {
 
   role: "admin" | "user";
 
+  favorites: mongoose.Types.ObjectId[];
+
   createdAt?: Date;
 
   updatedAt?: Date;
@@ -55,6 +57,16 @@ const UserSchema = new Schema<IUser>(
       type: String,
       enum: ["admin", "user"],
       default: "user",
+    },
+
+    favorites: {
+      type: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Property",
+        },
+      ],
+      default: [],
     },
   },
   {
