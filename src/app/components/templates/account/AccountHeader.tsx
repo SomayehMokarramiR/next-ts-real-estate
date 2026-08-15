@@ -2,6 +2,7 @@
 
 import { Bell, Moon, Sun, UserRound } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useMe } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
@@ -11,6 +12,8 @@ import { useReadAllNotifications } from "@/hooks/useReadAllNotifications";
 import { useTheme } from "../../../context/ThemeContext";
 
 export default function AccountHeader() {
+  const router = useRouter();
+
   const { data } = useMe();
 
   const { dark, toggleTheme } = useTheme();
@@ -90,6 +93,7 @@ export default function AccountHeader() {
           rounded-full
           bg-primary500
           text-white
+          cursor-pointer
           "
         >
           {dark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -119,19 +123,19 @@ export default function AccountHeader() {
             {(notificationsData?.unreadCount ?? 0) > 0 && (
               <span
                 className="
-                  absolute
-                  -top-1
-                  -right-1
-                  flex
-                  h-5
-                  w-5
-                  items-center
-                  justify-center
-                  rounded-full
-                  bg-red-500
-                  text-xs
-                  text-white
-                  "
+                absolute
+                -top-1
+                -right-1
+                flex
+                h-5
+                w-5
+                items-center
+                justify-center
+                rounded-full
+                bg-red-500
+                text-xs
+                text-white
+                "
               >
                 {notificationsData?.unreadCount}
               </span>
@@ -141,55 +145,47 @@ export default function AccountHeader() {
           {showNotifications && (
             <div
               className="
-                absolute
-                top-12
-                -right-50
-                z-50
-                w-80
-                max-h-[400px]
-                overflow-y-auto
-                rounded-2xl
-                bg-white
-                dark:bg-[#353535]
-                shadow-xl
-                border
-                border-border
-                p-4
-                "
+              absolute
+              top-12
+              -right-50
+              z-50
+              w-80
+              max-h-[400px]
+              overflow-y-auto
+              rounded-2xl
+              bg-white
+              dark:bg-[#353535]
+              shadow-xl
+              border
+              border-border
+              p-4
+              "
             >
               <h3
                 className="
-                  font-bold
-                  text-right
-                  dark:text-white
-                  mb-4
-                  "
+                font-bold
+                text-right
+                dark:text-white
+                mb-4
+                "
               >
                 اعلان‌ها
               </h3>
 
               {notificationsLoading ? (
-                <p
-                  className="
-                    text-sm
-                    text-gray-500
-                    text-right
-                    "
-                >
+                <p className="text-sm text-gray-500 text-right">
                   در حال دریافت اعلان‌ها...
                 </p>
               ) : notifications.length === 0 ? (
                 <div
                   className="
-                      text-sm
-                      text-gray-500
-                      dark:text-gray-300
-                      text-right
-                      "
+                  text-sm
+                  text-gray-500
+                  dark:text-gray-300
+                  text-right
+                  "
                 >
-                  <p className="mb-3">اعلان جدیدی ندارید</p>
-
-                  <p>وضعیت رزروها و پیام‌های سیستم اینجا نمایش داده می‌شود.</p>
+                  اعلان جدیدی ندارید
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -201,35 +197,36 @@ export default function AccountHeader() {
                         handleNotificationClick(item._id, item.isRead)
                       }
                       className={`
-                            w-full
-                            rounded-xl
-                            p-3
-                            text-right
-                            transition
-                            ${
-                              item.isRead
-                                ? "bg-gray-100 dark:bg-[#444]"
-                                : "bg-primary500/10 border border-primary500/20"
-                            }
-                            `}
+                      w-full
+                      rounded-xl
+                      p-3
+                      text-right
+                      transition
+
+                      ${
+                        item.isRead
+                          ? "bg-gray-100 dark:bg-[#444]"
+                          : "bg-primary500/10 border border-primary500/20"
+                      }
+                      `}
                     >
                       <h4
                         className="
-                              font-bold
-                              text-sm
-                              dark:text-white
-                              "
+                        font-bold
+                        text-sm
+                        dark:text-white
+                        "
                       >
                         {item.title}
                       </h4>
 
                       <p
                         className="
-                              mt-1
-                              text-xs
-                              text-gray-500
-                              dark:text-gray-300
-                              "
+                        mt-1
+                        text-xs
+                        text-gray-500
+                        dark:text-gray-300
+                        "
                       >
                         {item.message}
                       </p>
@@ -241,9 +238,11 @@ export default function AccountHeader() {
           )}
         </div>
 
-        {/* Avatar */}
+        {/* Profile */}
 
-        <div
+        <button
+          type="button"
+          onClick={() => router.push("/account/profile")}
           className="
           flex
           h-10
@@ -253,10 +252,13 @@ export default function AccountHeader() {
           rounded-full
           bg-primary500
           text-white
+          cursor-pointer
+          hover:opacity-90
+          transition
           "
         >
           <UserRound className="h-5 w-5" />
-        </div>
+        </button>
       </div>
     </header>
   );

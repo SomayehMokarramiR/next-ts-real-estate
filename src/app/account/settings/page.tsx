@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, Moon, ShieldCheck } from "lucide-react";
+import { Bell, Moon, Sun, ShieldCheck } from "lucide-react";
 import Swal from "sweetalert2";
 
 import { useSettings, useUpdateSettings } from "@/hooks/useSettings";
@@ -223,48 +223,52 @@ export default function SettingsPage() {
 
       <div
         className="
-        bg-white
-        dark:bg-[#353535]
-        rounded-2xl
-        p-5
-        mb-5
-        "
+  bg-white
+  dark:bg-[#353535]
+  rounded-2xl
+  p-5
+  mb-5
+  "
       >
         <div
           className="
-          flex
-          items-center
-          justify-between
-          "
+    flex
+    items-center
+    justify-between
+    "
         >
           <Switch checked={dark} onChange={updateDarkMode} />
 
           <div
             className="
-            flex
-            items-center
-            gap-2
-            "
+      flex
+      items-center
+      gap-2
+      "
           >
-            <Moon size={22} className="text-primary500" />
+            {dark ? (
+              <Sun size={22} className="text-primary500" />
+            ) : (
+              <Moon size={22} className="text-primary500" />
+            )}
 
             <div className="text-right">
               <h2
                 className="
-                font-bold
-                dark:text-white
-                "
+          font-bold
+          dark:text-white
+          "
               >
-                حالت تاریک
+                {dark ? "حالت روشن" : "حالت تاریک"}
               </h2>
 
               <p
                 className="
-                text-xs
-                text-gray-500
-                "
+          text-xs
+          text-gray-500
+          "
               >
-                تغییر ظاهر سایت
+                {dark ? "تغییر به حالت روشن" : "تغییر به حالت تاریک"}
               </p>
             </div>
           </div>
