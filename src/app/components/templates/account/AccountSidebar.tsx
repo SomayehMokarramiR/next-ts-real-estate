@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 
 import { useLogout } from "@/hooks/useAuth";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   {
@@ -45,10 +47,48 @@ const menuItems = [
 export default function AccountSidebar() {
   const pathname = usePathname();
 
+  const router = useRouter();
+
   const logoutMutation = useLogout();
 
   const handleLogout = () => {
-    logoutMutation.mutate();
+    Swal.fire({
+      title: "خروج از حساب کاربری",
+      text: "آیا مطمئن هستید؟",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "خروج",
+      cancelButtonText: "انصراف",
+    }).then((result) => {
+      if (!result.isConfirmed) return;
+
+      logoutMutation.mutate(undefined, {
+        onSuccess: () => {
+          Swal.fire({
+            icon: "success",
+            title: "خارج شدید",
+            text: "با موفقیت از حساب کاربری خارج شدید",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+
+          setTimeout(() => {
+            router.push("/login");
+          }, 1500);
+        },
+
+        onError: (error) => {
+          Swal.fire({
+            icon: "error",
+            title: "خطا",
+            text:
+              error instanceof Error
+                ? error.message
+                : "خطا در خروج از حساب کاربری",
+          });
+        },
+      });
+    });
   };
 
   return (

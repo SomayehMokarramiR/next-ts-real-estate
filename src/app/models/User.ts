@@ -15,6 +15,16 @@ export interface IUser extends Document {
 
   favorites: mongoose.Types.ObjectId[];
 
+  settings: {
+    notifications: {
+      reservation: boolean;
+      messages: boolean;
+      offers: boolean;
+    };
+
+    darkMode: boolean;
+  };
+
   createdAt?: Date;
 
   updatedAt?: Date;
@@ -66,9 +76,51 @@ const UserSchema = new Schema<IUser>(
           ref: "Property",
         },
       ],
+
       default: [],
     },
+
+    // =====================
+    // User Settings
+    // =====================
+
+    settings: {
+      type: {
+        notifications: {
+          reservation: {
+            type: Boolean,
+            default: true,
+          },
+
+          messages: {
+            type: Boolean,
+            default: true,
+          },
+
+          offers: {
+            type: Boolean,
+            default: false,
+          },
+        },
+
+        darkMode: {
+          type: Boolean,
+          default: false,
+        },
+      },
+
+      default: {
+        notifications: {
+          reservation: true,
+          messages: true,
+          offers: false,
+        },
+
+        darkMode: false,
+      },
+    },
   },
+
   {
     timestamps: true,
   },

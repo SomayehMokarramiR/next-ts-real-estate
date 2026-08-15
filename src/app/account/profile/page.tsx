@@ -487,31 +487,6 @@ export default function ProfilePage() {
             "
             >
               <button
-                type="button"
-                onClick={handleCancelEditing}
-                disabled={updateProfileMutation.isPending}
-                className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-xl
-              border
-              border-border
-              px-5
-              py-2.5
-              text-sm
-              font-medium
-              text-muted-foreground
-              transition
-              hover:bg-muted
-              disabled:opacity-50
-              "
-              >
-                <X className="h-4 w-4" />
-                انصراف
-              </button>
-
-              <button
                 type="submit"
                 disabled={updateProfileMutation.isPending}
                 className="
@@ -535,6 +510,30 @@ export default function ProfilePage() {
                 {updateProfileMutation.isPending
                   ? "در حال ذخیره..."
                   : "ذخیره تغییرات"}
+              </button>
+              <button
+                type="button"
+                onClick={handleCancelEditing}
+                disabled={updateProfileMutation.isPending}
+                className="
+              inline-flex
+              items-center
+              gap-2
+              rounded-xl
+              border
+              border-border
+              px-5
+              py-2.5
+              text-sm
+              font-medium
+              text-muted-foreground
+              transition
+              hover:bg-muted
+              disabled:opacity-50
+              "
+              >
+                <X className="h-4 w-4" />
+                انصراف
               </button>
             </div>
           </form>

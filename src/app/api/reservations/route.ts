@@ -5,6 +5,8 @@ import { connectDB } from "@/app/lib/mongodb";
 import Reservation from "@/app/models/Reservation";
 import Property from "@/app/models/Property";
 import User from "@/app/models/User";
+
+import { createNotification } from "@/app/lib/createNotification";
 import { verifyToken } from "@/app/lib/auth";
 
 export async function POST(req: Request) {
@@ -25,7 +27,9 @@ export async function POST(req: Request) {
           success: false,
           message: "برای ثبت رزرو ابتدا وارد حساب کاربری شوید",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
@@ -45,7 +49,9 @@ export async function POST(req: Request) {
           success: false,
           message: "جلسه کاربری معتبر نیست",
         },
-        { status: 401 },
+        {
+          status: 401,
+        },
       );
     }
 
@@ -61,7 +67,9 @@ export async function POST(req: Request) {
           success: false,
           message: "کاربر پیدا نشد",
         },
-        { status: 404 },
+        {
+          status: 404,
+        },
       );
     }
 
@@ -83,7 +91,9 @@ export async function POST(req: Request) {
           success: false,
           message: "اطلاعات رزرو ناقص است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -95,7 +105,9 @@ export async function POST(req: Request) {
           success: false,
           message: "تعداد شب اقامت نامعتبر است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -105,7 +117,9 @@ export async function POST(req: Request) {
           success: false,
           message: "اطلاعات مسافران الزامی است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -121,13 +135,15 @@ export async function POST(req: Request) {
           success: false,
           message: "اقامتگاه پیدا نشد",
         },
-        { status: 404 },
+        {
+          status: 404,
+        },
       );
     }
 
-    // =================================================
-    // جلوگیری از رزرو دوباره همین کاربر
-    // =================================================
+    // =========================
+    // Duplicate Reservation
+    // =========================
 
     const userDuplicateReservation = await Reservation.findOne({
       userId: decoded.id,
@@ -151,9 +167,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // =================================================
-    // جلوگیری از تداخل تاریخ با رزرو دیگران
-    // =================================================
+    // =========================
+    // Date Conflict
+    // =========================
 
     const conflictReservation = await Reservation.findOne({
       propertyId,
@@ -233,6 +249,20 @@ export async function POST(req: Request) {
       amount,
 
       status: "pending",
+    });
+
+    // =========================
+    // Create Notification
+    // =========================
+
+    await createNotification({
+      userId: decoded.id,
+
+      title: "رزرو جدید",
+
+      message: "رزرو شما با موفقیت ثبت شد.",
+
+      type: "reservation",
     });
 
     return NextResponse.json(

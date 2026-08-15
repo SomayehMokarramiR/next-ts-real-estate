@@ -3,8 +3,32 @@ import { cookies } from "next/headers";
 import mongoose from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
-import Reservation from "@/app/models/Reservation";
 import { verifyToken } from "@/app/lib/auth";
+
+import Reservation from "@/app/models/Reservation";
+import Notification from "@/app/models/Notification";
+import User from "@/app/models/User";
+
+async function getUser() {
+  const cookieStore = await cookies();
+
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) return null;
+
+  try {
+    return verifyToken(token) as {
+      id: string;
+      email?: string;
+    };
+  } catch {
+    return null;
+  }
+}
+
+// ======================
+// GET DETAIL
+// ======================
 
 export async function GET(
   _req: Request,
@@ -15,15 +39,9 @@ export async function GET(
   try {
     await connectDB();
 
-    // =========================
-    // Authentication
-    // =========================
+    const user = await getUser();
 
-    const cookieStore = await cookies();
-
-    const token = cookieStore.get("token")?.value;
-
-    if (!token) {
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
@@ -35,45 +53,7 @@ export async function GET(
       );
     }
 
-    let decoded: {
-      id: string;
-      email: string;
-    };
-
-    try {
-      decoded = verifyToken(token) as {
-        id: string;
-        email: string;
-      };
-    } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "جلسه کاربری معتبر نیست",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
-    // =========================
-    // Params
-    // =========================
-
     const { id } = await context.params;
-
-    if (!id) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "شناسه رزرو ارسال نشده است",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
@@ -87,17 +67,13 @@ export async function GET(
       );
     }
 
-    // =========================
-    // Find Reservation
-    // =========================
-
     const reservation = await Reservation.findOne({
       _id: id,
-      userId: decoded.id,
+      userId: user.id,
     })
       .populate({
         path: "propertyId",
-        select: "title description images location type pricing",
+        select: "title description images location pricing type",
       })
       .lean();
 
@@ -113,10 +89,6 @@ export async function GET(
       );
     }
 
-    // =========================
-    // Response
-    // =========================
-
     return NextResponse.json(
       {
         success: true,
@@ -127,12 +99,120 @@ export async function GET(
       },
     );
   } catch (error) {
-    console.error("GET RESERVATION DETAILS ERROR:", error);
+    console.error("GET RESERVATION DETAIL ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: "خطا در دریافت جزئیات رزرو",
+        message: "خطا در دریافت رزرو",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
+// ======================
+// DELETE
+// ======================
+
+export async function DELETE(
+  _req: Request,
+  context: {
+    params: Promise<{ id: string }>;
+  },
+) {
+  try {
+    await connectDB();
+
+    const user = await getUser();
+
+    if (!user) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "دسترسی غیرمجاز",
+        },
+        {
+          status: 401,
+        },
+      );
+    }
+
+    const { id } = await context.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه رزرو نامعتبر است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // پیدا کردن رزرو
+
+    const reservation = await Reservation.findOne({
+      _id: id,
+      userId: user.id,
+    });
+
+    if (!reservation) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "رزرو پیدا نشد",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    // حذف رزرو
+
+    await Reservation.findByIdAndDelete(id);
+
+    // ======================
+    // CHECK USER SETTINGS
+    // ======================
+
+    const currentUser = await User.findById(user.id).lean();
+
+    if (currentUser?.settings?.notifications?.reservation) {
+      await Notification.create({
+        userId: user.id,
+
+        title: "رزرو حذف شد",
+
+        message: "رزرو شما با موفقیت حذف شد.",
+
+        type: "reservation",
+
+        isRead: false,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "رزرو حذف شد",
+      },
+      {
+        status: 200,
+      },
+    );
+  } catch (error) {
+    console.error("DELETE RESERVATION ERROR:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "خطا در حذف رزرو",
       },
       {
         status: 500,

@@ -16,9 +16,14 @@ import {
 export function useMyReservations() {
   return useQuery({
     queryKey: ["my-reservations"],
+
     queryFn: getMyReservations,
+
     retry: false,
-    staleTime: 1000 * 60,
+
+    staleTime: 0,
+
+    refetchOnWindowFocus: true,
   });
 }
 
@@ -36,7 +41,7 @@ export function useReservation(reservationId: string) {
 
     retry: false,
 
-    staleTime: 1000 * 60,
+    staleTime: 0,
   });
 }
 
@@ -53,14 +58,29 @@ export function useDeleteReservation() {
     onSuccess: (data) => {
       console.log("DELETE SUCCESS:", data.message);
 
+      // بروزرسانی لیست رزروها
+
       queryClient.invalidateQueries({
         queryKey: ["my-reservations"],
+      });
+
+      // بروزرسانی اعلان‌ها
+
+      queryClient.invalidateQueries({
+        queryKey: ["notifications"],
+      });
+
+      // اگر صفحه جزئیات باز بود
+
+      queryClient.invalidateQueries({
+        queryKey: ["reservation"],
       });
     },
 
     onError: (error) => {
       console.error(
         "DELETE RESERVATION ERROR:",
+
         error instanceof Error ? error.message : error,
       );
     },
@@ -88,7 +108,11 @@ export function useUpdateReservation() {
     },
 
     onSuccess: (data, variables) => {
-      console.log("UPDATE SUCCESS:", data.message);
+      console.log(
+        "UPDATE SUCCESS:",
+
+        data.message,
+      );
 
       queryClient.invalidateQueries({
         queryKey: ["my-reservations"],

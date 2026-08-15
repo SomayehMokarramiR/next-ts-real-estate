@@ -253,3 +253,23 @@ export function resetPassword(data: {
     body: JSON.stringify(data),
   });
 }
+
+/* =========================
+   Change Password
+========================= */
+
+export interface ChangePasswordResponse {
+  success: boolean;
+  message: string;
+}
+
+export function changePassword(data: {
+  currentPassword: string;
+  newPassword: string;
+}) {
+  return apiRequest<ChangePasswordResponse>(`${API_URL}/change-password`, {
+    method: "PUT",
+
+    body: JSON.stringify(data),
+  });
+}
