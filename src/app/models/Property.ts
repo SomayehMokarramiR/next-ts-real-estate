@@ -57,9 +57,8 @@ export interface IProperty extends Document {
 
   featuredOrder?: number;
 
-  createdAt?: Date;
-
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const PropertySchema = new Schema<IProperty>(

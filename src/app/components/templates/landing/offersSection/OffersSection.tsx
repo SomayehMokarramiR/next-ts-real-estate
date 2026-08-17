@@ -12,7 +12,8 @@ export default function OffersSection() {
 
   const { data, isLoading, error } = useProperties({
     page: "1",
-    limit: "100",
+    limit: "6",
+    discounted: "true",
   });
 
   // ======================================
@@ -25,15 +26,8 @@ export default function OffersSection() {
       ? data.properties
       : [];
 
-  // ======================================
-  // DISCOUNTED PROPERTIES
-  // ======================================
-
-  const discountedProperties = properties.filter(
-    (property) => Number(property.pricing?.discount ?? 0) > 0,
-  );
-
-  const visibleOffers = discountedProperties.slice(0, 3);
+  // API فقط املاک تخفیف‌دار را برمی‌گرداند
+  const visibleOffers = properties.slice(0, 3);
 
   return (
     <section>
@@ -85,7 +79,7 @@ export default function OffersSection() {
         )}
 
         {/* Empty */}
-        {!isLoading && !error && discountedProperties.length === 0 && (
+        {!isLoading && !error && properties.length === 0 && (
           <div className="flex justify-center py-16">
             <p className="text-gray-500 dark:text-gray-300">
               در حال حاضر تخفیفی برای نمایش وجود ندارد
@@ -97,24 +91,24 @@ export default function OffersSection() {
         {!isLoading && !error && visibleOffers.length > 0 && (
           <div
             className="
-                grid
-                grid-cols-1
-                sm:grid-cols-2
-                lg:grid-cols-3
-                gap-6
-              "
+              grid
+              grid-cols-1
+              sm:grid-cols-2
+              lg:grid-cols-3
+              gap-6
+            "
           >
             {visibleOffers.map((property, index) => (
               <div
                 key={property._id}
                 className={`
-                    w-full
-                    ${
-                      visibleOffers.length === 3 && index === 2
-                        ? "sm:col-span-2 sm:flex sm:justify-center lg:col-span-1 lg:block"
-                        : ""
-                    }
-                  `}
+                  w-full
+                  ${
+                    visibleOffers.length === 3 && index === 2
+                      ? "sm:col-span-2 sm:flex sm:justify-center lg:col-span-1 lg:block"
+                      : ""
+                  }
+                `}
               >
                 <OfferCard offer={property} />
               </div>
@@ -123,7 +117,7 @@ export default function OffersSection() {
         )}
 
         {/* More */}
-        {!isLoading && discountedProperties.length > 3 && (
+        {!isLoading && !error && properties.length > 3 && (
           <div className="flex justify-center mt-10">
             <Link
               href="/offers"

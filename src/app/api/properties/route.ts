@@ -16,9 +16,10 @@ export async function GET(request: NextRequest) {
     const city = searchParams.get("city")?.trim() || "";
     const guests = searchParams.get("guests")?.trim() || "";
     const type = searchParams.get("type")?.trim() || "";
-
-    // اضافه شد
     const transactionType = searchParams.get("transactionType")?.trim() || "";
+
+    // فقط املاک دارای تخفیف
+    const discounted = searchParams.get("discounted") === "true";
 
     const pageParam = Number(searchParams.get("page"));
     const limitParam = Number(searchParams.get("limit"));
@@ -33,7 +34,10 @@ export async function GET(request: NextRequest) {
 
     const filter: Record<string, unknown> = {};
 
+    // =========================
     // شهر
+    // =========================
+
     if (city) {
       filter["location.city"] = {
         $regex: city,
@@ -41,17 +45,26 @@ export async function GET(request: NextRequest) {
       };
     }
 
+    // =========================
     // نوع ملک
+    // =========================
+
     if (type) {
       filter.type = type;
     }
 
-    // نوع معامله (رزرو، رهن، فروش و ...)
+    // =========================
+    // نوع معامله
+    // =========================
+
     if (transactionType) {
       filter.transactionType = transactionType;
     }
 
+    // =========================
     // ظرفیت
+    // =========================
+
     if (guests) {
       const capacity = Number(guests);
 
@@ -61,6 +74,20 @@ export async function GET(request: NextRequest) {
         };
       }
     }
+
+    // =========================
+    // تخفیف
+    // =========================
+
+    if (discounted) {
+      filter["pricing.discount"] = {
+        $gt: 0,
+      };
+    }
+
+    // =========================
+    // Pagination
+    // =========================
 
     const skip = (page - 1) * limit;
 
@@ -87,7 +114,9 @@ export async function GET(request: NextRequest) {
         currentPage: page,
         limit,
       },
-      { status: 200 },
+      {
+        status: 200,
+      },
     );
   } catch (error) {
     console.error("GET PROPERTIES ERROR:", error);
@@ -97,7 +126,9 @@ export async function GET(request: NextRequest) {
         success: false,
         message: "خطا در دریافت املاک",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

@@ -6,22 +6,28 @@ import { useProperties } from "@/hooks/useProperties";
 export default function OffersPageClient() {
   const { data, isLoading, error } = useProperties({
     page: "1",
-    limit: "100",
+    limit: "50",
   });
 
   // ======================================
   // API DATA
   // ======================================
 
-  const properties = data?.properties ?? [];
+  const properties = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.properties)
+      ? data.properties
+      : [];
 
   // ======================================
-  // ALL DISCOUNTED PROPERTIES
+  // DISCOUNTED PROPERTIES
   // ======================================
 
-  const discountedProperties = properties.filter(
-    (property) => Number(property.pricing?.discount ?? 0) > 0,
-  );
+  const discountedProperties = properties.filter((property) => {
+    const discount = Number(property.pricing?.discount ?? 0);
+
+    return Number.isFinite(discount) && discount > 0;
+  });
 
   // ======================================
   // PAGE
@@ -29,16 +35,17 @@ export default function OffersPageClient() {
 
   return (
     <section
+      dir="rtl"
       className="
-         w-full
-    bg-white
-    dark:bg-[#272727]
-    px-4
-    sm:px-6
-    pt-24
-    md:pt-28
-    pb-12
-    md:pb-14
+        w-full
+        bg-white
+        dark:bg-[#272727]
+        px-4
+        sm:px-6
+        pt-24
+        md:pt-28
+        pb-12
+        md:pb-14
       "
     >
       <div
@@ -105,27 +112,29 @@ export default function OffersPageClient() {
         {!isLoading && !error && discountedProperties.length === 0 && (
           <div className="flex justify-center py-16">
             <p className="text-center text-gray-500 dark:text-gray-300">
-              در حال حاضر تخفیف ویژه‌ای وجود ندارد
+              در حال حاضر تخفیفی برای نمایش وجود ندارد
             </p>
           </div>
         )}
 
         {/* ==============================
-            ALL OFFERS
+            OFFERS
         ============================== */}
 
         {!isLoading && !error && discountedProperties.length > 0 && (
           <div
             className="
-              grid
-              grid-cols-1
-              sm:grid-cols-2
-              lg:grid-cols-3
-              gap-6
-            "
+                grid
+                grid-cols-1
+                sm:grid-cols-2
+                lg:grid-cols-3
+                gap-6
+              "
           >
             {discountedProperties.map((property) => (
-              <OfferCard key={property._id} offer={property} />
+              <div key={property._id} className="w-full">
+                <OfferCard offer={property} />
+              </div>
             ))}
           </div>
         )}
