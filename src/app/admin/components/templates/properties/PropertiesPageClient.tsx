@@ -1,8 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import Link from "next/link";
+
+import { Search, Eye, Edit, Trash2, Plus } from "lucide-react";
+
 import { useQuery } from "@tanstack/react-query";
+
+import Swal from "sweetalert2";
+
+import { useAdminDeleteProperty } from "@/hooks/useAdminDeleteProperty";
 
 interface AdminProperty {
   _id: string;
@@ -34,6 +41,46 @@ interface AdminPropertiesResponse {
   limit: number;
 }
 
+// =========================
+// TYPE LABELS
+// =========================
+
+const propertyTypeLabels: Record<string, string> = {
+  apartment: "آپارتمان",
+  villa: "ویلا",
+  house: "خانه",
+  land: "زمین",
+  office: "اداری",
+  commercial: "تجاری",
+};
+
+// =========================
+// STATUS LABELS
+// =========================
+
+const propertyStatusLabels: Record<string, string> = {
+  available: "فعال",
+  reserved: "رزرو شده",
+  inactive: "غیرفعال",
+  sold: "فروخته شده",
+};
+
+// =========================
+// HELPERS
+// =========================
+
+function getPropertyTypeLabel(type: string) {
+  return propertyTypeLabels[type] || type || "-";
+}
+
+function getPropertyStatusLabel(status: string) {
+  return propertyStatusLabels[status] || status || "-";
+}
+
+// =========================
+// API
+// =========================
+
 async function getAdminProperties(params: {
   search?: string;
   page: number;
@@ -42,6 +89,7 @@ async function getAdminProperties(params: {
   const query = new URLSearchParams();
 
   query.append("page", String(params.page));
+
   query.append("limit", String(params.limit));
 
   if (params.search) {
@@ -61,6 +109,10 @@ async function getAdminProperties(params: {
   return data;
 }
 
+// =========================
+// COMPONENT
+// =========================
+
 export default function PropertiesPageClient() {
   const [search, setSearch] = useState("");
 
@@ -68,13 +120,17 @@ export default function PropertiesPageClient() {
 
   const limit = 10;
 
+  const deleteMutation = useAdminDeleteProperty();
+
   const { data, isLoading, error } = useQuery<AdminPropertiesResponse>({
     queryKey: ["admin-properties", search, page],
 
     queryFn: () =>
       getAdminProperties({
         search,
+
         page,
+
         limit,
       }),
   });
@@ -83,109 +139,208 @@ export default function PropertiesPageClient() {
 
   const totalPages = data?.totalPages ?? 1;
 
-  return (
-    <div
-      dir="rtl"
-      className="
-      w-full
-      p-6
-      "
-    >
-      <h1
-        className="
-        text-2xl
-        font-bold
-        mb-6
-        dark:text-white
-        "
-      >
-        مدیریت املاک
-      </h1>
+  // =========================
+  // DELETE
+  // =========================
 
-      {/* Search */}
+  const handleDelete = async (id: string) => {
+    const result = await Swal.fire({
+      title: "حذف ملک",
+
+      text: "آیا از حذف این ملک مطمئن هستید؟",
+
+      icon: "warning",
+
+      showCancelButton: true,
+
+      cancelButtonText: "انصراف",
+
+      confirmButtonText: "بله، حذف شود",
+
+      reverseButtons: false,
+
+      buttonsStyling: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        Swal.fire({
+          icon: "success",
+
+          title: "حذف شد",
+
+          text: "ملک با موفقیت حذف شد",
+
+          confirmButtonText: "باشه",
+        });
+      },
+
+      onError: (error) => {
+        Swal.fire({
+          icon: "error",
+
+          title: "خطا",
+
+          text: error instanceof Error ? error.message : "حذف ملک انجام نشد",
+
+          confirmButtonText: "باشه",
+        });
+      },
+    });
+  };
+
+  // =========================
+  // RENDER
+  // =========================
+
+  return (
+    <div dir="rtl" className="w-full p-6">
+      {/* =========================
+          HEADER
+      ========================= */}
 
       <div
         className="
-    bg-white
-    dark:bg-[#353535]
-    rounded-2xl
-    p-4
-    mb-5
-  "
+          mb-6
+          flex
+          items-center
+          justify-between
+        "
       >
-        <div
+        <h1
           className="
-      relative
-      max-w-md
-    "
+            text-2xl
+            font-bold
+            dark:text-white
+          "
         >
+          مدیریت املاک
+        </h1>
+
+        <Link
+          href="/admin/properties/create"
+          className="
+            flex
+            items-center
+            gap-2
+            rounded-xl
+            bg-primary500
+            px-5
+            py-2.5
+            text-sm
+            font-bold
+            text-white
+          "
+        >
+          <Plus size={18} />
+          افزودن ملک جدید
+        </Link>
+      </div>
+
+      {/* =========================
+          SEARCH
+      ========================= */}
+
+      <div
+        className="
+          mb-5
+          rounded-2xl
+          bg-white
+          p-4
+          dark:bg-[#353535]
+        "
+      >
+        <div className="relative max-w-md">
           <Search
             size={18}
             className="
-        absolute
-        right-3
-        top-3
-        text-gray-400
-      "
+              absolute
+              right-3
+              top-3
+              text-gray-400
+            "
           />
 
           <input
             value={search}
             onChange={(e) => {
               setSearch(e.target.value);
+
               setPage(1);
             }}
             placeholder="جستجوی عنوان، شهر یا نوع ملک..."
             className="
-        w-full
-        pr-10
-        pl-3
-        py-2.5
-        rounded-xl
-        border
-        outline-none
-        text-right
-        bg-transparent
-        dark:bg-[#222]
-        dark:text-white
-        dark:border-gray-700
-      "
+              w-full
+              rounded-xl
+              border
+              py-2.5
+              pr-10
+              outline-none
+              dark:bg-[#222]
+              dark:text-white
+            "
           />
         </div>
       </div>
+
+      {/* =========================
+          LOADING
+      ========================= */}
+
       {isLoading && (
-        <div className="text-center py-10 text-gray-500">
-          در حال دریافت املاک...
-        </div>
+        <div className="py-10 text-center">در حال دریافت املاک...</div>
       )}
 
-      {!isLoading && error && (
-        <div className="text-center py-10 text-red-500">
+      {/* =========================
+          ERROR
+      ========================= */}
+
+      {error && (
+        <div className="py-10 text-center text-red-500">
           خطا در دریافت املاک
         </div>
       )}
 
+      {/* =========================
+          EMPTY
+      ========================= */}
+
       {!isLoading && !error && properties.length === 0 && (
-        <div className="text-center py-10 text-gray-500">
-          ملکی برای نمایش وجود ندارد
+        <div
+          className="
+            rounded-2xl
+            bg-white
+            p-10
+            text-center
+            text-gray-500
+            dark:bg-[#353535]
+          "
+        >
+          ملکی پیدا نشد
         </div>
       )}
+
+      {/* =========================
+          TABLE
+      ========================= */}
 
       {!isLoading && !error && properties.length > 0 && (
         <div
           className="
-          bg-white
-          dark:bg-[#353535]
-          rounded-2xl
-          overflow-hidden
+            overflow-hidden
+            rounded-2xl
+            bg-white
+            dark:bg-[#353535]
           "
         >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead
                 className="
-                bg-gray-100
-                dark:bg-[#444]
+                  bg-gray-100
+                  dark:bg-[#444]
                 "
               >
                 <tr>
@@ -198,6 +353,8 @@ export default function PropertiesPageClient() {
                   <th className="p-4 text-right">وضعیت</th>
 
                   <th className="p-4 text-right">تاریخ</th>
+
+                  <th className="p-4 text-right">عملیات</th>
                 </tr>
               </thead>
 
@@ -206,22 +363,86 @@ export default function PropertiesPageClient() {
                   <tr
                     key={property._id}
                     className="
-                    border-b
-                    dark:border-gray-700
+                      border-b
+                      dark:border-gray-700
                     "
                   >
+                    {/* TITLE */}
+
                     <td className="p-4 dark:text-white">{property.title}</td>
+
+                    {/* CITY */}
 
                     <td className="p-4 dark:text-white">
                       {property.location?.city || "-"}
                     </td>
 
-                    <td className="p-4 dark:text-white">{property.type}</td>
+                    {/* TYPE */}
 
-                    <td className="p-4 dark:text-white">{property.status}</td>
+                    <td className="p-4 dark:text-white">
+                      {getPropertyTypeLabel(property.type)}
+                    </td>
+
+                    {/* STATUS */}
+
+                    <td className="p-4 dark:text-white">
+                      {getPropertyStatusLabel(property.status)}
+                    </td>
+
+                    {/* DATE */}
 
                     <td className="p-4 dark:text-white">
                       {new Date(property.createdAt).toLocaleDateString("fa-IR")}
+                    </td>
+
+                    {/* ACTIONS */}
+
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        {/* VIEW */}
+
+                        <Link
+                          href={`/admin/properties/${property._id}`}
+                          className="
+                            rounded-lg
+                            bg-blue-100
+                            p-2
+                            text-blue-600
+                          "
+                        >
+                          <Eye size={16} />
+                        </Link>
+
+                        {/* EDIT */}
+
+                        <Link
+                          href={`/admin/properties/${property._id}/edit`}
+                          className="
+                            rounded-lg
+                            bg-yellow-100
+                            p-2
+                            text-yellow-600
+                          "
+                        >
+                          <Edit size={16} />
+                        </Link>
+
+                        {/* DELETE */}
+
+                        <button
+                          disabled={deleteMutation.isPending}
+                          onClick={() => handleDelete(property._id)}
+                          className="
+                            rounded-lg
+                            bg-red-100
+                            p-2
+                            text-red-600
+                            disabled:opacity-50
+                          "
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -229,71 +450,44 @@ export default function PropertiesPageClient() {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* =========================
+              PAGINATION
+          ========================= */}
 
           {totalPages > 1 && (
             <div
               className="
-              flex
-              justify-center
-              items-center
-              gap-2
-              py-5
-              flex-wrap
+                flex
+                justify-center
+                gap-2
+                py-5
               "
             >
               <button
                 disabled={page === 1}
                 onClick={() => setPage(page - 1)}
                 className="
-                px-4
-                py-2
-                rounded-xl
-                bg-gray-200
-                disabled:opacity-40
-                dark:bg-[#444]
-                dark:text-white
+                  rounded-xl
+                  bg-gray-200
+                  px-4
+                  py-2
+                  disabled:opacity-40
                 "
               >
                 قبلی
               </button>
 
-              {Array.from(
-                {
-                  length: totalPages,
-                },
-                (_, index) => index + 1,
-              ).map((item) => (
-                <button
-                  key={item}
-                  onClick={() => setPage(item)}
-                  className={`
-                  w-9
-                  h-9
-                  rounded-full
-
-                  ${
-                    page === item
-                      ? "bg-primary500 text-white"
-                      : "bg-gray-200 dark:bg-[#444] dark:text-white"
-                  }
-                  `}
-                >
-                  {item}
-                </button>
-              ))}
+              <span className="px-4 py-2">{page}</span>
 
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage(page + 1)}
                 className="
-                px-4
-                py-2
-                rounded-xl
-                bg-gray-200
-                disabled:opacity-40
-                dark:bg-[#444]
-                dark:text-white
+                  rounded-xl
+                  bg-gray-200
+                  px-4
+                  py-2
+                  disabled:opacity-40
                 "
               >
                 بعدی

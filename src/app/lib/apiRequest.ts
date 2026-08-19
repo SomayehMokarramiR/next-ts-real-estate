@@ -1,27 +1,40 @@
-export async function apiRequest(url: string, options?: RequestInit) {
+export async function apiRequest<T>(
+  url: string,
+  options: RequestInit = {},
+): Promise<T> {
   const response = await fetch(url, {
+    ...options,
+
     credentials: "include",
 
     headers: {
       "Content-Type": "application/json",
-      ...(options?.headers || {}),
+      ...(options.headers || {}),
     },
-
-    ...options,
   });
 
   const text = await response.text();
 
-  let data;
+  console.log("API URL:", url);
+  console.log("API STATUS:", response.status);
+  console.log("API RAW RESPONSE:", text);
+
+  let data: T;
 
   try {
-    data = text ? JSON.parse(text) : {};
+    data = text ? JSON.parse(text) : ({} as T);
   } catch {
-    data = {};
+    throw new Error(`پاسخ API معتبر نیست. Status: ${response.status}`);
   }
 
+  console.log("API DATA:", data);
+
   if (!response.ok) {
-    throw new Error(data.message || "خطایی در درخواست رخ داده است");
+    const errorData = data as {
+      message?: string;
+    };
+
+    throw new Error(errorData.message || "خطایی در درخواست رخ داده است");
   }
 
   return data;

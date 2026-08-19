@@ -5,15 +5,18 @@ export interface IProperty extends Document {
 
   description?: string;
 
-  type: "apartment" | "villa" | "house" | "hotel" | "suite";
+  type:
+    | "apartment"
+    | "villa"
+    | "house"
+    | "hotel"
+    | "suite"
+    | "land"
+    | "office"
+    | "commercial";
 
-  // نوع معامله
   transactionType: "rent" | "mortgage" | "rent-mortgage" | "sale";
 
-  // نحوه استفاده
-  // daily = رزرو شبانه
-  // monthly = رهن و اجاره
-  // none = فقط نمایش در املاک
   bookingType: "daily" | "monthly" | "none";
 
   images: string[];
@@ -34,6 +37,7 @@ export interface IProperty extends Document {
   area: number;
 
   pricing: {
+    salePrice?: number;
     daily: number;
     monthly?: number;
     mortgage?: number;
@@ -41,7 +45,6 @@ export interface IProperty extends Document {
     discount?: number;
   };
 
-  // موقعیت پین روی نقشه
   mapPosition?: {
     top: string;
     left: string;
@@ -58,6 +61,7 @@ export interface IProperty extends Document {
   featuredOrder?: number;
 
   createdAt: Date;
+
   updatedAt: Date;
 }
 
@@ -75,19 +79,34 @@ const PropertySchema = new Schema<IProperty>(
 
     type: {
       type: String,
-      enum: ["apartment", "villa", "house", "hotel", "suite"],
+
+      enum: [
+        "apartment",
+        "villa",
+        "house",
+        "hotel",
+        "suite",
+        "land",
+        "office",
+        "commercial",
+      ],
+
       required: true,
     },
 
     transactionType: {
       type: String,
+
       enum: ["rent", "mortgage", "rent-mortgage", "sale"],
+
       required: true,
     },
 
     bookingType: {
       type: String,
+
       enum: ["daily", "monthly", "none"],
+
       default: "none",
     },
 
@@ -142,23 +161,33 @@ const PropertySchema = new Schema<IProperty>(
     },
 
     pricing: {
+      // قیمت فروش
+      salePrice: {
+        type: Number,
+      },
+
+      // قیمت روزانه
       daily: {
         type: Number,
         default: 0,
       },
 
+      // اجاره ماهانه
       monthly: {
         type: Number,
       },
 
+      // مبلغ رهن
       mortgage: {
         type: Number,
       },
 
+      // قیمت قبلی
       oldPrice: {
         type: Number,
       },
 
+      // درصد تخفیف
       discount: {
         type: Number,
       },
@@ -188,27 +217,38 @@ const PropertySchema = new Schema<IProperty>(
 
     status: {
       type: String,
+
       enum: ["available", "reserved", "inactive"],
+
       default: "available",
     },
 
     isFeatured: {
       type: Boolean,
+
       default: false,
     },
 
     featuredOrder: {
       type: Number,
+
       default: 0,
     },
   },
+
   {
     timestamps: true,
   },
 );
 
-const Property: Model<IProperty> =
-  mongoose.models.Property ||
-  mongoose.model<IProperty>("Property", PropertySchema);
+// جلوگیری از استفاده مدل قدیمی در Hot Reload
+if (mongoose.models.Property) {
+  delete mongoose.models.Property;
+}
+
+const Property: Model<IProperty> = mongoose.model<IProperty>(
+  "Property",
+  PropertySchema,
+);
 
 export default Property;
