@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import type { FilterQuery } from "mongoose";
+import { toGregorian } from "jalaali-js";
+import mongoose, { FilterQuery } from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
 import { verifyToken } from "@/app/lib/auth";
@@ -9,35 +10,11 @@ import User from "@/app/models/User";
 import Property from "@/app/models/Property";
 import Reservation from "@/app/models/Reservation";
 
-// ==========================================
-// تبدیل اعداد فارسی به انگلیسی
-// ==========================================
+import { checkReservationConflict } from "@/app/lib/reservation/checkAvailability";
 
-function normalizeNumber(value: string) {
-  return value
-    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
-    .replace(/[٬,]/g, "")
-    .replace(/تومان/g, "")
-    .trim();
-}
-
-// ==========================================
-// Jalali Date
-// ==========================================
-
-function toJalali(date: Date) {
-  return new Intl.DateTimeFormat("fa-IR", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  })
-    .format(date)
-    .replaceAll("-", "/");
-}
-
-// ==========================================
+// ===============================
 // ADMIN AUTH
-// ==========================================
+// ===============================
 
 async function checkAdmin() {
   const cookieStore = await cookies();
@@ -45,286 +22,537 @@ async function checkAdmin() {
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
-    return null;
+    throw new Error("Unauthorized");
   }
 
-  try {
-    const decoded = verifyToken(token) as {
-      id: string;
-      email: string;
-    };
+  const user = verifyToken(token);
 
-    const admin = await User.findById(decoded.id).select("role").lean();
-
-    if (!admin || admin.role !== "admin") {
-      return null;
-    }
-
-    return decoded;
-  } catch {
-    return null;
+  if (!user || user.role !== "admin") {
+    throw new Error("Forbidden");
   }
+
+  return user;
 }
 
-// ==========================================
-// GET RESERVATIONS
-// ==========================================
+// ===============================
+// NUMBER NORMALIZE
+// ===============================
+
+function normalizeNumber(value: string) {
+  return value
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/,/g, "")
+    .trim();
+}
+
+// ===============================
+// DATE NORMALIZE
+// ===============================
+
+function normalizeDate(value: string) {
+  const clean = normalizeNumber(value)
+    .replace(/-/g, "/")
+    .split("/")
+    .filter(Boolean);
+
+  if (clean.length !== 3) {
+    return "";
+  }
+
+  let year = "";
+  let month = "";
+  let day = "";
+
+  if (clean[0].length === 4) {
+    year = clean[0];
+    month = clean[1];
+    day = clean[2];
+  } else if (clean[2].length === 4) {
+    day = clean[0];
+    month = clean[1];
+    year = clean[2];
+  } else {
+    return "";
+  }
+
+  return `${year}/${month.padStart(2, "0")}/${day.padStart(2, "0")}`;
+}
+
+// ===============================
+// JALALI TO DATE
+// ===============================
+
+function jalaliToDate(value: string) {
+  const date = normalizeDate(value).split("/").map(Number);
+
+  if (date.length !== 3) {
+    return null;
+  }
+
+  const [year, month, day] = date;
+
+  if (!year || !month || !day) {
+    return null;
+  }
+
+  const result = toGregorian(year, month, day);
+
+  return new Date(result.gy, result.gm - 1, result.gd);
+}
+
+// ===============================
+// NIGHTS
+// ===============================
+
+function calculateNights(checkIn: string, checkOut: string) {
+  const start = jalaliToDate(checkIn);
+  const end = jalaliToDate(checkOut);
+
+  if (!start || !end) {
+    return 1;
+  }
+
+  const diff = end.getTime() - start.getTime();
+
+  const nights = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+  return nights > 0 ? nights : 1;
+}
 
 export async function GET(request: NextRequest) {
   try {
+    await checkAdmin();
     await connectDB();
 
-    const admin = await checkAdmin();
-
-    if (!admin) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "دسترسی غیرمجاز",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
-
     const { searchParams } = new URL(request.url);
+
+    const search = searchParams.get("search") || "";
+
+    const status = searchParams.get("status") || "";
 
     const page = Number(searchParams.get("page")) || 1;
 
     const limit = Number(searchParams.get("limit")) || 10;
 
-    const search = searchParams.get("search")?.trim() || "";
+    const skip = (page - 1) * limit;
 
-    const status = searchParams.get("status")?.trim() || "";
-
-    const checkIn = searchParams.get("checkIn")?.trim() || "";
-
-    const checkOut = searchParams.get("checkOut")?.trim() || "";
-
-    const filter: FilterQuery<Record<string, unknown>> = {};
-
-    const conditions: FilterQuery<Record<string, unknown>>[] = [];
+    const query: FilterQuery<typeof Reservation> = {};
 
     if (status) {
-      filter.status = status;
+      query.status = status;
     }
-
-    if (checkIn) {
-      filter.checkIn = checkIn;
-    }
-
-    if (checkOut) {
-      filter.checkOut = checkOut;
-    }
-
-    // ==========================================
-    // SEARCH
-    // ==========================================
 
     if (search) {
-      const normalizedSearch = normalizeNumber(search);
-
-      const regex = {
-        $regex: search,
-        $options: "i",
-      };
-
-      // USER SEARCH
-
       const users = await User.find({
         $or: [
           {
-            name: regex,
+            name: {
+              $regex: search,
+              $options: "i",
+            },
           },
 
           {
-            lastName: regex,
+            lastName: {
+              $regex: search,
+              $options: "i",
+            },
           },
 
           {
-            email: regex,
-          },
-
-          {
-            phoneNumber: regex,
-          },
-
-          {
-            $expr: {
-              $regexMatch: {
-                input: {
-                  $concat: ["$name", " ", "$lastName"],
-                },
-                regex: search,
-                options: "i",
-              },
+            phoneNumber: {
+              $regex: search,
+              $options: "i",
             },
           },
         ],
-      })
-        .select("_id email phoneNumber")
-        .lean();
+      }).select("_id");
 
-      if (users.length) {
-        conditions.push(
-          {
-            userId: {
-              $in: users.map((item) => item._id),
-            },
-          },
-
-          {
-            "contact.email": {
-              $in: users.map((item) => item.email).filter(Boolean),
-            },
-          },
-
-          {
-            "contact.phone": {
-              $in: users.map((item) => item.phoneNumber).filter(Boolean),
-            },
-          },
-        );
-      }
-
-      // PROPERTY SEARCH
+      const userIds = users.map((u) => u._id);
 
       const properties = await Property.find({
-        $or: [
-          {
-            title: regex,
-          },
+        title: {
+          $regex: search,
+          $options: "i",
+        },
+      }).select("_id");
 
-          {
-            "location.city": regex,
-          },
-        ],
-      })
-        .select("_id")
-        .lean();
+      const propertyIds = properties.map((p) => p._id);
 
-      if (properties.length) {
-        conditions.push({
+      query.$or = [
+        {
+          userId: {
+            $in: userIds,
+          },
+        },
+
+        {
           propertyId: {
-            $in: properties.map((item) => item._id),
+            $in: propertyIds,
           },
-        });
-      }
-
-      // AMOUNT SEARCH
-
-      const amount = Number(normalizedSearch);
-
-      if (!Number.isNaN(amount)) {
-        conditions.push({
-          amount,
-        });
-      }
-
-      conditions.push(
-        {
-          "contact.phone": regex,
         },
-
-        {
-          "contact.email": regex,
-        },
-
-        {
-          checkIn: regex,
-        },
-
-        {
-          checkOut: regex,
-        },
-
-        {
-          "passengers.name": regex,
-        },
-
-        {
-          "passengers.family": regex,
-        },
-      );
-
-      const dateReservations = await Reservation.find({})
-        .select("_id createdAt")
-        .lean();
-
-      const dateIds = dateReservations
-        .filter((item) => {
-          if (!item.createdAt) {
-            return false;
-          }
-
-          return toJalali(new Date(item.createdAt)).includes(search);
-        })
-        .map((item) => item._id);
-
-      if (dateIds.length) {
-        conditions.push({
-          _id: {
-            $in: dateIds,
-          },
-        });
-      }
-
-      if (conditions.length) {
-        filter.$or = conditions;
-      }
+      ];
     }
 
-    const skip = (page - 1) * limit;
+    const reservations = await Reservation.find(query)
+      .populate("userId", "name lastName phoneNumber")
+      .populate("propertyId", "title location")
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit);
 
-    const [reservations, total] = await Promise.all([
-      Reservation.find(filter)
-
-        .populate({
-          path: "userId",
-          select: "name lastName email phoneNumber",
-        })
-
-        .populate({
-          path: "propertyId",
-          select: "title location pricing",
-        })
-
-        .sort({
-          createdAt: -1,
-        })
-
-        .skip(skip)
-
-        .limit(limit)
-
-        .lean(),
-
-      Reservation.countDocuments(filter),
-    ]);
+    const total = await Reservation.countDocuments(query);
 
     return NextResponse.json({
       success: true,
 
       reservations,
 
-      total,
-
-      totalPages: Math.max(1, Math.ceil(total / limit)),
-
-      currentPage: page,
-
-      limit,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
     });
   } catch (error) {
-    console.error("ADMIN RESERVATIONS ERROR", error);
+    console.error("GET RESERVATION ERROR", error);
 
     return NextResponse.json(
       {
         success: false,
+
         message: "خطا در دریافت رزروها",
       },
+      {
+        status: 500,
+      },
+    );
+  }
+}
 
+// =====================================
+// CREATE RESERVATION
+// =====================================
+
+export async function POST(request: NextRequest) {
+  try {
+    await checkAdmin();
+
+    await connectDB();
+
+    const body = await request.json();
+
+    const { userId, propertyId, checkIn, checkOut, amount, status } = body;
+
+    const normalizedCheckIn = normalizeDate(String(checkIn));
+
+    const normalizedCheckOut = normalizeDate(String(checkOut));
+
+    if (!userId || !propertyId || !normalizedCheckIn || !normalizedCheckOut) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "اطلاعات رزرو ناقص است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    // =========================
+    // CHECK CONFLICT
+    // =========================
+
+    const conflict = await checkReservationConflict({
+      propertyId: String(propertyId),
+
+      checkIn: normalizedCheckIn,
+
+      checkOut: normalizedCheckOut,
+    });
+
+    if (conflict) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "این ملک در این بازه زمانی قبلاً رزرو شده است",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+    const reservationUser = await User.findById(userId);
+
+    if (!reservationUser) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "کاربر پیدا نشد",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+    const reservation = await Reservation.create({
+      userId,
+      propertyId,
+
+      checkIn: normalizedCheckIn,
+      checkOut: normalizedCheckOut,
+
+      contact: {
+        phone: reservationUser.phoneNumber,
+        email: reservationUser.email,
+      },
+
+      nights: calculateNights(normalizedCheckIn, normalizedCheckOut),
+
+      amount: Number(amount) || 0,
+
+      status: status || "pending",
+    });
+
+    return NextResponse.json({
+      success: true,
+
+      message: "رزرو ایجاد شد",
+
+      reservation,
+    });
+  } catch (error) {
+    console.error("CREATE RESERVATION ERROR", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "خطا در ایجاد رزرو",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+
+// =====================================
+// UPDATE RESERVATION
+// =====================================
+
+export async function PUT(
+  request: NextRequest,
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  },
+) {
+  try {
+    await checkAdmin();
+    await connectDB();
+
+    const { id } = await context.params;
+
+    const body = await request.json();
+
+    const reservation = await Reservation.findById(id);
+
+    if (!reservation) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "رزرو پیدا نشد",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    // =========================
+    // NEW VALUES
+    // =========================
+
+    const newCheckIn = body.checkIn
+      ? normalizeDate(String(body.checkIn))
+      : reservation.checkIn;
+
+    const newCheckOut = body.checkOut
+      ? normalizeDate(String(body.checkOut))
+      : reservation.checkOut;
+
+    const newPropertyId = body.propertyId
+      ? String(body.propertyId)
+      : String(reservation.propertyId);
+
+    console.log("UPDATE CONFLICT CHECK", {
+      id,
+      propertyId: newPropertyId,
+      checkIn: newCheckIn,
+      checkOut: newCheckOut,
+    });
+
+    // =========================
+    // CHECK CONFLICT
+    // =========================
+
+    const conflict = await checkReservationConflict({
+      propertyId: newPropertyId,
+
+      checkIn: newCheckIn,
+
+      checkOut: newCheckOut,
+
+      excludeReservationId: id,
+    });
+
+    if (conflict) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "این ملک در این بازه زمانی قبلاً رزرو شده است",
+        },
+        {
+          status: 409,
+        },
+      );
+    }
+
+    // =========================
+    // UPDATE USER
+    // =========================
+
+    if (body.userId) {
+      reservation.userId = body.userId;
+    }
+
+    // =========================
+    // UPDATE PROPERTY
+    // =========================
+
+    reservation.propertyId = new mongoose.Types.ObjectId(newPropertyId);
+
+    // =========================
+    // UPDATE DATE
+    // =========================
+
+    reservation.checkIn = newCheckIn;
+
+    reservation.checkOut = newCheckOut;
+
+    // =========================
+    // NIGHTS
+    // =========================
+
+    reservation.nights = calculateNights(newCheckIn, newCheckOut);
+
+    // =========================
+    // AMOUNT
+    // =========================
+
+    if (body.amount !== undefined) {
+      reservation.amount = Number(body.amount) || 0;
+    }
+
+    // =========================
+    // STATUS
+    // =========================
+
+    if (body.status) {
+      reservation.status = body.status;
+    }
+
+    await reservation.save();
+
+    return NextResponse.json({
+      success: true,
+
+      message: "رزرو ویرایش شد",
+
+      reservation,
+    });
+  } catch (error) {
+    console.error("UPDATE RESERVATION ERROR", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "خطا در ویرایش رزرو",
+      },
+      {
+        status: 500,
+      },
+    );
+  }
+}
+// =====================================
+// DELETE RESERVATION
+// =====================================
+
+export async function DELETE(
+  request: NextRequest,
+  context: {
+    params: Promise<{
+      id: string;
+    }>;
+  },
+) {
+  try {
+    await checkAdmin();
+
+    await connectDB();
+
+    const { id } = await context.params;
+
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "شناسه رزرو ارسال نشده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const reservation = await Reservation.findByIdAndDelete(id);
+
+    if (!reservation) {
+      return NextResponse.json(
+        {
+          success: false,
+
+          message: "رزرو پیدا نشد",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+
+      message: "رزرو حذف شد",
+    });
+  } catch (error) {
+    console.error("DELETE RESERVATION ERROR", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+
+        message: "خطا در حذف رزرو",
+      },
       {
         status: 500,
       },

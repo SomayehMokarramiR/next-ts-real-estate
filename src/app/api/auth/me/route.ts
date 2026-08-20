@@ -16,12 +16,17 @@ async function getAuthenticatedUser() {
   const token = cookieStore.get("token")?.value;
 
   if (!token) {
-    throw new Error("UNAUTHORIZED");
+    throw new Error("NO_TOKEN");
   }
 
-  const decoded = verifyToken(token) as DecodedToken;
+  let decoded: DecodedToken;
 
-  // const user = await User.findById(decoded.id);
+  try {
+    decoded = verifyToken(token) as DecodedToken;
+  } catch {
+    throw new Error("INVALID_TOKEN");
+  }
+
   const user = await User.findById(decoded.id);
 
   console.log("TOKEN DATA:", decoded);
@@ -39,12 +44,14 @@ async function getAuthenticatedUser() {
 ========================= */
 
 export async function GET() {
+  const response = NextResponse;
+
   try {
     await connectDB();
 
     const user = await getAuthenticatedUser();
 
-    return NextResponse.json(
+    return response.json(
       {
         success: true,
         user: {
@@ -59,25 +66,34 @@ export async function GET() {
       { status: 200 },
     );
   } catch (error) {
-    console.error("ME GET ERROR:", error);
+    console.error(
+      "ME GET ERROR:",
+      error instanceof Error
+        ? {
+            message: error.message,
+            stack: error.stack,
+          }
+        : error,
+    );
 
-    if (error instanceof Error && error.message === "USER_NOT_FOUND") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "کاربر پیدا نشد",
-        },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json(
+    const res = response.json(
       {
         success: false,
         message: "کاربر وارد نشده است",
       },
-      { status: 401 },
+      {
+        status: 401,
+      },
     );
+
+    // پاک کردن توکن خراب یا منقضی شده
+    res.cookies.set("token", "", {
+      httpOnly: true,
+      expires: new Date(0),
+      path: "/",
+    });
+
+    return res;
   }
 }
 
