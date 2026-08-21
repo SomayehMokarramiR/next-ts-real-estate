@@ -82,6 +82,7 @@ export default function GeneralSettings({
             rounded-xl
             border
             border-gray-200
+            dark:border-[#555555]
             bg-transparent
             px-4
             py-3
@@ -126,6 +127,7 @@ function Input({
           rounded-xl
           border
           border-gray-200
+          dark:border-[#555555]
           bg-transparent
           px-4
           py-3
@@ -150,7 +152,7 @@ function Toggle({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
+    <div className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-[#555555] p-4">
       <div>
         <p className="text-sm font-medium">{label}</p>
 
@@ -201,15 +203,20 @@ function SaveButton({
       onClick={onClick}
       disabled={isSaving}
       className="
-        rounded-xl
-        bg-primary500
-        px-6
-        py-3
-        text-sm
-        font-medium
-        text-white
-        disabled:opacity-50
-      "
+      rounded-xl
+      bg-primary500
+      px-6
+      py-3
+      text-sm
+      font-medium
+      text-white
+      transition
+
+      hover:bg-primary600
+
+      disabled:opacity-50
+      disabled:cursor-not-allowed
+    "
     >
       {isSaving ? "در حال ذخیره..." : "ذخیره تغییرات"}
     </button>

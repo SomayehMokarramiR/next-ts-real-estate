@@ -192,11 +192,27 @@ export default function AdminSettingsPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">تنظیمات</h1>
 
-        <p className="mt-1 text-sm text-gray-500">مدیریت تنظیمات پنل و سایت</p>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          مدیریت تنظیمات پنل و سایت
+        </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 rounded-2xl bg-background p-2 shadow-sm">
+      <div
+        className="
+        flex
+        flex-wrap
+        gap-2
+        rounded-2xl
+        bg-background
+        dark:bg-[#353535]
+        border
+        border-transparent
+        dark:border-[#555555]
+        p-2
+        shadow-sm
+      "
+      >
         {sections.map((section) => {
           const active = activeSection === section.id;
 
@@ -205,11 +221,24 @@ export default function AdminSettingsPage() {
               key={section.id}
               type="button"
               onClick={() => setActiveSection(section.id)}
-              className={`rounded-xl px-4 py-2 text-sm transition ${
+              className={`
+              rounded-xl
+              px-4
+              py-2
+              text-sm
+              transition
+
+              ${
                 active
                   ? "bg-primary500 text-white"
-                  : "text-gray-500 hover:bg-gray-100 dark:hover:bg-[#353535]"
-              }`}
+                  : `
+                    text-gray-500
+                    dark:text-gray-300
+                    hover:bg-gray-100
+                    dark:hover:bg-[#454545]
+                  `
+              }
+            `}
             >
               {section.label}
             </button>
@@ -218,7 +247,18 @@ export default function AdminSettingsPage() {
       </div>
 
       {/* Content */}
-      <div className="rounded-2xl bg-background p-5 shadow-sm">
+      <div
+        className="
+        rounded-2xl
+        bg-background
+        dark:bg-[#353535]
+        border
+        border-transparent
+        dark:border-[#555555]
+        p-5
+        shadow-sm
+      "
+      >
         {/* GENERAL */}
         {activeSection === "general" && (
           <GeneralSettings
@@ -252,9 +292,11 @@ export default function AdminSettingsPage() {
           <NotificationSettings
             settings={{
               systemMessages: settings.notifications?.systemMessages ?? true,
+
               reservation:
                 (settings.notifications as NotificationSettingsValues)
                   ?.reservation ?? true,
+
               offersAndDiscounts:
                 settings.notifications?.offersAndDiscounts ?? true,
             }}
@@ -267,6 +309,7 @@ export default function AdminSettingsPage() {
             isSaving={updateMutation.isPending}
           />
         )}
+
         {/* SYSTEM */}
         {activeSection === "system" && (
           <SystemSettings

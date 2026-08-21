@@ -43,9 +43,11 @@ export default function NotificationSettings({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-bold">تنظیمات اعلان‌ها</h2>
+        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
+          تنظیمات اعلان‌ها
+        </h2>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           نحوه فعال بودن اعلان‌های سایت را مدیریت کنید.
         </p>
       </div>
@@ -75,7 +77,19 @@ export default function NotificationSettings({
         type="button"
         onClick={handleSave}
         disabled={isSaving}
-        className="rounded-xl bg-primary500 px-6 py-3 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-50"
+        className="
+        rounded-xl
+        bg-primary500
+        px-6
+        py-3
+        text-sm
+        font-medium
+        text-white
+        transition
+        hover:bg-primary600
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+      "
       >
         {isSaving ? "در حال ذخیره..." : "ذخیره تغییرات"}
       </button>
@@ -95,7 +109,7 @@ function Toggle({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
+    <div className="flex items-center justify-between rounded-xl border border-gray-200  dark:border-[#555555] p-4">
       <div>
         <p className="text-sm font-medium">{label}</p>
 

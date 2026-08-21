@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-export type ReservationSettings = {
+export type ReservationSettingsValues = {
   reservationEnabled: boolean;
   minNights: number;
   maxNights: number;
@@ -11,38 +11,33 @@ export type ReservationSettings = {
 };
 
 interface Props {
-  settings: ReservationSettings;
-  onSave: (values: ReservationSettings) => void;
+  settings?: ReservationSettingsValues;
+  onSave: (values: ReservationSettingsValues) => void;
   isSaving: boolean;
 }
+
+const getInitialForm = (
+  settings?: Partial<ReservationSettingsValues>,
+): ReservationSettingsValues => ({
+  reservationEnabled: settings?.reservationEnabled ?? true,
+  minNights: settings?.minNights ?? 1,
+  maxNights: settings?.maxNights ?? 30,
+  cancellationEnabled: settings?.cancellationEnabled ?? true,
+  cancellationDeadlineHours: settings?.cancellationDeadlineHours ?? 24,
+});
 
 export default function ReservationSettings({
   settings,
   onSave,
   isSaving,
 }: Props) {
-  const [form, setForm] = useState<ReservationSettings>({
-    reservationEnabled: settings.reservationEnabled,
-    minNights: settings.minNights,
-    maxNights: settings.maxNights,
-    cancellationEnabled: settings.cancellationEnabled,
-    cancellationDeadlineHours: settings.cancellationDeadlineHours,
-  });
+  const [form, setForm] = useState<ReservationSettingsValues>(() =>
+    getInitialForm(settings),
+  );
 
-  // Sync form with latest settings from API
-  useEffect(() => {
-    setForm({
-      reservationEnabled: settings.reservationEnabled,
-      minNights: settings.minNights,
-      maxNights: settings.maxNights,
-      cancellationEnabled: settings.cancellationEnabled,
-      cancellationDeadlineHours: settings.cancellationDeadlineHours,
-    });
-  }, [settings]);
-
-  const update = <K extends keyof ReservationSettings>(
+  const update = <K extends keyof ReservationSettingsValues>(
     key: K,
-    value: ReservationSettings[K],
+    value: ReservationSettingsValues[K],
   ) => {
     setForm((prev) => ({
       ...prev,
@@ -50,7 +45,6 @@ export default function ReservationSettings({
     }));
   };
 
-  // حداقل تعداد شب
   const handleMinNightsChange = (value: number) => {
     const minNights = Math.max(1, value);
 
@@ -61,43 +55,54 @@ export default function ReservationSettings({
     }));
   };
 
-  // حداکثر تعداد شب
   const handleMaxNightsChange = (value: number) => {
-    const maxNights = Math.max(form.minNights, value);
-
-    update("maxNights", maxNights);
+    update("maxNights", Math.max(form.minNights, value));
   };
 
-  // مهلت لغو رزرو
   const handleDeadlineChange = (value: number) => {
     update("cancellationDeadlineHours", Math.max(0, value));
   };
 
-  // ذخیره
-  const handleSave = () => {
-    onSave(form);
-  };
-
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
-        <h2 className="text-lg font-bold">تنظیمات رزرو</h2>
+        <h2
+          className="
+          text-lg
+          font-bold
+          text-gray-900
+          dark:text-white
+        "
+        >
+          تنظیمات رزرو
+        </h2>
 
-        <p className="mt-1 text-sm text-gray-500">
+        <p
+          className="
+          mt-1
+          text-sm
+          text-gray-500
+          dark:text-gray-400
+        "
+        >
           قوانین مربوط به رزرو ملک را مدیریت کنید.
         </p>
       </div>
 
-      {/* Reservation Enabled */}
       <Toggle
         label="فعال بودن رزرو آنلاین"
         checked={form.reservationEnabled}
         onChange={(value) => update("reservationEnabled", value)}
       />
 
-      {/* Nights */}
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <div
+        className="
+        grid
+        grid-cols-1
+        gap-5
+        md:grid-cols-2
+      "
+      >
         <NumberInput
           label="حداقل تعداد شب"
           value={form.minNights}
@@ -113,14 +118,12 @@ export default function ReservationSettings({
         />
       </div>
 
-      {/* Cancellation */}
       <Toggle
         label="امکان لغو رزرو"
         checked={form.cancellationEnabled}
         onChange={(value) => update("cancellationEnabled", value)}
       />
 
-      {/* Cancellation Deadline */}
       <NumberInput
         label="مهلت لغو رزرو (ساعت)"
         value={form.cancellationDeadlineHours}
@@ -128,10 +131,9 @@ export default function ReservationSettings({
         onChange={handleDeadlineChange}
       />
 
-      {/* Save */}
       <button
         type="button"
-        onClick={handleSave}
+        onClick={() => onSave(form)}
         disabled={isSaving}
         className="
           rounded-xl
@@ -141,6 +143,7 @@ export default function ReservationSettings({
           text-sm
           font-medium
           text-white
+          transition
           disabled:opacity-50
         "
       >
@@ -167,7 +170,18 @@ function NumberInput({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm font-medium">{label}</label>
+      <label
+        className="
+          mb-2
+          block
+          text-sm
+          font-medium
+          text-gray-800
+          dark:text-gray-200
+        "
+      >
+        {label}
+      </label>
 
       <input
         type="number"
@@ -176,21 +190,23 @@ function NumberInput({
         onChange={(e) => {
           const value = Number(e.target.value);
 
-          if (Number.isNaN(value)) {
-            return;
+          if (!Number.isNaN(value)) {
+            onChange(value);
           }
-
-          onChange(value);
         }}
         className="
           w-full
           rounded-xl
           border
-          border-gray-200
-          bg-transparent
+          border-gray-300
+          dark:border-gray-500
+          bg-white
+          dark:bg-[#353535]
           px-4
           py-3
           text-sm
+          text-gray-900
+          dark:text-white
           outline-none
           focus:border-primary500
         "
@@ -213,21 +229,55 @@ function Toggle({
   onChange: (value: boolean) => void;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
-      <span className="text-sm font-medium">{label}</span>
+    <div
+      className="
+        flex
+        items-center
+        justify-between
+        rounded-xl
+        border
+        border-gray-300
+        dark:border-gray-500
+        bg-white
+        dark:bg-[#353535]
+        p-4
+      "
+    >
+      <span
+        className="
+          text-sm
+          font-medium
+          text-gray-900
+          dark:text-white
+        "
+      >
+        {label}
+      </span>
 
       <button
         type="button"
         aria-pressed={checked}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 rounded-full transition ${
-          checked ? "bg-primary500" : "bg-gray-300"
-        }`}
+        className={`
+          relative
+          h-6
+          w-11
+          rounded-full
+          transition
+          ${checked ? "bg-primary500" : "bg-gray-300 dark:bg-gray-600"}
+        `}
       >
         <span
-          className={`absolute top-1 h-4 w-4 rounded-full bg-white transition ${
-            checked ? "right-1" : "right-6"
-          }`}
+          className={`
+            absolute
+            top-1
+            h-4
+            w-4
+            rounded-full
+            bg-white
+            transition
+            ${checked ? "right-1" : "right-6"}
+          `}
         />
       </button>
     </div>
