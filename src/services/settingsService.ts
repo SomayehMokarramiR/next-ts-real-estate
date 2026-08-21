@@ -7,12 +7,9 @@ const API_URL = "/api/user/settings";
 async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(url, {
     ...options,
-
     credentials: "include",
-
     headers: {
       "Content-Type": "application/json",
-
       ...options?.headers,
     },
   });
@@ -32,14 +29,14 @@ async function apiRequest<T>(url: string, options?: RequestInit): Promise<T> {
 
 export interface UserSettings {
   notifications: {
-    // اعلان وضعیت رزرو
+    // اعلان رزرو
     reservation: boolean;
 
-    // پیام‌های سیستم
-    messages: boolean;
+    // پیام های سیستم
+    systemMessages: boolean;
 
-    // پیشنهادها و تخفیف‌ها
-    offers: boolean;
+    // پیشنهادها و تخفیف ها
+    offersAndDiscounts: boolean;
   };
 
   darkMode: boolean;
@@ -51,9 +48,7 @@ export interface UserSettings {
 
 export interface SettingsResponse {
   success: boolean;
-
   settings: UserSettings;
-
   message?: string;
 }
 
@@ -74,7 +69,6 @@ export function getSettings() {
 export function updateSettings(settings: Partial<UserSettings>) {
   return apiRequest<SettingsResponse>(API_URL, {
     method: "PUT",
-
     body: JSON.stringify(settings),
   });
 }

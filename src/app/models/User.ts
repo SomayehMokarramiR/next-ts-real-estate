@@ -11,13 +11,13 @@ export interface IUser extends Document {
 
   favorites: mongoose.Types.ObjectId[];
 
-  settings: {
-    notifications: {
-      reservation: boolean;
-      messages: boolean;
-      offers: boolean;
-    };
+  notifications: {
+    systemMessages: boolean;
+    reservation: boolean;
+    offersAndDiscounts: boolean;
+  };
 
+  settings: {
     darkMode: boolean;
   };
 
@@ -71,54 +71,42 @@ const UserSchema = new Schema<IUser>(
           ref: "Property",
         },
       ],
-
       default: [],
     },
 
     // =====================
-    // User Settings
+    // USER NOTIFICATIONS
+    // =====================
+
+    notifications: {
+      systemMessages: {
+        type: Boolean,
+        default: true,
+      },
+
+      // اعلان‌های مربوط به رزرو
+      reservation: {
+        type: Boolean,
+        default: true,
+      },
+
+      offersAndDiscounts: {
+        type: Boolean,
+        default: false,
+      },
+    },
+
+    // =====================
+    // USER SETTINGS
     // =====================
 
     settings: {
-      type: {
-        notifications: {
-          // اعلان وضعیت رزرو
-          reservation: {
-            type: Boolean,
-            default: true,
-          },
-
-          // پیام‌های سیستم
-          messages: {
-            type: Boolean,
-            default: true,
-          },
-
-          // پیشنهادها و تخفیف‌ها
-          offers: {
-            type: Boolean,
-            default: false,
-          },
-        },
-
-        darkMode: {
-          type: Boolean,
-          default: false,
-        },
-      },
-
-      default: {
-        notifications: {
-          reservation: true,
-          messages: true,
-          offers: false,
-        },
-
-        darkMode: false,
+      darkMode: {
+        type: Boolean,
+        default: false,
       },
     },
   },
-
   {
     timestamps: true,
   },

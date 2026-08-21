@@ -1,11 +1,8 @@
 import { NextResponse } from "next/server";
-
 import { cookies } from "next/headers";
 
 import { connectDB } from "@/app/lib/mongodb";
-
 import User from "@/app/models/User";
-
 import { verifyToken } from "@/app/lib/auth";
 
 // =========================
@@ -17,7 +14,6 @@ export async function GET() {
     await connectDB();
 
     const cookieStore = await cookies();
-
     const token = cookieStore.get("token")?.value;
 
     if (!token) {
@@ -26,9 +22,7 @@ export async function GET() {
           success: false,
           message: "ابتدا وارد حساب شوید",
         },
-        {
-          status: 401,
-        },
+        { status: 401 },
       );
     }
 
@@ -37,7 +31,9 @@ export async function GET() {
       email: string;
     };
 
-    const user = await User.findById(decoded.id).select("settings").lean();
+    const user = await User.findById(decoded.id)
+      .select("notifications settings")
+      .lean();
 
     if (!user) {
       return NextResponse.json(
@@ -45,15 +41,24 @@ export async function GET() {
           success: false,
           message: "کاربر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
 
     return NextResponse.json({
       success: true,
-      settings: user.settings,
+
+      settings: {
+        notifications: {
+          reservation: user.notifications?.reservation ?? true,
+
+          systemMessages: user.notifications?.systemMessages ?? true,
+
+          offersAndDiscounts: user.notifications?.offersAndDiscounts ?? false,
+        },
+
+        darkMode: user.settings?.darkMode ?? false,
+      },
     });
   } catch (error) {
     console.error("GET SETTINGS ERROR:", error);
@@ -63,9 +68,7 @@ export async function GET() {
         success: false,
         message: "خطا در دریافت تنظیمات",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
@@ -88,9 +91,7 @@ export async function PUT(req: Request) {
           success: false,
           message: "ابتدا وارد حساب شوید",
         },
-        {
-          status: 401,
-        },
+        { status: 401 },
       );
     }
 
@@ -109,27 +110,36 @@ export async function PUT(req: Request) {
           success: false,
           message: "کاربر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
 
-    user.settings = {
-      notifications: {
+    // =========================
+    // UPDATE NOTIFICATIONS
+    // =========================
+
+    if (body.notifications) {
+      user.notifications = {
+        systemMessages:
+          body.notifications.systemMessages ??
+          user.notifications.systemMessages,
+
         reservation:
-          body.notifications?.reservation ??
-          user.settings.notifications.reservation,
+          body.notifications.reservation ?? user.notifications.reservation,
 
-        messages:
-          body.notifications?.messages ?? user.settings.notifications.messages,
+        offersAndDiscounts:
+          body.notifications.offersAndDiscounts ??
+          user.notifications.offersAndDiscounts,
+      };
+    }
 
-        offers:
-          body.notifications?.offers ?? user.settings.notifications.offers,
-      },
+    // =========================
+    // UPDATE DARK MODE
+    // =========================
 
-      darkMode: body.darkMode ?? user.settings.darkMode,
-    };
+    if (typeof body.darkMode === "boolean") {
+      user.settings.darkMode = body.darkMode;
+    }
 
     await user.save();
 
@@ -138,7 +148,11 @@ export async function PUT(req: Request) {
 
       message: "تنظیمات ذخیره شد",
 
-      settings: user.settings,
+      settings: {
+        notifications: user.notifications,
+
+        darkMode: user.settings.darkMode,
+      },
     });
   } catch (error) {
     console.error("UPDATE SETTINGS ERROR:", error);
@@ -148,9 +162,7 @@ export async function PUT(req: Request) {
         success: false,
         message: "خطا در ذخیره تنظیمات",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }

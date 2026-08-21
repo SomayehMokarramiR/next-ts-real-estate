@@ -8,10 +8,11 @@ import { verifyToken } from "@/app/lib/auth";
 import User from "@/app/models/User";
 import Property from "@/app/models/Property";
 import Reservation from "@/app/models/Reservation";
-import Notification from "@/app/models/Notification";
 
 import { checkReservationConflict } from "@/app/lib/reservation/checkAvailability";
 import { toGregorian } from "jalaali-js";
+import { createNotification } from "@/app/lib/createNotification";
+import Notification from "@/app/models/Notification";
 
 // ===============================
 // ADMIN AUTH
@@ -549,12 +550,11 @@ export async function POST(request: NextRequest) {
     // NOTIFICATION
     // ===============================
 
-    await Notification.create({
-      userId,
+    await createNotification({
+      userId: String(reservation.userId),
       title: "رزرو جدید ثبت شد",
       message: "رزرو شما با موفقیت ثبت شد",
       type: "reservation",
-      isRead: false,
     });
 
     // ===============================
@@ -596,11 +596,9 @@ export async function PUT(
 ) {
   try {
     await checkAdmin();
-
     await connectDB();
 
     const { id } = await context.params;
-
     const body = await request.json();
 
     const reservation = await Reservation.findById(id);
@@ -617,6 +615,8 @@ export async function PUT(
       );
     }
 
+    const oldStatus = reservation.status;
+
     const newCheckIn = body.checkIn
       ? normalizeDate(String(body.checkIn))
       : reservation.checkIn;
@@ -631,11 +631,8 @@ export async function PUT(
 
     const conflict = await checkReservationConflict({
       propertyId: newPropertyId,
-
       checkIn: newCheckIn,
-
       checkOut: newCheckOut,
-
       excludeReservationId: id,
     });
 
@@ -669,9 +666,8 @@ export async function PUT(
 
     let statusChanged = false;
 
-    if (body.status) {
-      statusChanged = reservation.status !== body.status;
-
+    if (body.status !== undefined && body.status !== oldStatus) {
+      statusChanged = true;
       reservation.status = body.status;
     }
 
@@ -682,24 +678,28 @@ export async function PUT(
     // ===============================
 
     if (statusChanged) {
-      await Notification.create({
+      const notificationExists = await Notification.findOne({
         userId: reservation.userId,
-
-        title: "وضعیت رزرو تغییر کرد",
-
-        message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
-
         type: "reservation",
-
-        isRead: false,
+        title: "وضعیت رزرو تغییر کرد",
+        message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+        createdAt: {
+          $gte: new Date(Date.now() - 5000), // 5 ثانیه اخیر
+        },
       });
-    }
 
+      if (!notificationExists) {
+        await createNotification({
+          userId: String(reservation.userId),
+          title: "وضعیت رزرو تغییر کرد",
+          message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+          type: "reservation",
+        });
+      }
+    }
     return NextResponse.json({
       success: true,
-
       message: "رزرو ویرایش شد",
-
       reservation,
     });
   } catch (error) {
@@ -716,7 +716,6 @@ export async function PUT(
     );
   }
 }
-
 // ===============================
 // DELETE RESERVATION
 // ===============================
@@ -756,16 +755,11 @@ export async function DELETE(
     // NOTIFICATION DELETE
     // ===============================
 
-    await Notification.create({
-      userId: reservation.userId,
-
+    await createNotification({
+      userId: String(reservation.userId),
       title: "رزرو حذف شد",
-
       message: "رزرو شما توسط مدیریت حذف شد",
-
       type: "reservation",
-
-      isRead: false,
     });
 
     return NextResponse.json({

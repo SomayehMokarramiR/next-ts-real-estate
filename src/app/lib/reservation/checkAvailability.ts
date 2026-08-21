@@ -32,7 +32,6 @@ export async function checkReservationConflict({
     };
   } = {
     propertyId: new mongoose.Types.ObjectId(propertyId),
-
     status: {
       $in: ["pending", "paid", "cancelled"],
     },
@@ -44,33 +43,19 @@ export async function checkReservationConflict({
     };
   }
 
-  console.log("CONFLICT QUERY =>", query);
-
   const reservations = await Reservation.find(query);
 
   for (const reservation of reservations) {
     const oldStart = jalaliToDate(reservation.checkIn);
-
     const oldEnd = jalaliToDate(reservation.checkOut);
 
     if (!oldStart || !oldEnd) continue;
 
-    console.log("COMPARE", {
-      newStart: startDate,
-      newEnd: endDate,
-      oldStart,
-      oldEnd,
-    });
-
     // تداخل واقعی تاریخ
     if (startDate < oldEnd && endDate > oldStart) {
-      console.log("CONFLICT TRUE", reservation._id.toString());
-
       return true;
     }
   }
-
-  console.log("CONFLICT FALSE");
 
   return false;
 }

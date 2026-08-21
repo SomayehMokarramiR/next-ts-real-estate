@@ -4,10 +4,8 @@ import mongoose from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
 import { verifyToken } from "@/app/lib/auth";
-
 import Reservation from "@/app/models/Reservation";
-import Notification from "@/app/models/Notification";
-import User from "@/app/models/User";
+import { createNotification } from "@/app/lib/createNotification";
 
 async function getUser() {
   const cookieStore = await cookies();
@@ -181,22 +179,19 @@ export async function DELETE(
     // CHECK USER SETTINGS
     // ======================
 
-    const currentUser = await User.findById(user.id).lean();
+    // حذف رزرو
+    await Reservation.findByIdAndDelete(id);
 
-    if (currentUser?.settings?.notifications?.reservation) {
-      await Notification.create({
-        userId: user.id,
+    // ======================
+    // CREATE NOTIFICATION
+    // ======================
 
-        title: "رزرو حذف شد",
-
-        message: "رزرو شما با موفقیت حذف شد.",
-
-        type: "reservation",
-
-        isRead: false,
-      });
-    }
-
+    await createNotification({
+      userId: user.id,
+      title: "رزرو حذف شد",
+      message: "رزرو شما با موفقیت حذف شد.",
+      type: "reservation",
+    });
     return NextResponse.json(
       {
         success: true,

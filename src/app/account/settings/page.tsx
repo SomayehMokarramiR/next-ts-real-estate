@@ -42,20 +42,23 @@ export default function SettingsPage() {
 
   const settings = data?.settings;
 
+  const notifications = settings?.notifications ?? {
+    reservation: false,
+    systemMessages: false,
+    offersAndDiscounts: false,
+  };
+
   const updateNotification = (
-    key: "reservation" | "messages" | "offers" | "system",
+    key: "reservation" | "systemMessages" | "offersAndDiscounts",
     value: boolean,
   ) => {
-    if (!settings) return;
-
     updateMutation.mutate({
       notifications: {
-        ...settings.notifications,
+        ...notifications,
         [key]: value,
       },
     });
   };
-
   const updateDarkMode = (value: boolean) => {
     updateMutation.mutate(
       {
@@ -165,31 +168,30 @@ export default function SettingsPage() {
       </div>
 
       {/* اعلان ها */}
-
       <div
         className="
-        bg-white
-        dark:bg-[#353535]
-        rounded-2xl
-        p-5
-        mb-5
-        "
+  bg-white
+  dark:bg-[#353535]
+  rounded-2xl
+  p-5
+  mb-5
+  "
       >
         <div
           className="
-          flex
-          items-center
-          gap-2
-          mb-5
-          "
+    flex
+    items-center
+    gap-2
+    mb-5
+    "
         >
           <Bell size={22} className="text-primary500" />
 
           <h2
             className="
-            font-bold
-            dark:text-white
-            "
+      font-bold
+      dark:text-white
+      "
           >
             اعلان‌ها
           </h2>
@@ -199,21 +201,24 @@ export default function SettingsPage() {
           <SettingSwitch
             title="اعلان وضعیت رزرو"
             description="تغییرات رزروهای شما"
-            checked={settings?.notifications.reservation ?? false}
+            checked={notifications.reservation}
             onChange={(value) => updateNotification("reservation", value)}
           />
 
           <SettingSwitch
             title="پیام‌های سیستم"
             description="اطلاعیه‌های مهم سایت"
-            checked={settings?.notifications.messages ?? false}
-            onChange={(value) => updateNotification("messages", value)}
+            checked={notifications.systemMessages}
+            onChange={(value) => updateNotification("systemMessages", value)}
           />
+
           <SettingSwitch
             title="پیشنهادها و تخفیف‌ها"
             description="دریافت پیشنهادهای ویژه"
-            checked={settings?.notifications.offers ?? false}
-            onChange={(value) => updateNotification("offers", value)}
+            checked={notifications.offersAndDiscounts}
+            onChange={(value) =>
+              updateNotification("offersAndDiscounts", value)
+            }
           />
         </div>
       </div>

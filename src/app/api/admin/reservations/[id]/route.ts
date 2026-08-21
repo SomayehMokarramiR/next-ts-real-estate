@@ -7,9 +7,9 @@ import { connectDB } from "../../../../lib/mongodb";
 import { verifyToken } from "../../../../lib/auth";
 
 import Reservation from "../../../../models/Reservation";
-import Notification from "../../../../models/Notification";
 
 import { checkReservationConflict } from "../../../../lib/reservation/checkAvailability";
+import { createNotification } from "@/app/lib/createNotification";
 
 // =========================
 // ADMIN CHECK
@@ -232,20 +232,15 @@ export async function PUT(
 
     // اعلان تغییر وضعیت
 
+    // اعلان تغییر وضعیت
     if (body.status && body.status !== oldStatus) {
-      await Notification.create({
-        userId: reservation.userId,
-
+      await createNotification({
+        userId: String(reservation.userId),
         title: "تغییر وضعیت رزرو",
-
         message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
-
         type: "reservation",
-
-        isRead: false,
       });
     }
-
     return NextResponse.json({
       success: true,
 
@@ -304,16 +299,12 @@ export async function DELETE(
 
     // اعلان حذف
 
-    await Notification.create({
-      userId: reservation.userId,
-
+    // اعلان حذف
+    await createNotification({
+      userId: String(reservation.userId),
       title: "رزرو حذف شد",
-
       message: "رزرو شما توسط مدیریت حذف شد",
-
       type: "reservation",
-
-      isRead: false,
     });
 
     return NextResponse.json({
