@@ -13,6 +13,7 @@ import {
   FileText,
   Settings,
   LogOut,
+  LayoutDashboard,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";
@@ -35,33 +36,6 @@ type NavLink = {
 const avatarUrl =
   "https://api.dicebear.com/7.x/adventurer/svg?seed=amirMohammad";
 
-const userMenu = [
-  {
-    label: "پروفایل من",
-    icon: User,
-    href: "/account/profile",
-  },
-  {
-    label: "علاقه‌مندی‌ها",
-    icon: Heart,
-    href: "/account/favorites",
-  },
-  {
-    label: "رزروهای من",
-    icon: FileText,
-    href: "/account/reservations",
-  },
-  {
-    label: "تنظیمات",
-    icon: Settings,
-    href: "/account/settings",
-  },
-  {
-    label: "خروج از حساب",
-    icon: LogOut,
-    action: "logout",
-  },
-];
 function Avatar() {
   return (
     <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-white">
@@ -86,6 +60,47 @@ export default function Navbar() {
   const [userOpen, setUserOpen] = useState(false);
 
   const isLoggedIn = Boolean(data?.user);
+
+  const isAdmin = data?.user?.role === "admin";
+
+  const currentUserMenu = [
+    {
+      label: "پروفایل من",
+      icon: User,
+      href: "/account/profile",
+    },
+    {
+      label: "علاقه‌مندی‌ها",
+      icon: Heart,
+      href: "/account/favorites",
+    },
+    {
+      label: "رزروهای من",
+      icon: FileText,
+      href: "/account/reservations",
+    },
+    {
+      label: "تنظیمات",
+      icon: Settings,
+      href: "/account/settings",
+    },
+
+    ...(isAdmin
+      ? [
+          {
+            label: "پنل مدیریت",
+            icon: LayoutDashboard,
+            href: "/admin",
+          },
+        ]
+      : []),
+
+    {
+      label: "خروج از حساب",
+      icon: LogOut,
+      action: "logout",
+    },
+  ];
 
   const navLinks: NavLink[] = [
     {
@@ -332,23 +347,24 @@ export default function Navbar() {
                     p-2
                   "
                 >
-                  {userMenu.map(({ label, icon: Icon, href, action }) => (
-                    <button
-                      key={label}
-                      type="button"
-                      onClick={() => {
-                        setUserOpen(false);
+                  {currentUserMenu.map(
+                    ({ label, icon: Icon, href, action }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => {
+                          setUserOpen(false);
 
-                        if (action === "logout") {
-                          handleLogout();
-                          return;
-                        }
+                          if (action === "logout") {
+                            handleLogout();
+                            return;
+                          }
 
-                        if (href) {
-                          router.push(href);
-                        }
-                      }}
-                      className="
+                          if (href) {
+                            router.push(href);
+                          }
+                        }}
+                        className="
       w-full
       flex
       items-center
@@ -361,11 +377,12 @@ export default function Navbar() {
       dark:hover:bg-[#353535]
       dark:text-white
     "
-                    >
-                      <Icon size={16} />
-                      {label}
-                    </button>
-                  ))}
+                      >
+                        <Icon size={16} />
+                        {label}
+                      </button>
+                    ),
+                  )}
                 </div>
               )}
             </div>

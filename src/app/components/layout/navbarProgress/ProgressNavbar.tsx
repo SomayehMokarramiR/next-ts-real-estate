@@ -41,34 +41,6 @@ type NavLink = {
 const avatarUrl =
   "https://api.dicebear.com/7.x/adventurer/svg?seed=amirMohammad";
 
-const userMenu = [
-  {
-    label: "پروفایل من",
-    icon: User,
-    href: "/account/profile",
-  },
-  {
-    label: "علاقه‌مندی‌ها",
-    icon: Heart,
-    href: "/account/favorites",
-  },
-  {
-    label: "رزروهای من",
-    icon: FileText,
-    href: "/account/reservations",
-  },
-  {
-    label: "تنظیمات",
-    icon: Settings,
-    href: "/account/settings",
-  },
-  {
-    label: "خروج از حساب",
-    icon: LogOut,
-    action: "logout",
-  },
-];
-
 function Avatar() {
   return (
     <div
@@ -103,6 +75,47 @@ export default function ProgressNavbar({ progress }: Props) {
   const { dark, toggleTheme } = useTheme();
 
   const isLoggedIn = Boolean(data?.success && data?.user);
+
+  const userMenu = [
+    {
+      label: "پروفایل من",
+      icon: User,
+      href: "/account/profile",
+    },
+    {
+      label: "علاقه‌مندی‌ها",
+      icon: Heart,
+      href: "/account/favorites",
+    },
+    {
+      label: "رزروهای من",
+      icon: FileText,
+      href: "/account/reservations",
+    },
+    {
+      label: "تنظیمات",
+      icon: Settings,
+      href: "/account/settings",
+    },
+
+    // فقط برای ادمین
+    ...(data?.user?.role === "admin"
+      ? [
+          {
+            label: "پنل مدیریت",
+            icon: Settings,
+            href: "/admin",
+          },
+        ]
+      : []),
+
+    {
+      label: "خروج از حساب",
+      icon: LogOut,
+      action: "logout",
+    },
+  ];
+
   const [open, setOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
 
