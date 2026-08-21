@@ -19,7 +19,7 @@ interface NotificationFormProps {
   onSuccess?: () => void;
 }
 
-type NotificationType = "reservation" | "message" | "offer" | "system";
+type NotificationType = "message" | "offer" | "system";
 
 interface NotificationFormState {
   userId: string;
@@ -205,13 +205,11 @@ export default function NotificationForm({
           onChange={handleChange}
           className={inputClass}
         >
-          <option value="reservation">رزرو</option>
+          <option value="system">پیام سیستم</option>
 
-          <option value="message">پیام</option>
+          <option value="message">پیام کاربری</option>
 
-          <option value="offer">پیشنهاد</option>
-
-          <option value="system">سیستم</option>
+          <option value="offer">پیشنهادها و تخفیف‌ها</option>
         </select>
       </div>
 

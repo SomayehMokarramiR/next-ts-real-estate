@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+
 import { cookies } from "next/headers";
 
 import { connectDB } from "@/app/lib/mongodb";
+
 import User from "@/app/models/User";
+
 import { verifyToken } from "@/app/lib/auth";
 
 // =========================
@@ -21,7 +24,7 @@ export async function GET() {
       return NextResponse.json(
         {
           success: false,
-          message: "ابتدا وارد حساب کاربری شوید",
+          message: "ابتدا وارد حساب شوید",
         },
         {
           status: 401,
@@ -48,15 +51,10 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        settings: user.settings,
-      },
-      {
-        status: 200,
-      },
-    );
+    return NextResponse.json({
+      success: true,
+      settings: user.settings,
+    });
   } catch (error) {
     console.error("GET SETTINGS ERROR:", error);
 
@@ -88,7 +86,7 @@ export async function PUT(req: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: "ابتدا وارد حساب کاربری شوید",
+          message: "ابتدا وارد حساب شوید",
         },
         {
           status: 401,
@@ -135,16 +133,13 @@ export async function PUT(req: Request) {
 
     await user.save();
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "تنظیمات ذخیره شد",
-        settings: user.settings,
-      },
-      {
-        status: 200,
-      },
-    );
+    return NextResponse.json({
+      success: true,
+
+      message: "تنظیمات ذخیره شد",
+
+      settings: user.settings,
+    });
   } catch (error) {
     console.error("UPDATE SETTINGS ERROR:", error);
 

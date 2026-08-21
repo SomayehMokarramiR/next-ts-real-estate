@@ -34,7 +34,7 @@ export async function checkReservationConflict({
     propertyId: new mongoose.Types.ObjectId(propertyId),
 
     status: {
-      $in: ["pending", "paid", "پرداخت شده"],
+      $in: ["pending", "paid", "cancelled"],
     },
   };
 

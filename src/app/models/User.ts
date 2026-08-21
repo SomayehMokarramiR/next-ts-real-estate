@@ -2,13 +2,9 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
-
   lastName: string;
-
   email: string;
-
   password: string;
-
   phoneNumber: string;
 
   role: "admin" | "user";
@@ -26,7 +22,6 @@ export interface IUser extends Document {
   };
 
   createdAt?: Date;
-
   updatedAt?: Date;
 }
 
@@ -87,16 +82,19 @@ const UserSchema = new Schema<IUser>(
     settings: {
       type: {
         notifications: {
+          // اعلان وضعیت رزرو
           reservation: {
             type: Boolean,
             default: true,
           },
 
+          // پیام‌های سیستم
           messages: {
             type: Boolean,
             default: true,
           },
 
+          // پیشنهادها و تخفیف‌ها
           offers: {
             type: Boolean,
             default: false,

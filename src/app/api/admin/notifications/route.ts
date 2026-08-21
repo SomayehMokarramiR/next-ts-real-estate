@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { cookies } from "next/headers";
 
+import mongoose from "mongoose";
+
 import { connectDB } from "@/app/lib/mongodb";
 
 import { verifyToken } from "@/app/lib/auth";
 
 import Notification from "@/app/models/Notification";
+
+import User from "@/app/models/User";
 
 // ===============================
 // CHECK ADMIN
@@ -21,9 +25,22 @@ async function checkAdmin() {
     throw new Error("Unauthorized");
   }
 
-  const user = verifyToken(token);
+  const decoded = verifyToken(token) as {
+    id: string;
+    role?: string;
+  };
 
-  if (!user || user.role !== "admin") {
+  if (!decoded?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await User.findById(decoded.id);
+
+  if (!user) {
+    throw new Error("UserNotFound");
+  }
+
+  if (user.role !== "admin") {
     throw new Error("Forbidden");
   }
 
@@ -36,9 +53,9 @@ async function checkAdmin() {
 
 export async function GET() {
   try {
-    await checkAdmin();
-
     await connectDB();
+
+    await checkAdmin();
 
     const notifications = await Notification.find({})
       .populate({
@@ -50,25 +67,43 @@ export async function GET() {
       })
       .lean();
 
-    const formattedNotifications = notifications.map((item) => ({
-      ...item,
-
-      type:
-        item.type === "reservation"
-          ? "reservation"
-          : item.type === "message"
-            ? "message"
-            : item.type === "offer"
-              ? "offer"
-              : "system",
-    }));
-
-    return NextResponse.json({
-      success: true,
-      notifications: formattedNotifications,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        notifications,
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
-    console.error("ADMIN GET NOTIFICATIONS ERROR", error);
+    console.error("ADMIN GET NOTIFICATIONS ERROR:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "دسترسی غیرمجاز",
+          },
+          {
+            status: 401,
+          },
+        );
+      }
+
+      if (error.message === "Forbidden") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "اجازه دسترسی ندارید",
+          },
+          {
+            status: 403,
+          },
+        );
+      }
+    }
 
     return NextResponse.json(
       {
@@ -88,15 +123,15 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    await checkAdmin();
-
     await connectDB();
+
+    await checkAdmin();
 
     const body = await request.json();
 
     const { userId, title, message, type } = body;
 
-    if (!userId || !title || !message) {
+    if (!userId || !title?.trim() || !message?.trim()) {
       return NextResponse.json(
         {
           success: false,
@@ -108,6 +143,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه کاربر نامعتبر است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
+
+    const userExists = await User.findById(userId);
+
+    if (!userExists) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "کاربر پیدا نشد",
+        },
+        {
+          status: 404,
+        },
+      );
+    }
+
     const allowedTypes = ["reservation", "message", "offer", "system"];
 
     const notificationType = allowedTypes.includes(type) ? type : "system";
@@ -115,24 +176,27 @@ export async function POST(request: NextRequest) {
     const notification = await Notification.create({
       userId,
 
-      title,
+      title: title.trim(),
 
-      message,
+      message: message.trim(),
 
       type: notificationType,
 
       isRead: false,
     });
 
-    return NextResponse.json({
-      success: true,
-
-      message: "اعلان ایجاد شد",
-
-      notification,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "اعلان ایجاد شد",
+        notification,
+      },
+      {
+        status: 201,
+      },
+    );
   } catch (error) {
-    console.error("ADMIN CREATE NOTIFICATION ERROR", error);
+    console.error("ADMIN CREATE NOTIFICATION ERROR:", error);
 
     return NextResponse.json(
       {

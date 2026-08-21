@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { toGregorian } from "jalaali-js";
 import mongoose, { FilterQuery } from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
@@ -9,8 +8,10 @@ import { verifyToken } from "@/app/lib/auth";
 import User from "@/app/models/User";
 import Property from "@/app/models/Property";
 import Reservation from "@/app/models/Reservation";
+import Notification from "@/app/models/Notification";
 
 import { checkReservationConflict } from "@/app/lib/reservation/checkAvailability";
+import { toGregorian } from "jalaali-js";
 
 // ===============================
 // ADMIN AUTH
@@ -25,7 +26,10 @@ async function checkAdmin() {
     throw new Error("Unauthorized");
   }
 
-  const user = verifyToken(token);
+  const user = verifyToken(token) as {
+    id: string;
+    role: string;
+  };
 
   if (!user || user.role !== "admin") {
     throw new Error("Forbidden");
@@ -83,13 +87,13 @@ function normalizeDate(value: string) {
 // ===============================
 
 function jalaliToDate(value: string) {
-  const date = normalizeDate(value).split("/").map(Number);
+  const parts = normalizeDate(value).split("/").map(Number);
 
-  if (date.length !== 3) {
+  if (parts.length !== 3) {
     return null;
   }
 
-  const [year, month, day] = date;
+  const [year, month, day] = parts;
 
   if (!year || !month || !day) {
     return null;
@@ -118,6 +122,9 @@ function calculateNights(checkIn: string, checkOut: string) {
 
   return nights > 0 ? nights : 1;
 }
+// ===============================
+// GET RESERVATIONS
+// ===============================
 
 export async function GET(request: NextRequest) {
   try {
@@ -127,75 +134,243 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const search = searchParams.get("search") || "";
-
     const status = searchParams.get("status") || "";
+    const checkIn = searchParams.get("checkIn") || "";
+    const checkOut = searchParams.get("checkOut") || "";
 
     const page = Number(searchParams.get("page")) || 1;
-
     const limit = Number(searchParams.get("limit")) || 10;
-
     const skip = (page - 1) * limit;
 
     const query: FilterQuery<typeof Reservation> = {};
+
+    // ===============================
+    // STATUS
+    // ===============================
 
     if (status) {
       query.status = status;
     }
 
-    if (search) {
+    // ===============================
+    // CHECK IN FILTER
+    // ===============================
+
+    if (checkIn.trim()) {
+      const normalizedCheckIn = normalizeDate(checkIn);
+
+      if (normalizedCheckIn) {
+        query.checkIn = normalizedCheckIn;
+      }
+    }
+
+    // ===============================
+    // CHECK OUT FILTER
+    // ===============================
+
+    if (checkOut.trim()) {
+      const normalizedCheckOut = normalizeDate(checkOut);
+
+      if (normalizedCheckOut) {
+        query.checkOut = normalizedCheckOut;
+      }
+    }
+
+    // ===============================
+    // SEARCH
+    // ===============================
+
+    if (search.trim()) {
+      const cleanSearch = search.trim();
+
+      // تبدیل اعداد فارسی به انگلیسی
+      const normalizedSearch = normalizeNumber(cleanSearch);
+
+      // ===============================
+      // USER SEARCH
+      // ===============================
+
+      const searchParts = cleanSearch.split(/\s+/);
+
+      const userConditions: FilterQuery<typeof User>[] = [
+        {
+          name: {
+            $regex: cleanSearch,
+            $options: "i",
+          },
+        },
+        {
+          lastName: {
+            $regex: cleanSearch,
+            $options: "i",
+          },
+        },
+        {
+          phoneNumber: {
+            $regex: cleanSearch,
+            $options: "i",
+          },
+        },
+        {
+          email: {
+            $regex: cleanSearch,
+            $options: "i",
+          },
+        },
+      ];
+
+      // نام + نام خانوادگی
+      if (searchParts.length >= 2) {
+        userConditions.push(
+          {
+            $and: [
+              {
+                name: {
+                  $regex: searchParts[0],
+                  $options: "i",
+                },
+              },
+              {
+                lastName: {
+                  $regex: searchParts[1],
+                  $options: "i",
+                },
+              },
+            ],
+          },
+          {
+            $and: [
+              {
+                name: {
+                  $regex: searchParts[1],
+                  $options: "i",
+                },
+              },
+              {
+                lastName: {
+                  $regex: searchParts[0],
+                  $options: "i",
+                },
+              },
+            ],
+          },
+        );
+      }
+
       const users = await User.find({
-        $or: [
-          {
-            name: {
-              $regex: search,
-              $options: "i",
-            },
-          },
-
-          {
-            lastName: {
-              $regex: search,
-              $options: "i",
-            },
-          },
-
-          {
-            phoneNumber: {
-              $regex: search,
-              $options: "i",
-            },
-          },
-        ],
+        $or: userConditions,
       }).select("_id");
 
-      const userIds = users.map((u) => u._id);
+      const userIds = users.map((user) => user._id);
+
+      // ===============================
+      // PROPERTY SEARCH
+      // ===============================
 
       const properties = await Property.find({
         title: {
-          $regex: search,
+          $regex: cleanSearch,
           $options: "i",
         },
       }).select("_id");
 
-      const propertyIds = properties.map((p) => p._id);
+      const propertyIds = properties.map((property) => property._id);
 
-      query.$or = [
-        {
+      // ===============================
+      // SEARCH CONDITIONS
+      // ===============================
+
+      const searchConditions: FilterQuery<typeof Reservation>[] = [];
+
+      // USER
+      if (userIds.length > 0) {
+        searchConditions.push({
           userId: {
             $in: userIds,
           },
-        },
+        });
+      }
 
-        {
+      // PROPERTY
+      if (propertyIds.length > 0) {
+        searchConditions.push({
           propertyId: {
             $in: propertyIds,
           },
-        },
-      ];
+        });
+      }
+
+      // ===============================
+      // AMOUNT SEARCH
+      // ===============================
+
+      const amountString = normalizedSearch.replace(/[^\d]/g, "");
+
+      if (amountString) {
+        const amount = Number(amountString);
+
+        if (Number.isFinite(amount)) {
+          console.log("SEARCH AMOUNT:", {
+            original: cleanSearch,
+            normalized: normalizedSearch,
+            amount,
+          });
+
+          searchConditions.push({
+            amount: amount,
+          });
+        }
+      }
+
+      // ===============================
+      // DATE SEARCH
+      // ===============================
+
+      const normalizedSearchDate = normalizeDate(cleanSearch);
+
+      if (normalizedSearchDate) {
+        searchConditions.push(
+          {
+            checkIn: normalizedSearchDate,
+          },
+          {
+            checkOut: normalizedSearchDate,
+          },
+        );
+      }
+
+      // ===============================
+      // APPLY SEARCH
+      // ===============================
+
+      if (searchConditions.length > 0) {
+        query.$or = searchConditions;
+      } else {
+        // هیچ نتیجه‌ای برای عبارت جستجو وجود ندارد
+        query._id = new mongoose.Types.ObjectId();
+      }
     }
 
+    // ===============================
+    // DEBUG
+    // ===============================
+
+    console.log("========== RESERVATION SEARCH ==========");
+    console.log({
+      search,
+      normalizedSearch: normalizeNumber(search),
+      checkIn,
+      checkOut,
+      status,
+      query,
+    });
+
+    // ===============================
+    // GET DATA
+    // ===============================
+
     const reservations = await Reservation.find(query)
-      .populate("userId", "name lastName phoneNumber")
+      .populate("userId", "name lastName phoneNumber email")
       .populate("propertyId", "title location")
       .sort({
         createdAt: -1,
@@ -203,13 +378,19 @@ export async function GET(request: NextRequest) {
       .skip(skip)
       .limit(limit);
 
+    // ===============================
+    // TOTAL
+    // ===============================
+
     const total = await Reservation.countDocuments(query);
+
+    // ===============================
+    // RESPONSE
+    // ===============================
 
     return NextResponse.json({
       success: true,
-
       reservations,
-
       pagination: {
         page,
         limit,
@@ -218,12 +399,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("GET RESERVATION ERROR", error);
+    console.error("GET RESERVATIONS ERROR", error);
 
     return NextResponse.json(
       {
         success: false,
-
         message: "خطا در دریافت رزروها",
       },
       {
@@ -233,46 +413,74 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// =====================================
+// ===============================
 // CREATE RESERVATION
-// =====================================
+// ===============================
 
 export async function POST(request: NextRequest) {
   try {
     await checkAdmin();
-
     await connectDB();
 
     const body = await request.json();
 
     const { userId, propertyId, checkIn, checkOut, amount, status } = body;
 
-    const normalizedCheckIn = normalizeDate(String(checkIn));
+    // ===============================
+    // DATE
+    // ===============================
 
-    const normalizedCheckOut = normalizeDate(String(checkOut));
+    const normalizedCheckIn = normalizeDate(String(checkIn ?? ""));
+    const normalizedCheckOut = normalizeDate(String(checkOut ?? ""));
+
+    console.log("========== CREATE DATE ==========");
+    console.log({
+      receivedCheckIn: checkIn,
+      receivedCheckOut: checkOut,
+      normalizedCheckIn,
+      normalizedCheckOut,
+    });
+
+    // ===============================
+    // VALIDATION
+    // ===============================
 
     if (!userId || !propertyId || !normalizedCheckIn || !normalizedCheckOut) {
       return NextResponse.json(
         {
           success: false,
-
           message: "اطلاعات رزرو ناقص است",
         },
-        {
-          status: 400,
-        },
+        { status: 400 },
       );
     }
 
-    // =========================
-    // CHECK CONFLICT
-    // =========================
+    // ===============================
+    // JALALI DATE FORMAT
+    // ===============================
+
+    const jalaliDateRegex = /^\d{4}\/\d{2}\/\d{2}$/;
+
+    if (
+      !jalaliDateRegex.test(normalizedCheckIn) ||
+      !jalaliDateRegex.test(normalizedCheckOut)
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "فرمت تاریخ باید به صورت جلالی YYYY/MM/DD باشد",
+        },
+        { status: 400 },
+      );
+    }
+
+    // ===============================
+    // CONFLICT
+    // ===============================
 
     const conflict = await checkReservationConflict({
       propertyId: String(propertyId),
-
       checkIn: normalizedCheckIn,
-
       checkOut: normalizedCheckOut,
     });
 
@@ -280,71 +488,103 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-
           message: "این ملک در این بازه زمانی قبلاً رزرو شده است",
         },
-        {
-          status: 409,
-        },
+        { status: 409 },
       );
     }
-    const reservationUser = await User.findById(userId);
 
-    if (!reservationUser) {
+    // ===============================
+    // USER
+    // ===============================
+
+    const user = await User.findById(userId);
+
+    if (!user) {
       return NextResponse.json(
         {
           success: false,
           message: "کاربر پیدا نشد",
         },
-        {
-          status: 404,
-        },
+        { status: 404 },
       );
     }
+
+    // ===============================
+    // NIGHTS
+    // ===============================
+
+    const nights = calculateNights(normalizedCheckIn, normalizedCheckOut);
+
+    // ===============================
+    // CREATE
+    // ===============================
+
     const reservation = await Reservation.create({
       userId,
       propertyId,
 
+      // مهم:
+      // در دیتابیس تاریخ جلالی String ذخیره می‌شود
       checkIn: normalizedCheckIn,
       checkOut: normalizedCheckOut,
 
       contact: {
-        phone: reservationUser.phoneNumber,
-        email: reservationUser.email,
+        phone: user.phoneNumber,
+        email: user.email,
       },
 
-      nights: calculateNights(normalizedCheckIn, normalizedCheckOut),
-
+      nights,
       amount: Number(amount) || 0,
-
       status: status || "pending",
     });
 
-    return NextResponse.json({
-      success: true,
-
-      message: "رزرو ایجاد شد",
-
-      reservation,
+    console.log("========== CREATED RESERVATION ==========");
+    console.log({
+      checkIn: reservation.checkIn,
+      checkOut: reservation.checkOut,
     });
+
+    // ===============================
+    // NOTIFICATION
+    // ===============================
+
+    await Notification.create({
+      userId,
+      title: "رزرو جدید ثبت شد",
+      message: "رزرو شما با موفقیت ثبت شد",
+      type: "reservation",
+      isRead: false,
+    });
+
+    // ===============================
+    // RESPONSE
+    // ===============================
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "رزرو ایجاد شد",
+        reservation,
+      },
+      { status: 201 },
+    );
   } catch (error) {
-    console.error("CREATE RESERVATION ERROR", error);
+    console.error("CREATE RESERVATION ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
         message: "خطا در ایجاد رزرو",
       },
-      {
-        status: 500,
-      },
+      { status: 500 },
     );
   }
 }
 
-// =====================================
+// ===============================
 // UPDATE RESERVATION
-// =====================================
+// ===============================
 
 export async function PUT(
   request: NextRequest,
@@ -356,6 +596,7 @@ export async function PUT(
 ) {
   try {
     await checkAdmin();
+
     await connectDB();
 
     const { id } = await context.params;
@@ -376,10 +617,6 @@ export async function PUT(
       );
     }
 
-    // =========================
-    // NEW VALUES
-    // =========================
-
     const newCheckIn = body.checkIn
       ? normalizeDate(String(body.checkIn))
       : reservation.checkIn;
@@ -391,17 +628,6 @@ export async function PUT(
     const newPropertyId = body.propertyId
       ? String(body.propertyId)
       : String(reservation.propertyId);
-
-    console.log("UPDATE CONFLICT CHECK", {
-      id,
-      propertyId: newPropertyId,
-      checkIn: newCheckIn,
-      checkOut: newCheckOut,
-    });
-
-    // =========================
-    // CHECK CONFLICT
-    // =========================
 
     const conflict = await checkReservationConflict({
       propertyId: newPropertyId,
@@ -425,51 +651,49 @@ export async function PUT(
       );
     }
 
-    // =========================
-    // UPDATE USER
-    // =========================
-
     if (body.userId) {
       reservation.userId = body.userId;
     }
 
-    // =========================
-    // UPDATE PROPERTY
-    // =========================
-
     reservation.propertyId = new mongoose.Types.ObjectId(newPropertyId);
-
-    // =========================
-    // UPDATE DATE
-    // =========================
 
     reservation.checkIn = newCheckIn;
 
     reservation.checkOut = newCheckOut;
 
-    // =========================
-    // NIGHTS
-    // =========================
-
     reservation.nights = calculateNights(newCheckIn, newCheckOut);
-
-    // =========================
-    // AMOUNT
-    // =========================
 
     if (body.amount !== undefined) {
       reservation.amount = Number(body.amount) || 0;
     }
 
-    // =========================
-    // STATUS
-    // =========================
+    let statusChanged = false;
 
     if (body.status) {
+      statusChanged = reservation.status !== body.status;
+
       reservation.status = body.status;
     }
 
     await reservation.save();
+
+    // ===============================
+    // NOTIFICATION UPDATE
+    // ===============================
+
+    if (statusChanged) {
+      await Notification.create({
+        userId: reservation.userId,
+
+        title: "وضعیت رزرو تغییر کرد",
+
+        message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+
+        type: "reservation",
+
+        isRead: false,
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -492,9 +716,10 @@ export async function PUT(
     );
   }
 }
-// =====================================
+
+// ===============================
 // DELETE RESERVATION
-// =====================================
+// ===============================
 
 export async function DELETE(
   request: NextRequest,
@@ -511,26 +736,12 @@ export async function DELETE(
 
     const { id } = await context.params;
 
-    if (!id) {
-      return NextResponse.json(
-        {
-          success: false,
-
-          message: "شناسه رزرو ارسال نشده است",
-        },
-        {
-          status: 400,
-        },
-      );
-    }
-
-    const reservation = await Reservation.findByIdAndDelete(id);
+    const reservation = await Reservation.findById(id);
 
     if (!reservation) {
       return NextResponse.json(
         {
           success: false,
-
           message: "رزرو پیدا نشد",
         },
         {
@@ -538,6 +749,24 @@ export async function DELETE(
         },
       );
     }
+
+    await Reservation.findByIdAndDelete(id);
+
+    // ===============================
+    // NOTIFICATION DELETE
+    // ===============================
+
+    await Notification.create({
+      userId: reservation.userId,
+
+      title: "رزرو حذف شد",
+
+      message: "رزرو شما توسط مدیریت حذف شد",
+
+      type: "reservation",
+
+      isRead: false,
+    });
 
     return NextResponse.json({
       success: true,
@@ -550,7 +779,6 @@ export async function DELETE(
     return NextResponse.json(
       {
         success: false,
-
         message: "خطا در حذف رزرو",
       },
       {

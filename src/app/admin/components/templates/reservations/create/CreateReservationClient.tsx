@@ -189,6 +189,15 @@ function getUserLabel(user: UserItem) {
   return name || "بدون نام";
 }
 
+//==================
+function normalizePersianDate(value: string) {
+  if (!value) return "";
+
+  return value
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/-/g, "/")
+    .trim();
+}
 // =========================
 // COMPONENT
 // =========================
@@ -270,77 +279,72 @@ export default function CreateReservationClient() {
     if (!form.userId) {
       await Swal.fire({
         icon: "warning",
-
         title: "کاربر را انتخاب کنید",
-
         confirmButtonText: "باشه",
       });
-
       return;
     }
 
     if (!form.propertyId) {
       await Swal.fire({
         icon: "warning",
-
         title: "ملک را انتخاب کنید",
-
         confirmButtonText: "باشه",
       });
-
       return;
     }
 
     if (!form.checkIn || !form.checkOut) {
       await Swal.fire({
         icon: "warning",
-
         title: "تاریخ ورود و خروج را وارد کنید",
-
         confirmButtonText: "باشه",
       });
-
       return;
     }
 
     if (form.nights <= 0) {
       await Swal.fire({
         icon: "warning",
-
         title: "تعداد شب معتبر نیست",
-
         text: "تاریخ خروج باید بعد از تاریخ ورود باشد",
-
         confirmButtonText: "باشه",
       });
-
       return;
     }
 
     if (form.amount <= 0) {
       await Swal.fire({
         icon: "warning",
-
         title: "مبلغ را وارد کنید",
-
         confirmButtonText: "باشه",
       });
-
       return;
     }
 
     try {
       setSaving(true);
 
-      const result = await createReservation(form);
+      const payload: CreateReservationForm = {
+        userId: form.userId,
+        propertyId: form.propertyId,
+
+        checkIn: normalizePersianDate(form.checkIn),
+        checkOut: normalizePersianDate(form.checkOut),
+
+        nights: form.nights,
+        amount: form.amount,
+        status: form.status,
+      };
+
+      console.log("SEND RESERVATION:", payload);
+
+      const result = await createReservation(payload);
 
       await Swal.fire({
         icon: "success",
-
         title: "موفق شد",
-
         text: result.message || "رزرو با موفقیت ایجاد شد",
-
         confirmButtonText: "باشه",
       });
 
@@ -354,18 +358,14 @@ export default function CreateReservationClient() {
     } catch (error) {
       await Swal.fire({
         icon: "error",
-
         title: "خطا",
-
         text: error instanceof Error ? error.message : "خطا در ایجاد رزرو",
-
         confirmButtonText: "باشه",
       });
     } finally {
       setSaving(false);
     }
   }
-
   // =========================
   // RENDER
   // =========================

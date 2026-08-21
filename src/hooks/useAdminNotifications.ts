@@ -9,15 +9,21 @@ export interface AdminNotification {
 
   userId: {
     _id: string;
-    name: string;
-    lastName: string;
-    phoneNumber: string;
+
+    name?: string;
+
+    lastName?: string;
+
+    phoneNumber?: string;
+
+    email?: string;
   } | null;
 
   title: string;
 
   message: string;
 
+  // شامل اعلان‌های رزرو ساخته شده توسط سیستم هم می‌شود
   type: "reservation" | "message" | "offer" | "system";
 
   isRead: boolean;
@@ -40,7 +46,9 @@ interface NotificationsResponse {
 async function getAdminNotifications(): Promise<AdminNotification[]> {
   const res = await fetch("/api/admin/notifications", {
     method: "GET",
+
     credentials: "include",
+
     cache: "no-store",
   });
 

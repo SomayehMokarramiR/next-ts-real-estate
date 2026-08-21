@@ -9,7 +9,7 @@ import {
 } from "@/services/settingsService";
 
 // =========================
-// Get Settings
+// GET SETTINGS
 // =========================
 
 export function useSettings() {
@@ -23,7 +23,7 @@ export function useSettings() {
 }
 
 // =========================
-// Update Settings
+// UPDATE SETTINGS
 // =========================
 
 export function useUpdateSettings() {

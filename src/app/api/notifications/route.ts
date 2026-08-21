@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
+
 import { cookies } from "next/headers";
+
 import mongoose from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
+
 import { verifyToken } from "@/app/lib/auth";
 
 import Notification from "@/app/models/Notification";
+
 import User from "@/app/models/User";
 
 // =========================
@@ -89,7 +93,7 @@ export async function GET() {
 }
 
 // =========================
-// CREATE NOTIFICATION
+// CREATE NOTIFICATION (ADMIN)
 // =========================
 
 export async function POST(req: Request) {
@@ -184,6 +188,13 @@ export async function POST(req: Request) {
       );
     }
 
+    // فقط اعلان‌های دستی مجاز از پنل ادمین
+    // رزرو فقط از سیستم رزرو ساخته می‌شود
+
+    const allowedTypes = ["system", "message", "offer"];
+
+    const notificationType = allowedTypes.includes(type) ? type : "system";
+
     const notification = await Notification.create({
       userId: targetUser._id,
 
@@ -191,7 +202,7 @@ export async function POST(req: Request) {
 
       message,
 
-      type: type || "system",
+      type: notificationType,
 
       isRead: false,
     });
@@ -212,7 +223,6 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-
         message: error instanceof Error ? error.message : "خطا در ایجاد اعلان",
       },
       {

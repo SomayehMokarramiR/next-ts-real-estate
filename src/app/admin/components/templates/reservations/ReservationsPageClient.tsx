@@ -1,5 +1,6 @@
 "use client";
 
+import { toJalaali } from "jalaali-js";
 import { Eye, Pencil, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -49,18 +50,14 @@ interface AdminReservation {
 
 interface ReservationsResponse {
   success: boolean;
-
   reservations: AdminReservation[];
-
-  total: number;
-
-  totalPages: number;
-
-  currentPage: number;
-
-  limit: number;
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
-
 // =========================
 // GET RESERVATIONS
 // =========================
@@ -165,6 +162,52 @@ function getStatusClass(status: AdminReservation["status"]): string {
       return "bg-gray-400 text-white";
   }
 }
+//===============================
+
+function toPersianNumber(value: string) {
+  return value.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+}
+
+function formatJalaliDate(date?: string) {
+  if (!date) return "-";
+
+  const value = String(date).trim();
+
+  // اگر تاریخ از قبل شمسی باشد
+  // مثال: 1405/02/01
+  const jalaliMatch = value.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+
+  if (jalaliMatch) {
+    const year = Number(jalaliMatch[1]);
+
+    // سال‌های شمسی
+    if (year >= 1300 && year <= 1500) {
+      const month = jalaliMatch[2].padStart(2, "0");
+      const day = jalaliMatch[3].padStart(2, "0");
+
+      return `${toPersianNumber(String(year))}/${toPersianNumber(
+        month,
+      )}/${toPersianNumber(day)}`;
+    }
+  }
+
+  // اگر تاریخ میلادی / ISO باشد
+  const parsedDate = new Date(value);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    const { jy, jm, jd } = toJalaali(
+      parsedDate.getFullYear(),
+      parsedDate.getMonth() + 1,
+      parsedDate.getDate(),
+    );
+
+    return `${toPersianNumber(String(jy))}/${toPersianNumber(
+      String(jm).padStart(2, "0"),
+    )}/${toPersianNumber(String(jd).padStart(2, "0"))}`;
+  }
+
+  return value;
+}
 
 // =========================
 // COMPONENT
@@ -206,7 +249,7 @@ export default function ReservationsPageClient() {
 
   const reservations = data?.reservations ?? [];
 
-  const totalPages = Math.max(data?.totalPages ?? 1, 1);
+  const totalPages = Math.max(data?.pagination?.pages ?? 1, 1);
 
   // =========================
   // RESET FILTERS
@@ -540,13 +583,13 @@ export default function ReservationsPageClient() {
                     {/* CHECK IN */}
 
                     <td className="whitespace-nowrap p-4 dark:text-white">
-                      {item.checkIn || "-"}
+                      {formatJalaliDate(item.checkIn)}
                     </td>
 
                     {/* CHECK OUT */}
 
                     <td className="whitespace-nowrap p-4 dark:text-white">
-                      {item.checkOut || "-"}
+                      {formatJalaliDate(item.checkOut)}
                     </td>
 
                     {/* NIGHTS */}

@@ -33,15 +33,11 @@ interface NotificationTableProps {
 }
 
 const typeLabels: Record<string, string> = {
-  reservation: "رزرو",
-
-  message: "پیام",
-
-  offer: "پیشنهاد",
-
-  system: "سیستم",
+  reservation: "وضعیت رزرو",
+  message: "پیام کاربری",
+  offer: "پیشنهادها و تخفیف‌ها",
+  system: "پیام سیستم",
 };
-
 const getTypeLabel = (type?: string) => {
   if (!type) return "-";
 

@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
+
 import { cookies } from "next/headers";
 
+import mongoose from "mongoose";
+
 import { connectDB } from "@/app/lib/mongodb";
+
 import { verifyToken } from "@/app/lib/auth";
+
 import Notification from "@/app/models/Notification";
+
+import User from "@/app/models/User";
 
 // ===============================
 // CHECK ADMIN
@@ -18,9 +25,21 @@ async function checkAdmin() {
     throw new Error("Unauthorized");
   }
 
-  const user = verifyToken(token);
+  const decoded = verifyToken(token) as {
+    id: string;
+  };
 
-  if (!user || user.role !== "admin") {
+  if (!decoded?.id) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = await User.findById(decoded.id);
+
+  if (!user) {
+    throw new Error("UserNotFound");
+  }
+
+  if (user.role !== "admin") {
     throw new Error("Forbidden");
   }
 
@@ -28,8 +47,7 @@ async function checkAdmin() {
 }
 
 // ===============================
-// UPDATE NOTIFICATION STATUS
-// PATCH /api/admin/notifications/:id
+// PATCH UPDATE NOTIFICATION
 // ===============================
 
 export async function PATCH(
@@ -41,17 +59,17 @@ export async function PATCH(
   },
 ) {
   try {
-    await checkAdmin();
-
     await connectDB();
+
+    await checkAdmin();
 
     const { id } = await context.params;
 
-    if (!id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
-          message: "شناسه اعلان ارسال نشده",
+          message: "شناسه اعلان نامعتبر است",
         },
         {
           status: 400,
@@ -63,13 +81,11 @@ export async function PATCH(
 
     const notification = await Notification.findByIdAndUpdate(
       id,
-
       {
         ...(typeof body.isRead === "boolean" && {
           isRead: body.isRead,
         }),
       },
-
       {
         new: true,
       },
@@ -87,36 +103,42 @@ export async function PATCH(
       );
     }
 
-    return NextResponse.json({
-      success: true,
-
-      notification,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        notification,
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.error("ADMIN UPDATE NOTIFICATION ERROR:", error);
 
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "دسترسی غیرمجاز",
-        },
-        {
-          status: 401,
-        },
-      );
-    }
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "دسترسی غیرمجاز",
+          },
+          {
+            status: 401,
+          },
+        );
+      }
 
-    if (error instanceof Error && error.message === "Forbidden") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "دسترسی ادمین لازم است",
-        },
-        {
-          status: 403,
-        },
-      );
+      if (error.message === "Forbidden") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "دسترسی ادمین لازم است",
+          },
+          {
+            status: 403,
+          },
+        );
+      }
     }
 
     return NextResponse.json(
@@ -133,7 +155,6 @@ export async function PATCH(
 
 // ===============================
 // DELETE NOTIFICATION
-// DELETE /api/admin/notifications/:id
 // ===============================
 
 export async function DELETE(
@@ -145,17 +166,17 @@ export async function DELETE(
   },
 ) {
   try {
-    await checkAdmin();
-
     await connectDB();
+
+    await checkAdmin();
 
     const { id } = await context.params;
 
-    if (!id) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json(
         {
           success: false,
-          message: "شناسه اعلان ارسال نشده",
+          message: "شناسه اعلان نامعتبر است",
         },
         {
           status: 400,
@@ -177,13 +198,43 @@ export async function DELETE(
       );
     }
 
-    return NextResponse.json({
-      success: true,
-
-      message: "اعلان حذف شد",
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "اعلان حذف شد",
+      },
+      {
+        status: 200,
+      },
+    );
   } catch (error) {
     console.error("ADMIN DELETE NOTIFICATION ERROR:", error);
+
+    if (error instanceof Error) {
+      if (error.message === "Unauthorized") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "دسترسی غیرمجاز",
+          },
+          {
+            status: 401,
+          },
+        );
+      }
+
+      if (error.message === "Forbidden") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "دسترسی ادمین لازم است",
+          },
+          {
+            status: 403,
+          },
+        );
+      }
+    }
 
     return NextResponse.json(
       {

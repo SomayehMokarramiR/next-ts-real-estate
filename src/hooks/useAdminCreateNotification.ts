@@ -11,7 +11,9 @@ export interface CreateNotificationPayload {
 
   message: string;
 
-  type: "reservation" | "message" | "offer" | "system";
+  // اعلان‌های دستی پنل ادمین
+  // رزرو از سیستم رزرو ساخته می‌شود
+  type: "message" | "offer" | "system";
 }
 
 interface CreateNotificationResponse {

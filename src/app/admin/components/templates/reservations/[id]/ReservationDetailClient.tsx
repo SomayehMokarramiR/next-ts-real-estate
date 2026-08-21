@@ -156,6 +156,9 @@ function formatAmount(amount: number) {
   return `${Number(amount || 0).toLocaleString("fa-IR")} تومان`;
 }
 
+function toPersianNumber(value: string) {
+  return value.replace(/\d/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+}
 // =========================
 // COMPONENT
 // =========================
@@ -424,9 +427,15 @@ export default function ReservationDetailClient({
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
-          <InfoBox label="تاریخ ورود" value={reservation.checkIn || "-"} />
+          <InfoBox
+            label="تاریخ ورود"
+            value={toPersianNumber(reservation.checkIn || "-")}
+          />
 
-          <InfoBox label="تاریخ خروج" value={reservation.checkOut || "-"} />
+          <InfoBox
+            label="تاریخ خروج"
+            value={toPersianNumber(reservation.checkOut || "-")}
+          />
 
           <InfoBox label="تعداد شب" value={`${reservation.nights ?? 0} شب`} />
         </div>

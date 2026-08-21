@@ -43,7 +43,7 @@ export default function SettingsPage() {
   const settings = data?.settings;
 
   const updateNotification = (
-    key: "reservation" | "messages" | "offers",
+    key: "reservation" | "messages" | "offers" | "system",
     value: boolean,
   ) => {
     if (!settings) return;
@@ -51,7 +51,6 @@ export default function SettingsPage() {
     updateMutation.mutate({
       notifications: {
         ...settings.notifications,
-
         [key]: value,
       },
     });
@@ -210,7 +209,6 @@ export default function SettingsPage() {
             checked={settings?.notifications.messages ?? false}
             onChange={(value) => updateNotification("messages", value)}
           />
-
           <SettingSwitch
             title="پیشنهادها و تخفیف‌ها"
             description="دریافت پیشنهادهای ویژه"

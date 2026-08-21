@@ -1,10 +1,37 @@
 import { NextResponse } from "next/server";
-import { toGregorian } from "jalaali-js";
+import { cookies } from "next/headers";
 import mongoose from "mongoose";
+import { toGregorian } from "jalaali-js";
 
 import { connectDB } from "../../../../lib/mongodb";
+import { verifyToken } from "../../../../lib/auth";
+
 import Reservation from "../../../../models/Reservation";
+import Notification from "../../../../models/Notification";
+
 import { checkReservationConflict } from "../../../../lib/reservation/checkAvailability";
+
+// =========================
+// ADMIN CHECK
+// =========================
+
+async function checkAdmin() {
+  const cookieStore = await cookies();
+
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    throw new Error("Unauthorized");
+  }
+
+  const user = verifyToken(token) as {
+    role?: string;
+  };
+
+  if (!user || user.role !== "admin") {
+    throw new Error("Forbidden");
+  }
+}
 
 // =========================
 // Normalize Date
@@ -49,16 +76,19 @@ function calculateNights(checkIn: string, checkOut: string) {
 }
 
 // =========================
-// GET
+// GET ONE RESERVATION
 // =========================
 
 export async function GET(
   _request: Request,
   context: {
-    params: Promise<{ id: string }>;
+    params: Promise<{
+      id: string;
+    }>;
   },
 ) {
   try {
+    await checkAdmin();
     await connectDB();
 
     const { id } = await context.params;
@@ -81,6 +111,7 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
+
       reservation,
     });
   } catch (error) {
@@ -99,16 +130,19 @@ export async function GET(
 }
 
 // =========================
-// PUT UPDATE
+// UPDATE
 // =========================
 
 export async function PUT(
   request: Request,
   context: {
-    params: Promise<{ id: string }>;
+    params: Promise<{
+      id: string;
+    }>;
   },
 ) {
   try {
+    await checkAdmin();
     await connectDB();
 
     const { id } = await context.params;
@@ -129,6 +163,8 @@ export async function PUT(
       );
     }
 
+    const oldStatus = reservation.status;
+
     const newCheckIn = body.checkIn
       ? String(body.checkIn)
       : reservation.checkIn;
@@ -140,13 +176,6 @@ export async function PUT(
     const newPropertyId = body.propertyId
       ? String(body.propertyId)
       : reservation.propertyId.toString();
-
-    console.log("CHECK CONFLICT DATA =>", {
-      id,
-      newPropertyId,
-      newCheckIn,
-      newCheckOut,
-    });
 
     const conflict = await checkReservationConflict({
       propertyId: newPropertyId,
@@ -165,12 +194,10 @@ export async function PUT(
           message: "این ملک در این بازه زمانی قبلاً رزرو شده است",
         },
         {
-          status: 400,
+          status: 409,
         },
       );
     }
-
-    // DATE
 
     if (body.checkIn) {
       reservation.checkIn = String(body.checkIn);
@@ -180,38 +207,44 @@ export async function PUT(
       reservation.checkOut = String(body.checkOut);
     }
 
-    // PROPERTY
-
     if (body.propertyId) {
       reservation.propertyId = new mongoose.Types.ObjectId(body.propertyId);
     }
 
-    // USER
-
     if (body.userId) {
       reservation.userId = new mongoose.Types.ObjectId(body.userId);
     }
-
-    // NIGHTS
 
     reservation.nights = calculateNights(
       reservation.checkIn,
       reservation.checkOut,
     );
 
-    // AMOUNT
-
     if (body.amount !== undefined) {
       reservation.amount = Number(body.amount);
     }
-
-    // STATUS
 
     if (body.status) {
       reservation.status = body.status;
     }
 
     await reservation.save();
+
+    // اعلان تغییر وضعیت
+
+    if (body.status && body.status !== oldStatus) {
+      await Notification.create({
+        userId: reservation.userId,
+
+        title: "تغییر وضعیت رزرو",
+
+        message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+
+        type: "reservation",
+
+        isRead: false,
+      });
+    }
 
     return NextResponse.json({
       success: true,
@@ -242,15 +275,18 @@ export async function PUT(
 export async function DELETE(
   _request: Request,
   context: {
-    params: Promise<{ id: string }>;
+    params: Promise<{
+      id: string;
+    }>;
   },
 ) {
   try {
+    await checkAdmin();
     await connectDB();
 
     const { id } = await context.params;
 
-    const reservation = await Reservation.findByIdAndDelete(id);
+    const reservation = await Reservation.findById(id);
 
     if (!reservation) {
       return NextResponse.json(
@@ -264,13 +300,29 @@ export async function DELETE(
       );
     }
 
+    await Reservation.findByIdAndDelete(id);
+
+    // اعلان حذف
+
+    await Notification.create({
+      userId: reservation.userId,
+
+      title: "رزرو حذف شد",
+
+      message: "رزرو شما توسط مدیریت حذف شد",
+
+      type: "reservation",
+
+      isRead: false,
+    });
+
     return NextResponse.json({
       success: true,
 
       message: "رزرو حذف شد",
     });
   } catch (error) {
-    console.error(error);
+    console.error("DELETE RESERVATION ERROR", error);
 
     return NextResponse.json(
       {
