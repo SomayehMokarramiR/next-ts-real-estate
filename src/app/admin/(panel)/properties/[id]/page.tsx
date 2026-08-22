@@ -1,4 +1,4 @@
-import PropertyDetailClient from "../../../admin/components/templates/properties/[id]/PropertyDetailClient";
+import PropertyDetailClient from "../../../components/templates/properties/[id]/PropertyDetailClient";
 
 interface Props {
   params: Promise<{

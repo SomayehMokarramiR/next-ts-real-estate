@@ -1,4 +1,4 @@
-import EditPropertyClient from "../../../components/templates/properties/[id]/edit/EditPropertyClient";
+import EditPropertyClient from "../../../../components/templates/properties/[id]/edit/EditPropertyClient";
 
 export default async function Page({
   params,

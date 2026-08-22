@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 
-import AdminGuard from "./AdminGuard";
-import AdminSidebar from "./components/AdminSidebar";
-import AdminHeader from "./components/AdminHeader";
-import { requireAdminPage } from "./adminAuth";
+import AdminGuard from "../AdminGuard";
+import AdminSidebar from "../components/AdminSidebar";
+import AdminHeader from "../components/AdminHeader";
+import { requireAdminPage } from "../adminAuth";
 
 export default async function AdminLayout({
   children,

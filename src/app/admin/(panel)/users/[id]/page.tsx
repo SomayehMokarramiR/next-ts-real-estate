@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 
-import UserDetailClient from "../../../admin/components/templates/users/[id]/UserDetailClient";
+import UserDetailClient from "../../../components/templates/users/[id]/UserDetailClient";
 
 type Props = {
   params: Promise<{
