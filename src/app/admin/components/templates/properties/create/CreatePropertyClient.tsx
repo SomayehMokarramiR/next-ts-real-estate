@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Save, X } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,21 +28,27 @@ type TransactionType = "rent" | "mortgage" | "rent-mortgage" | "sale";
 
 type PropertyStatus = "available" | "reserved" | "inactive";
 
+type BookingType = "daily" | "none";
+
 // =========================
 // FORM TYPE
 // =========================
 
 type CreatePropertyForm = {
   title: string;
+
   description: string;
 
   type: PropertyType | "";
 
-  status: PropertyStatus;
-
   transactionType: TransactionType | "";
 
+  status: PropertyStatus;
+
+  bookingType: BookingType;
+
   city: string;
+
   address: string;
 
   images: string[];
@@ -49,14 +56,19 @@ type CreatePropertyForm = {
   area: string;
 
   sale: string;
+
   monthly: string;
+
   mortgage: string;
 
   bedrooms: string;
-  bathrooms: string;
+
+  bathrooms: boolean;
+
   capacity: string;
 
   parking: boolean;
+
   pool: boolean;
 };
 
@@ -73,15 +85,19 @@ export default function CreatePropertyClient() {
 
   const [form, setForm] = useState<CreatePropertyForm>({
     title: "",
+
     description: "",
 
     type: "",
 
-    status: "available",
-
     transactionType: "",
 
+    status: "available",
+
+    bookingType: "none",
+
     city: "",
+
     address: "",
 
     images: [],
@@ -89,14 +105,19 @@ export default function CreatePropertyClient() {
     area: "",
 
     sale: "",
+
     monthly: "",
+
     mortgage: "",
 
     bedrooms: "",
-    bathrooms: "",
+
+    bathrooms: false,
+
     capacity: "",
 
     parking: false,
+
     pool: false,
   });
 
@@ -111,12 +132,13 @@ export default function CreatePropertyClient() {
 
     setForm((prev) => ({
       ...prev,
+
       [name]: value,
     }));
   }
 
   // =========================
-  // PROPERTY TYPE CHANGE
+  // PROPERTY TYPE
   // =========================
 
   function handlePropertyTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -124,12 +146,13 @@ export default function CreatePropertyClient() {
 
     setForm((prev) => ({
       ...prev,
+
       type: value,
     }));
   }
 
   // =========================
-  // STATUS CHANGE
+  // STATUS
   // =========================
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
@@ -137,12 +160,27 @@ export default function CreatePropertyClient() {
 
     setForm((prev) => ({
       ...prev,
+
       status: value,
     }));
   }
 
   // =========================
-  // TRANSACTION TYPE CHANGE
+  // BOOKING TYPE
+  // =========================
+
+  function handleBookingTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value as BookingType;
+
+    setForm((prev) => ({
+      ...prev,
+
+      bookingType: value,
+    }));
+  }
+
+  // =========================
+  // TRANSACTION TYPE
   // =========================
 
   function handleTransactionTypeChange(
@@ -155,16 +193,13 @@ export default function CreatePropertyClient() {
 
       transactionType,
 
-      // فروش
       sale: transactionType === "sale" ? prev.sale : "",
 
-      // اجاره یا رهن و اجاره
       monthly:
         transactionType === "rent" || transactionType === "rent-mortgage"
           ? prev.monthly
           : "",
 
-      // رهن یا رهن و اجاره
       mortgage:
         transactionType === "mortgage" || transactionType === "rent-mortgage"
           ? prev.mortgage
@@ -176,9 +211,14 @@ export default function CreatePropertyClient() {
   // BOOLEAN CHANGE
   // =========================
 
-  function handleBooleanChange(field: "parking" | "pool", value: boolean) {
+  function handleBooleanChange(
+    field: "parking" | "pool" | "bathrooms",
+
+    value: boolean,
+  ) {
     setForm((prev) => ({
       ...prev,
+
       [field]: value,
     }));
   }
@@ -190,9 +230,7 @@ export default function CreatePropertyClient() {
   async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = Array.from(e.target.files ?? []);
 
-    if (!files.length) {
-      return;
-    }
+    if (!files.length) return;
 
     setUploading(true);
 
@@ -221,32 +259,23 @@ export default function CreatePropertyClient() {
 
       setForm((prev) => ({
         ...prev,
+
         images: [...prev.images, ...urls],
       }));
-
-      Swal.fire({
-        icon: "success",
-        title: "موفق شد",
-        text: "تصاویر با موفقیت آپلود شدند",
-        confirmButtonText: "باشه",
-      });
     } catch (error) {
-      console.error("IMAGE UPLOAD ERROR:", error);
-
       Swal.fire({
         icon: "error",
+
         title: "خطا در آپلود تصویر",
-        text: error instanceof Error ? error.message : "آپلود تصویر انجام نشد",
-        confirmButtonText: "باشه",
+
+        text: error instanceof Error ? error.message : "خطا",
       });
     } finally {
       setUploading(false);
 
-      // امکان انتخاب مجدد همان فایل
       e.target.value = "";
     }
   }
-
   // =========================
   // REMOVE IMAGE
   // =========================
@@ -255,239 +284,12 @@ export default function CreatePropertyClient() {
     setForm((prev) => ({
       ...prev,
 
-      images: prev.images.filter((_, imageIndex) => imageIndex !== index),
+      images: prev.images.filter((_, i) => i !== index),
     }));
   }
 
   // =========================
-  // SUBMIT
-  // =========================
-
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    // =========================
-    // UPLOAD CHECK
-    // =========================
-
-    if (uploading) {
-      Swal.fire({
-        icon: "warning",
-        title: "لطفاً صبر کنید",
-        text: "آپلود تصاویر هنوز تمام نشده است",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    // =========================
-    // MUTATION CHECK
-    // =========================
-
-    if (createMutation.isPending) {
-      return;
-    }
-
-    // =========================
-    // BASIC VALIDATION
-    // =========================
-
-    if (!form.title.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "عنوان ملک را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (!form.type) {
-      Swal.fire({
-        icon: "warning",
-        title: "نوع ملک را انتخاب کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (!form.transactionType) {
-      Swal.fire({
-        icon: "warning",
-        title: "نوع معامله را انتخاب کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (!form.city.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "شهر را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (!form.address.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "آدرس را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    // =========================
-    // PRICE VALIDATION
-    // =========================
-
-    if (form.transactionType === "sale" && !form.sale.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "قیمت فروش را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (
-      (form.transactionType === "rent" ||
-        form.transactionType === "rent-mortgage") &&
-      !form.monthly.trim()
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "اجاره ماهانه را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (
-      (form.transactionType === "mortgage" ||
-        form.transactionType === "rent-mortgage") &&
-      !form.mortgage.trim()
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "مبلغ رهن را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    // =========================
-    // NARROW TYPES
-    // =========================
-
-    const propertyType = form.type as PropertyType;
-
-    const transactionType = form.transactionType as TransactionType;
-
-    const status = form.status as PropertyStatus;
-
-    // =========================
-    // PRICING
-    // =========================
-
-    const pricing = {
-      sale: transactionType === "sale" ? Number(form.sale) || 0 : 0,
-
-      daily: 0,
-
-      monthly:
-        transactionType === "rent" || transactionType === "rent-mortgage"
-          ? Number(form.monthly) || 0
-          : 0,
-
-      mortgage:
-        transactionType === "mortgage" || transactionType === "rent-mortgage"
-          ? Number(form.mortgage) || 0
-          : 0,
-    };
-
-    // =========================
-    // PAYLOAD
-    // =========================
-
-    const payload: CreateAdminPropertyPayload = {
-      title: form.title.trim(),
-
-      description: form.description.trim(),
-
-      type: propertyType,
-
-      transactionType,
-
-      status,
-
-      location: {
-        city: form.city.trim(),
-
-        address: form.address.trim(),
-      },
-
-      images: form.images,
-
-      area: Number(form.area) || 0,
-
-      pricing,
-
-      facilities: {
-        bedrooms: Number(form.bedrooms) || 0,
-
-        bathrooms: Number(form.bathrooms) || 0,
-
-        capacity: Number(form.capacity) || 0,
-
-        parking: form.parking,
-
-        pool: form.pool,
-      },
-    };
-
-    console.log("FINAL CREATE PAYLOAD:", JSON.stringify(payload, null, 2));
-
-    // =========================
-    // CREATE PROPERTY
-    // =========================
-
-    createMutation.mutate(payload, {
-      onSuccess: () => {
-        Swal.fire({
-          icon: "success",
-          title: "موفق شد",
-          text: "ملک با موفقیت اضافه شد",
-          confirmButtonText: "باشه",
-        }).then(() => {
-          router.push("/admin/properties");
-        });
-      },
-
-      onError: (error) => {
-        console.error("CREATE PROPERTY ERROR:", error);
-
-        Swal.fire({
-          icon: "error",
-          title: "خطا",
-          text: error instanceof Error ? error.message : "خطا در ایجاد ملک",
-          confirmButtonText: "باشه",
-        });
-      },
-    });
-  }
-
-  // =========================
-  // PRICE STATES
+  // HELPERS
   // =========================
 
   const isSale = form.transactionType === "sale";
@@ -499,15 +301,166 @@ export default function CreatePropertyClient() {
   const isRentMortgage = form.transactionType === "rent-mortgage";
 
   // =========================
+  // SUBMIT
+  // =========================
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+
+    if (uploading) return;
+
+    if (createMutation.isPending) return;
+
+    if (!form.title.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "عنوان ملک را وارد کنید",
+      });
+
+      return;
+    }
+
+    if (!form.type) {
+      Swal.fire({
+        icon: "warning",
+        title: "نوع ملک را انتخاب کنید",
+      });
+
+      return;
+    }
+
+    if (!form.transactionType) {
+      Swal.fire({
+        icon: "warning",
+        title: "نوع معامله را انتخاب کنید",
+      });
+
+      return;
+    }
+
+    if (!form.city.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "شهر را وارد کنید",
+      });
+
+      return;
+    }
+
+    // =========================
+    // PRICE VALIDATION
+    // =========================
+
+    if (isSale && !form.sale.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "قیمت فروش را وارد کنید",
+      });
+
+      return;
+    }
+
+    if ((isRent || isRentMortgage) && !form.monthly.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "اجاره ماهانه را وارد کنید",
+      });
+
+      return;
+    }
+
+    if ((isMortgage || isRentMortgage) && !form.mortgage.trim()) {
+      Swal.fire({
+        icon: "warning",
+        title: "مبلغ رهن را وارد کنید",
+      });
+
+      return;
+    }
+
+    const payload: CreateAdminPropertyPayload = {
+      title: form.title.trim(),
+
+      description: form.description.trim(),
+
+      type: form.type as PropertyType,
+
+      transactionType: form.transactionType as TransactionType,
+
+      status: form.status,
+
+      bookingType: form.bookingType,
+
+      location: {
+        city: form.city.trim(),
+
+        address: form.address.trim(),
+      },
+
+      images: form.images,
+
+      area: Number(form.area.replace(/\D/g, "")) || 0,
+
+      pricing: {
+        sale: isSale ? Number(form.sale.replace(/\D/g, "")) || 0 : 0,
+
+        monthly:
+          isRent || isRentMortgage
+            ? Number(form.monthly.replace(/\D/g, "")) || 0
+            : 0,
+
+        mortgage:
+          isMortgage || isRentMortgage
+            ? Number(form.mortgage.replace(/\D/g, "")) || 0
+            : 0,
+
+        daily: 0,
+      },
+
+      facilities: {
+        bedrooms: Number(form.bedrooms) || 0,
+        bathrooms: Number(form.bathrooms) || 0,
+        capacity: Number(form.capacity) || 0,
+        parking: form.parking,
+        pool: form.pool,
+      },
+    };
+
+    console.log("FINAL CREATE PAYLOAD", payload);
+
+    createMutation.mutate(payload, {
+      onSuccess: () => {
+        Swal.fire({
+          icon: "success",
+
+          title: "موفق شد",
+
+          text: "ملک ذخیره شد",
+
+          confirmButtonText: "باشه",
+        }).then(() => {
+          router.push("/admin/properties");
+        });
+      },
+
+      onError: (error) => {
+        Swal.fire({
+          icon: "error",
+
+          title: "خطا",
+
+          text: error instanceof Error ? error.message : "خطا در ذخیره ملک",
+        });
+      },
+    });
+  }
+
+  // =========================
   // RENDER
   // =========================
 
   return (
     <div dir="rtl" className="w-full p-6">
-      {/* =========================
-          HEADER
-      ========================= */}
-
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold dark:text-white">
@@ -520,41 +473,29 @@ export default function CreatePropertyClient() {
         <Link
           href="/admin/properties"
           className="
-            flex
-            items-center
-            gap-2
-            rounded-xl
-            bg-gray-200
-            px-4
-            py-2
-            dark:bg-[#444]
-            dark:text-white
-          "
+ flex items-center gap-2
+ rounded-xl bg-gray-200
+ px-4 py-2
+ dark:bg-[#444]
+ dark:text-white
+ "
         >
           <ArrowRight size={18} />
           بازگشت
         </Link>
       </div>
 
-      {/* =========================
-          FORM
-      ========================= */}
-
       <form
         onSubmit={handleSubmit}
         className="
-          space-y-6
-          rounded-2xl
-          bg-white
-          p-6
-          shadow-sm
-          dark:bg-[#353535]
-        "
+ space-y-6
+ rounded-2xl
+ bg-white
+ p-6
+ shadow-sm
+ dark:bg-[#353535]
+ "
       >
-        {/* =========================
-            TITLE
-        ========================= */}
-
         <Input
           label="عنوان ملک"
           name="title"
@@ -562,13 +503,8 @@ export default function CreatePropertyClient() {
           onChange={handleChange}
         />
 
-        {/* =========================
-            PROPERTY TYPE
-        ========================= */}
-
         <SelectInput
           label="نوع ملک"
-          name="type"
           value={form.type}
           onChange={handlePropertyTypeChange}
           options={[
@@ -607,13 +543,8 @@ export default function CreatePropertyClient() {
           ]}
         />
 
-        {/* =========================
-            TRANSACTION TYPE
-        ========================= */}
-
         <SelectInput
           label="نوع معامله"
-          name="transactionType"
           value={form.transactionType}
           onChange={handleTransactionTypeChange}
           options={[
@@ -636,13 +567,24 @@ export default function CreatePropertyClient() {
           ]}
         />
 
-        {/* =========================
-            STATUS
-        ========================= */}
+        <SelectInput
+          label="نوع رزرو"
+          value={form.bookingType}
+          onChange={handleBookingTypeChange}
+          options={[
+            {
+              value: "daily",
+              label: "رزرو روزانه",
+            },
+            {
+              value: "none",
+              label: "بدون رزرو",
+            },
+          ]}
+        />
 
         <SelectInput
           label="وضعیت"
-          name="status"
           value={form.status}
           onChange={handleStatusChange}
           options={[
@@ -661,10 +603,6 @@ export default function CreatePropertyClient() {
           ]}
         />
 
-        {/* =========================
-            LOCATION
-        ========================= */}
-
         <div className="grid gap-4 md:grid-cols-2">
           <Input
             label="شهر"
@@ -681,21 +619,12 @@ export default function CreatePropertyClient() {
           />
         </div>
 
-        {/* =========================
-            AREA
-        ========================= */}
-
         <Input
-          label="متراژ (متر مربع)"
+          label="متراژ"
           name="area"
-          type="number"
           value={form.area}
           onChange={handleChange}
         />
-
-        {/* =========================
-            PRICING
-        ========================= */}
 
         <div>
           <h2 className="mb-4 text-lg font-semibold dark:text-white">
@@ -703,139 +632,32 @@ export default function CreatePropertyClient() {
           </h2>
 
           <div className="grid gap-4 md:grid-cols-3">
-            {/* SALE */}
-
             <Input
-              label="قیمت فروش (تومان)"
+              label="قیمت فروش"
               name="sale"
-              type="number"
               value={form.sale}
               disabled={!isSale}
               onChange={handleChange}
             />
 
-            {/* MONTHLY */}
-
             <Input
-              label="اجاره ماهانه (تومان)"
+              label="اجاره ماهانه"
               name="monthly"
-              type="number"
               value={form.monthly}
               disabled={!isRent && !isRentMortgage}
               onChange={handleChange}
             />
 
-            {/* MORTGAGE */}
-
             <Input
-              label="رهن (تومان)"
+              label="رهن"
               name="mortgage"
-              type="number"
               value={form.mortgage}
               disabled={!isMortgage && !isRentMortgage}
               onChange={handleChange}
             />
           </div>
-
-          {!form.transactionType && (
-            <p className="mt-3 text-sm text-gray-500">
-              ابتدا نوع معامله را انتخاب کنید.
-            </p>
-          )}
-
-          {isSale && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک فروشی است؛ فقط قیمت فروش فعال است.
-            </p>
-          )}
-
-          {isRent && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک اجاره‌ای است؛ فقط اجاره ماهانه فعال است.
-            </p>
-          )}
-
-          {isMortgage && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک رهنی است؛ فقط مبلغ رهن فعال است.
-            </p>
-          )}
-
-          {isRentMortgage && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک رهن و اجاره است؛ مبلغ رهن و اجاره ماهانه را وارد کنید.
-            </p>
-          )}
         </div>
-
-        {/* =========================
-            FACILITIES
-        ========================= */}
-
-        <div>
-          <h2 className="mb-4 text-lg font-semibold dark:text-white">
-            امکانات و مشخصات
-          </h2>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <Input
-              label="تعداد اتاق خواب"
-              name="bedrooms"
-              type="number"
-              value={form.bedrooms}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="تعداد حمام"
-              name="bathrooms"
-              type="number"
-              value={form.bathrooms}
-              onChange={handleChange}
-            />
-
-            <Input
-              label="ظرفیت نفرات"
-              name="capacity"
-              type="number"
-              value={form.capacity}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="mt-5 flex flex-wrap gap-6">
-            {/* PARKING */}
-
-            <label className="flex cursor-pointer items-center gap-2 dark:text-white">
-              <input
-                type="checkbox"
-                checked={form.parking}
-                onChange={(e) =>
-                  handleBooleanChange("parking", e.target.checked)
-                }
-                className="h-5 w-5"
-              />
-              پارکینگ دارد
-            </label>
-
-            {/* POOL */}
-
-            <label className="flex cursor-pointer items-center gap-2 dark:text-white">
-              <input
-                type="checkbox"
-                checked={form.pool}
-                onChange={(e) => handleBooleanChange("pool", e.target.checked)}
-                className="h-5 w-5"
-              />
-              استخر دارد
-            </label>
-          </div>
-        </div>
-
-        {/* =========================
-            DESCRIPTION
-        ========================= */}
-
+        {/* DESCRIPTION */}
         <div>
           <label className="mb-2 block text-sm dark:text-white">توضیحات</label>
 
@@ -857,10 +679,7 @@ export default function CreatePropertyClient() {
           />
         </div>
 
-        {/* =========================
-            IMAGES
-        ========================= */}
-
+        {/* IMAGES */}
         <div>
           <label className="mb-3 block dark:text-white">تصاویر ملک</label>
 
@@ -893,7 +712,7 @@ export default function CreatePropertyClient() {
               >
                 <img
                   src={img}
-                  alt={`تصویر ملک ${index + 1}`}
+                  alt={`تصویر ${index + 1}`}
                   className="
                     h-32
                     w-full
@@ -914,7 +733,6 @@ export default function CreatePropertyClient() {
                     p-1
                     text-red-500
                     shadow
-                    hover:bg-red-50
                   "
                 >
                   <X size={16} />
@@ -924,10 +742,7 @@ export default function CreatePropertyClient() {
           </div>
         </div>
 
-        {/* =========================
-            SUBMIT
-        ========================= */}
-
+        {/* SUBMIT */}
         <button
           type="submit"
           disabled={createMutation.isPending || uploading}
@@ -940,9 +755,6 @@ export default function CreatePropertyClient() {
             px-5
             py-3
             text-white
-            transition
-            hover:opacity-90
-            disabled:cursor-not-allowed
             disabled:opacity-50
           "
         >
@@ -959,9 +771,9 @@ export default function CreatePropertyClient() {
   );
 }
 
-// =========================
-// INPUT
-// =========================
+/* =========================
+   INPUT
+========================= */
 
 function Input({
   label,
@@ -994,34 +806,27 @@ function Input({
           border
           p-3
           outline-none
-          transition
           focus:border-primary500
-          disabled:cursor-not-allowed
           disabled:bg-gray-100
-          disabled:text-gray-400
           dark:bg-[#444]
           dark:text-white
-          dark:disabled:bg-[#2f2f2f]
-          dark:disabled:text-gray-500
         "
       />
     </div>
   );
 }
 
-// =========================
-// SELECT INPUT
-// =========================
+/* =========================
+   SELECT
+========================= */
 
 function SelectInput({
   label,
-  name,
   value,
   onChange,
   options,
 }: {
   label: string;
-  name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   options: {
@@ -1034,7 +839,6 @@ function SelectInput({
       <label className="mb-2 block text-sm dark:text-white">{label}</label>
 
       <select
-        name={name}
         value={value}
         onChange={onChange}
         className="

@@ -16,34 +16,72 @@ import Link from "next/link";
 import Image from "next/image";
 
 import MapPinCmp from "./MapPinCmp";
+
 import { useProperties, type Property } from "@/hooks/useProperties";
 
 type Props = {
   filters?: Record<string, string>;
 };
 
+// ===============================
+// FORMAT PRICE
+// ===============================
+
 function formatPrice(price: number) {
   return price.toLocaleString("fa-IR");
 }
 
+// ===============================
+// COMPONENT
+// ===============================
+
 export default function ContentReseve({ filters = {} }: Props) {
   const [activePin, setActivePin] = useState<string | null>(null);
 
+  // ===============================
+  // GET PROPERTIES
+  // ===============================
+
   const { data, isLoading, error } = useProperties({
     ...filters,
+
+    // مهم:
+    // صفحه رزرو نباید فقط 10 ملک بگیرد
+    // چون ممکن است 28 ملک رزروی داشته باشیم
+    limit: "100",
   });
-  // فقط املاک قابل رزرو
+
+  // ===============================
+  // RESERVE LOGIC
+  // ===============================
+
   const apiProperties: Property[] = (data?.properties ?? []).filter(
-    (property) =>
-      property.status === "available" &&
-      property.bookingType === "daily" &&
-      Number(property.pricing?.daily ?? 0) > 0,
+    (property) => {
+      const dailyPrice = Number(property.pricing?.daily ?? 0);
+
+      console.log("CHECK PROPERTY:", {
+        title: property.title,
+        bookingType: property.bookingType,
+        status: property.status,
+        dailyPrice,
+      });
+
+      return property.status !== "inactive" && dailyPrice > 0;
+    },
+  );
+
+  console.log(
+    "RESERVE PROPERTIES:",
+    data?.properties?.filter(
+      (p) => p.bookingType === "daily" || p.bookingType === "monthly",
+    ).length,
   );
   const activeProp = apiProperties.find((item) => item._id === activePin);
 
   if (isLoading) {
     return (
       <div
+        dir="rtl"
         className="
           flex
           min-h-[300px]
@@ -52,7 +90,6 @@ export default function ContentReseve({ filters = {} }: Props) {
           text-sm
           text-gray-500
         "
-        dir="rtl"
       >
         در حال دریافت اقامتگاه‌های قابل رزرو...
       </div>
@@ -62,6 +99,7 @@ export default function ContentReseve({ filters = {} }: Props) {
   if (error) {
     return (
       <div
+        dir="rtl"
         className="
           flex
           min-h-[300px]
@@ -70,42 +108,40 @@ export default function ContentReseve({ filters = {} }: Props) {
           text-sm
           text-red-500
         "
-        dir="rtl"
       >
         خطا در دریافت اقامتگاه‌های قابل رزرو
       </div>
     );
   }
-
   return (
     <div
       className="
-        flex
-        flex-col
-        min-[1200px]:flex-row
-        gap-4
-      "
+      flex
+      flex-col
+      min-[1200px]:flex-row
+      gap-4
+    "
       dir="rtl"
     >
       {/* LIST */}
+
       <div
         className="
-          flex-1
-          px-3
-          py-12
-          lg:px-4
-          grid
-          grid-cols-1
-          min-[700px]:grid-cols-2
-          min-[1200px]:grid-cols-1
-          gap-3
-          content-start
-        "
+        flex-1
+        px-3
+        py-12
+        lg:px-4
+        grid
+        grid-cols-1
+        min-[700px]:grid-cols-2
+        min-[1200px]:grid-cols-1
+        gap-3
+        content-start
+      "
       >
         {apiProperties.length === 0 ? (
           <div
             className="
-              min-[1200px]:col-span-1
               flex
               min-h-[300px]
               items-center
@@ -114,12 +150,25 @@ export default function ContentReseve({ filters = {} }: Props) {
             "
           >
             <div>
-              <h2 className="text-lg font-bold text-gray-700 dark:text-white">
+              <h2
+                className="
+                  text-lg
+                  font-bold
+                  text-gray-700
+                  dark:text-white
+                "
+              >
                 اقامتگاه قابل رزروی پیدا نشد
               </h2>
 
-              <p className="mt-2 text-sm text-gray-400">
-                با تغییر مقصد یا فیلترهای جستجو دوباره امتحان کنید.
+              <p
+                className="
+                  mt-2
+                  text-sm
+                  text-gray-400
+                "
+              >
+                هیچ ویلای قابل رزرو در حال حاضر موجود نیست.
               </p>
             </div>
           </div>
@@ -145,9 +194,11 @@ export default function ContentReseve({ filters = {} }: Props) {
                     ? "border-primary500 shadow-md"
                     : "border-gray-100 shadow-sm"
                 }
+
               `}
             >
               {/* IMAGE */}
+
               <div
                 className="
                   relative
@@ -161,11 +212,13 @@ export default function ContentReseve({ filters = {} }: Props) {
                   src={property.images?.[0] || "/images/placeholder.jpg"}
                   alt={property.title}
                   fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover"
                 />
               </div>
 
               {/* CONTENT */}
+
               <div
                 className="
                   flex-1
@@ -178,6 +231,7 @@ export default function ContentReseve({ filters = {} }: Props) {
                 "
               >
                 {/* RATING */}
+
                 <div
                   className="
                     flex
@@ -193,10 +247,12 @@ export default function ContentReseve({ filters = {} }: Props) {
                   "
                 >
                   <Star size={15} className="fill-white" />
-                  {property.rating ?? 0} ستاره
+                  {property.rating ?? 0}
+                  ستاره
                 </div>
 
                 {/* TITLE */}
+
                 <h3
                   className="
                     font-bold
@@ -210,6 +266,7 @@ export default function ContentReseve({ filters = {} }: Props) {
                 </h3>
 
                 {/* LOCATION */}
+
                 <div
                   className="
                     flex
@@ -220,7 +277,12 @@ export default function ContentReseve({ filters = {} }: Props) {
                 >
                   <MapPin size={13} />
 
-                  <span className="text-xs truncate">
+                  <span
+                    className="
+                      text-xs
+                      truncate
+                    "
+                  >
                     {property.location?.address ||
                       property.location?.city ||
                       "بدون آدرس"}
@@ -228,6 +290,7 @@ export default function ContentReseve({ filters = {} }: Props) {
                 </div>
 
                 {/* FEATURES */}
+
                 <div
                   className="
                     flex
@@ -238,35 +301,62 @@ export default function ContentReseve({ filters = {} }: Props) {
                     dark:text-gray-300
                   "
                 >
-                  <span className="flex gap-1 items-center">
+                  <span
+                    className="
+                      flex
+                      gap-1
+                      items-center
+                    "
+                  >
                     <Home size={13} />
-                    {property.facilities?.bedrooms ?? 0} اتاق
+                    {property.facilities?.bedrooms ?? 0}
+                    اتاق
                   </span>
 
                   <span>|</span>
 
-                  <span className="flex gap-1 items-center">
+                  <span
+                    className="
+                      flex
+                      gap-1
+                      items-center
+                    "
+                  >
                     <Bath size={13} />
-                    {property.facilities?.bathrooms ?? 0} حمام
+                    {property.facilities?.bathrooms ?? 0}
+                    حمام
                   </span>
 
                   <span>|</span>
 
-                  <span className="flex gap-1 items-center">
+                  <span
+                    className="
+                      flex
+                      gap-1
+                      items-center
+                    "
+                  >
                     <Users size={13} />
-                    {property.facilities?.capacity ?? 0} نفر
+                    {property.facilities?.capacity ?? 0}
+                    نفر
                   </span>
 
                   <span>|</span>
 
-                  <span className="flex gap-1 items-center">
+                  <span
+                    className="
+                      flex
+                      gap-1
+                      items-center
+                    "
+                  >
                     <Car size={13} />
 
                     {property.facilities?.parking ? "پارکینگ" : "بدون پارکینگ"}
                   </span>
                 </div>
-
                 {/* SEPARATOR */}
+
                 <div
                   className="
                     border-t
@@ -277,6 +367,7 @@ export default function ContentReseve({ filters = {} }: Props) {
                 />
 
                 {/* PRICE */}
+
                 <div
                   className="
                     flex
@@ -297,16 +388,34 @@ export default function ContentReseve({ filters = {} }: Props) {
                       gap-2
                     "
                   >
-                    <span className="font-bold text-sm text-gray-900 dark:text-white">
-                      {formatPrice(property.pricing?.daily ?? 0)}
+                    <span
+                      className="
+                        font-bold
+                        text-sm
+                        text-gray-900
+                        dark:text-white
+                      "
+                    >
+                      {formatPrice(Number(property.pricing?.daily ?? 0))}
                     </span>
 
-                    <span className="text-gray-400 text-xs">تومان / شب</span>
+                    <span
+                      className="
+                        text-gray-400
+                        text-xs
+                      "
+                    >
+                      تومان / شب
+                    </span>
                   </div>
+
+                  {/* RESERVE BUTTON */}
 
                   <Link
                     href={`/single-reserve-house/${property._id}`}
-                    onClick={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                    }}
                     className="
                       text-primary500
                       text-xs
@@ -325,8 +434,8 @@ export default function ContentReseve({ filters = {} }: Props) {
           ))
         )}
       </div>
-
       {/* MAP */}
+
       <div
         className="
           relative
@@ -343,16 +452,22 @@ export default function ContentReseve({ filters = {} }: Props) {
           src="/images/mapImg.png"
           alt="map"
           fill
+          sizes="100vw"
           className="object-cover"
         />
 
         {/* MAP PINS */}
+
         {apiProperties.map((property) => (
           <div
             key={property._id}
-            className="absolute z-10"
+            className="
+                absolute
+                z-10
+              "
             style={{
               top: property.mapPosition?.top || "50%",
+
               left: property.mapPosition?.left || "50%",
             }}
           >
@@ -364,77 +479,97 @@ export default function ContentReseve({ filters = {} }: Props) {
         ))}
 
         {/* POPUP */}
+
         {activeProp && (
           <div
             className="
-              absolute
-              z-20
-              w-56
-              -translate-x-1/2
-              -translate-y-full
-            "
+                absolute
+                z-20
+                w-56
+                -translate-x-1/2
+                -translate-y-full
+              "
             style={{
               top: activeProp.mapPosition?.top || "50%",
+
               left: activeProp.mapPosition?.left || "50%",
             }}
           >
             <div
               className="
-                relative
-                bg-white
-                rounded-xl
-                shadow-xl
-                overflow-hidden
-              "
+                  relative
+                  bg-white
+                  rounded-xl
+                  shadow-xl
+                  overflow-hidden
+                "
             >
               {/* IMAGE */}
+
               <Image
                 src={activeProp.images?.[0] || "/images/placeholder.jpg"}
                 alt={activeProp.title}
                 width={400}
                 height={300}
                 className="
-                  w-full
-                  h-28
-                  object-cover
-                "
+                    w-full
+                    h-28
+                    object-cover
+                  "
               />
 
               {/* CLOSE */}
+
               <button
                 type="button"
                 onClick={() => setActivePin(null)}
                 className="
-                  absolute
-                  top-2
-                  left-2
-                  bg-white
-                  rounded-full
-                  p-1
-                  shadow
-                  z-10
-                "
+                    absolute
+                    top-2
+                    left-2
+                    bg-white
+                    rounded-full
+                    p-1
+                    shadow
+                    z-10
+                  "
                 aria-label="بستن"
               >
                 <X size={12} />
               </button>
 
-              {/* POPUP CONTENT */}
-              <div className="p-3" dir="rtl">
-                <p className="text-xs font-bold">{activeProp.title}</p>
+              {/* CONTENT */}
 
-                <p className="mt-1 text-[11px] text-primary500">قابل رزرو</p>
+              <div className="p-3" dir="rtl">
+                <p
+                  className="
+                      text-xs
+                      font-bold
+                    "
+                >
+                  {activeProp.title}
+                </p>
+
+                <p
+                  className="
+                      mt-1
+                      text-[11px]
+                      text-primary500
+                    "
+                >
+                  قابل رزرو
+                </p>
 
                 <Link
                   href={`/single-reserve-house/${activeProp._id}`}
                   className="
-                    text-primary500
-                    text-xs
-                    mt-2
-                    flex
-                    gap-1
-                    items-center
-                  "
+                      text-primary500
+                      text-xs
+                      mt-2
+                      flex
+                      gap-1
+                      items-center
+                    "
                 >
                   رزرو اقامتگاه
                   <ChevronLeft size={12} />

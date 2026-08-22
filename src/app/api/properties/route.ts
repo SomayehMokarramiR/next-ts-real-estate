@@ -4,8 +4,8 @@ import { connectDB } from "@/app/lib/mongodb";
 import Property from "@/app/models/Property";
 
 const DEFAULT_PAGE = 1;
-const DEFAULT_LIMIT = 6;
-const MAX_LIMIT = 50;
+const DEFAULT_LIMIT = 12;
+const MAX_LIMIT = 100;
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,6 +21,9 @@ export async function GET(request: NextRequest) {
     // فقط املاک دارای تخفیف
     const discounted = searchParams.get("discounted") === "true";
 
+    // فقط املاک قابل رزرو
+    const reserve = searchParams.get("reserve") === "true";
+
     const pageParam = Number(searchParams.get("page"));
     const limitParam = Number(searchParams.get("limit"));
 
@@ -35,9 +38,21 @@ export async function GET(request: NextRequest) {
     const filter: Record<string, unknown> = {};
 
     // =========================
+    // فقط املاک رزروی
+    // =========================
+    if (reserve) {
+      filter.bookingType = {
+        $in: ["daily", "monthly"],
+      };
+
+      filter.status = {
+        $ne: "inactive",
+      };
+    }
+
+    // =========================
     // شهر
     // =========================
-
     if (city) {
       filter["location.city"] = {
         $regex: city,
@@ -48,7 +63,6 @@ export async function GET(request: NextRequest) {
     // =========================
     // نوع ملک
     // =========================
-
     if (type) {
       filter.type = type;
     }
@@ -56,7 +70,6 @@ export async function GET(request: NextRequest) {
     // =========================
     // نوع معامله
     // =========================
-
     if (transactionType) {
       filter.transactionType = transactionType;
     }
@@ -64,7 +77,6 @@ export async function GET(request: NextRequest) {
     // =========================
     // ظرفیت
     // =========================
-
     if (guests) {
       const capacity = Number(guests);
 
@@ -78,7 +90,6 @@ export async function GET(request: NextRequest) {
     // =========================
     // تخفیف
     // =========================
-
     if (discounted) {
       filter["pricing.discount"] = {
         $gt: 0,
@@ -88,7 +99,6 @@ export async function GET(request: NextRequest) {
     // =========================
     // Pagination
     // =========================
-
     const skip = (page - 1) * limit;
 
     const [properties, total] = await Promise.all([

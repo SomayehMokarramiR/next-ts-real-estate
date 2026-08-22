@@ -22,6 +22,8 @@ export type AdminTransactionType =
 
 export type AdminPropertyStatus = "available" | "reserved" | "inactive";
 
+export type AdminBookingType = "daily" | "none";
+
 // =========================
 // PRICING
 // =========================
@@ -83,6 +85,8 @@ export interface AdminPropertyDetail {
 
   status: AdminPropertyStatus;
 
+  bookingType?: AdminBookingType;
+
   location?: AdminPropertyLocation;
 
   images?: string[];
@@ -112,6 +116,8 @@ export interface CreateAdminPropertyPayload {
   transactionType: AdminTransactionType;
 
   status: AdminPropertyStatus;
+
+  bookingType?: AdminBookingType;
 
   location: {
     city?: string;
@@ -164,6 +170,8 @@ export interface UpdateAdminPropertyPayload {
   transactionType: AdminTransactionType;
 
   status: AdminPropertyStatus;
+
+  bookingType?: AdminBookingType;
 
   location: {
     city?: string;
@@ -253,6 +261,7 @@ export async function createAdminProperty(
 ): Promise<AdminPropertyDetail> {
   const response = await apiRequest<AdminPropertyMutationResponse>(
     "/api/admin/properties",
+
     {
       method: "POST",
 
@@ -273,10 +282,12 @@ export async function createAdminProperty(
 
 export async function updateAdminProperty(
   id: string,
+
   payload: UpdateAdminPropertyPayload,
 ): Promise<AdminPropertyDetail> {
   const response = await apiRequest<AdminPropertyMutationResponse>(
     `/api/admin/properties/${id}`,
+
     {
       method: "PUT",
 
@@ -300,6 +311,7 @@ export async function deleteAdminProperty(
 ): Promise<DeleteAdminPropertyResponse> {
   const response = await apiRequest<DeleteAdminPropertyResponse>(
     `/api/admin/properties/${id}`,
+
     {
       method: "DELETE",
     },

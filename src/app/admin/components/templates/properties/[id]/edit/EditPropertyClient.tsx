@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Save, X } from "lucide-react";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import Swal from "sweetalert2";
 
 import { useAdminProperty } from "@/hooks/useAdminProperty";
 import { useAdminUpdateProperty } from "@/hooks/useAdminUpdateProperty";
+
 import type { UpdateAdminPropertyPayload } from "@/services/adminPropertyService";
 
 // =====================================================
@@ -28,64 +30,98 @@ type TransactionType = "rent" | "mortgage" | "rent-mortgage" | "sale";
 
 type PropertyStatus = "available" | "reserved" | "inactive";
 
+// =====================================================
+// FORM TYPE
+// =====================================================
+
 type EditPropertyForm = {
   title: string;
+
   description: string;
 
   type: PropertyType | "";
+
   transactionType: TransactionType | "";
+
   status: PropertyStatus;
 
   city: string;
+
   address: string;
 
   images: string[];
 
-  area: number;
+  area: number | "";
 
   pricing: {
-    sale: number;
-    daily: number;
-    monthly: number;
-    mortgage: number;
+    sale: number | "";
+
+    daily: number | "";
+
+    monthly: number | "";
+
+    mortgage: number | "";
   };
 
   facilities: {
-    bedrooms: number;
-    bathrooms: number;
-    capacity: number;
+    bedrooms: number | "";
+
+    bathrooms: number | "";
+
+    capacity: number | "";
+
     parking: boolean;
+
     pool: boolean;
   };
 };
 
 // =====================================================
-// INPUT
+// INPUT COMPONENT
 // =====================================================
 
 function Input({
   label,
+
   name,
+
   value,
+
   type = "text",
+
   disabled = false,
+
   onChange,
 }: {
   label: string;
+
   name: string;
-  value: string | number;
+
+  value: string | number | "";
+
   type?: string;
+
   disabled?: boolean;
+
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm dark:text-white">{label}</label>
+      <label
+        className="
+          mb-2
+          block
+          text-sm
+          dark:text-white
+        "
+      >
+        {label}
+      </label>
 
       <input
         type={type}
         name={name}
-        value={value}
+        value={value === undefined ? "" : value}
         disabled={disabled}
         onChange={onChange}
         className="
@@ -96,14 +132,15 @@ function Input({
           p-3
           outline-none
           focus:border-primary500
+
           disabled:cursor-not-allowed
           disabled:bg-gray-100
           disabled:text-gray-400
+
           dark:border-gray-600
           dark:bg-[#444]
           dark:text-white
           dark:disabled:bg-[#2f2f2f]
-          dark:disabled:text-gray-500
         "
       />
     </div>
@@ -111,18 +148,24 @@ function Input({
 }
 
 // =====================================================
-// SELECT
+// SELECT COMPONENT
 // =====================================================
 
 function SelectInput({
   label,
+
   value,
+
   onChange,
+
   options,
 }: {
   label: string;
+
   value: string;
+
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+
   options: {
     value: string;
     label: string;
@@ -130,7 +173,16 @@ function SelectInput({
 }) {
   return (
     <div>
-      <label className="mb-2 block text-sm dark:text-white">{label}</label>
+      <label
+        className="
+          mb-2
+          block
+          text-sm
+          dark:text-white
+        "
+      >
+        {label}
+      </label>
 
       <select
         value={value}
@@ -141,8 +193,9 @@ function SelectInput({
           border
           border-gray-300
           p-3
+
           outline-none
-          focus:border-primary500
+
           dark:border-gray-600
           dark:bg-[#444]
           dark:text-white
@@ -171,7 +224,13 @@ export default function EditPropertyClient({
 }) {
   const router = useRouter();
 
-  const { data: property, isLoading, isError } = useAdminProperty(propertyId);
+  const {
+    data: property,
+
+    isLoading,
+
+    isError,
+  } = useAdminProperty(propertyId);
 
   const updateMutation = useAdminUpdateProperty();
 
@@ -179,25 +238,31 @@ export default function EditPropertyClient({
 
   const [uploading, setUploading] = useState(false);
 
-  // =====================================================
-  // LOADING
-  // =====================================================
-
   if (isLoading) {
     return (
-      <div dir="rtl" className="p-8 text-center text-gray-500">
+      <div
+        dir="rtl"
+        className="
+          p-8
+          text-center
+          text-gray-500
+        "
+      >
         در حال دریافت اطلاعات ملک...
       </div>
     );
   }
 
-  // =====================================================
-  // ERROR
-  // =====================================================
-
   if (isError || !property) {
     return (
-      <div dir="rtl" className="p-8 text-center text-red-500">
+      <div
+        dir="rtl"
+        className="
+          p-8
+          text-center
+          text-red-500
+        "
+      >
         خطا در دریافت اطلاعات ملک
       </div>
     );
@@ -212,11 +277,11 @@ export default function EditPropertyClient({
 
     description: property.description ?? "",
 
-    type: (property.type as PropertyType | "") ?? "",
+    type: (property.type as PropertyType) ?? "",
 
-    transactionType: (property.transactionType as TransactionType | "") ?? "",
+    transactionType: (property.transactionType as TransactionType) ?? "",
 
-    status: (property.status as PropertyStatus | undefined) ?? "available",
+    status: (property.status as PropertyStatus) ?? "available",
 
     city: property.location?.city ?? "",
 
@@ -224,24 +289,45 @@ export default function EditPropertyClient({
 
     images: Array.isArray(property.images) ? property.images : [],
 
-    area: Number(property.area) || 0,
+    area: property.area !== undefined ? Number(property.area) : "",
 
     pricing: {
-      sale: Number(property.pricing?.sale) || 0,
+      sale:
+        property.pricing?.sale !== undefined
+          ? Number(property.pricing.sale)
+          : "",
 
-      daily: Number(property.pricing?.daily) || 0,
+      daily:
+        property.pricing?.daily !== undefined
+          ? Number(property.pricing.daily)
+          : "",
 
-      monthly: Number(property.pricing?.monthly) || 0,
+      monthly:
+        property.pricing?.monthly !== undefined
+          ? Number(property.pricing.monthly)
+          : "",
 
-      mortgage: Number(property.pricing?.mortgage) || 0,
+      mortgage:
+        property.pricing?.mortgage !== undefined
+          ? Number(property.pricing.mortgage)
+          : "",
     },
 
     facilities: {
-      bedrooms: Number(property.facilities?.bedrooms) || 0,
+      bedrooms:
+        property.facilities?.bedrooms !== undefined
+          ? Number(property.facilities.bedrooms)
+          : "",
 
-      bathrooms: Number(property.facilities?.bathrooms) || 0,
+      bathrooms:
+        property.facilities?.bathrooms !== undefined
+          ? Number(property.facilities.bathrooms)
+          : "",
 
-      capacity: Number(property.facilities?.capacity) || 0,
+      capacity:
+        property.facilities?.capacity !== undefined
+          ? Number(property.facilities.capacity)
+          : "",
 
       parking: Boolean(property.facilities?.parking),
 
@@ -268,12 +354,13 @@ export default function EditPropertyClient({
   function updateForm(value: Partial<EditPropertyForm>) {
     setForm((prev) => ({
       ...(prev ?? currentForm),
+
       ...value,
     }));
   }
 
   // =====================================================
-  // GENERAL CHANGE
+  // GENERAL INPUT
   // =====================================================
 
   function handleChange(
@@ -281,86 +368,76 @@ export default function EditPropertyClient({
   ) {
     const { name, value } = e.target;
 
-    setForm((prev) => ({
-      ...(prev ?? currentForm),
-
+    updateForm({
       [name]: value,
-    }));
+    } as Partial<EditPropertyForm>);
   }
 
   // =====================================================
-  // PROPERTY TYPE CHANGE
+  // PROPERTY TYPE
   // =====================================================
 
   function handlePropertyTypeChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-
-    const type: PropertyType | "" = value === "" ? "" : (value as PropertyType);
-
     updateForm({
-      type,
+      type: e.target.value as PropertyType,
     });
   }
 
   // =====================================================
-  // TRANSACTION TYPE CHANGE
+  // TRANSACTION TYPE
   // =====================================================
 
   function handleTransactionTypeChange(
     e: React.ChangeEvent<HTMLSelectElement>,
   ) {
-    const value = e.target.value;
-
-    const transactionType: TransactionType | "" =
-      value === "" ? "" : (value as TransactionType);
+    const value = e.target.value as TransactionType;
 
     updateForm({
-      transactionType,
+      transactionType: value,
 
       pricing: {
-        sale: transactionType === "sale" ? currentForm.pricing.sale : 0,
+        sale: value === "sale" ? currentForm.pricing.sale : "",
 
-        daily: transactionType === "rent" ? currentForm.pricing.daily : 0,
+        daily: value === "rent" ? currentForm.pricing.daily : "",
 
         monthly:
-          transactionType === "rent" || transactionType === "rent-mortgage"
+          value === "rent" || value === "rent-mortgage"
             ? currentForm.pricing.monthly
-            : 0,
+            : "",
 
         mortgage:
-          transactionType === "mortgage" || transactionType === "rent-mortgage"
+          value === "mortgage" || value === "rent-mortgage"
             ? currentForm.pricing.mortgage
-            : 0,
+            : "",
       },
     });
   }
 
   // =====================================================
-  // STATUS CHANGE
+  // STATUS
   // =====================================================
 
   function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const value = e.target.value;
-
-    const status: PropertyStatus =
-      value === "reserved"
-        ? "reserved"
-        : value === "inactive"
-          ? "inactive"
-          : "available";
-
     updateForm({
-      status,
+      status: e.target.value as PropertyStatus,
     });
   }
 
   // =====================================================
-  // AREA
+  // AREA FIX
   // =====================================================
 
   function handleAreaChange(e: React.ChangeEvent<HTMLInputElement>) {
+    let value = e.target.value;
+
+    value = value.replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)));
+
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
+
     updateForm({
-      area: Number(e.target.value) || 0,
+      area: value === "" ? "" : Number(value),
     });
   }
 
@@ -370,39 +447,63 @@ export default function EditPropertyClient({
 
   function updatePricing(
     field: "sale" | "daily" | "monthly" | "mortgage",
+
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
+    const value = e.target.value;
+
     updateForm({
       pricing: {
         ...currentForm.pricing,
 
-        [field]: Number(e.target.value) || 0,
+        [field]: value === "" ? "" : Number(value),
       },
     });
   }
 
   // =====================================================
-  // FACILITY NUMBER
+  // FACILITIES NUMBER
   // =====================================================
 
   function updateFacilityNumber(
-    field: "bedrooms" | "bathrooms" | "capacity",
+    field: "bedrooms" | "capacity",
+
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
+    const value = e.target.value;
+
     updateForm({
       facilities: {
         ...currentForm.facilities,
 
-        [field]: Number(e.target.value) || 0,
+        [field]: value === "" ? "" : Number(value),
       },
     });
   }
 
   // =====================================================
-  // FACILITY BOOLEAN
+  // BATHROOM
   // =====================================================
 
-  function updateFacilityBoolean(field: "parking" | "pool", value: boolean) {
+  function updateBathroom(checked: boolean) {
+    updateForm({
+      facilities: {
+        ...currentForm.facilities,
+
+        bathrooms: checked ? 1 : "",
+      },
+    });
+  }
+
+  // =====================================================
+  // BOOLEAN FACILITIES
+  // =====================================================
+
+  function updateFacilityBoolean(
+    field: "parking" | "pool",
+
+    value: boolean,
+  ) {
     updateForm({
       facilities: {
         ...currentForm.facilities,
@@ -435,7 +536,9 @@ export default function EditPropertyClient({
 
         const response = await fetch("/api/upload", {
           method: "POST",
+
           body: formData,
+
           credentials: "include",
         });
 
@@ -448,23 +551,28 @@ export default function EditPropertyClient({
         urls.push(data.url);
       }
 
+      // جایگزینی تصاویر قبلی
       updateForm({
-        images: [...currentForm.images, ...urls],
+        images: urls,
       });
 
       await Swal.fire({
         icon: "success",
+
         title: "موفق شد",
-        text: "تصاویر با موفقیت اضافه شدند",
+
+        text: "تصاویر جدید جایگزین شدند",
+
         confirmButtonText: "باشه",
       });
     } catch (error) {
-      console.error("IMAGE UPLOAD ERROR:", error);
-
       await Swal.fire({
         icon: "error",
+
         title: "خطا",
+
         text: error instanceof Error ? error.message : "خطا در آپلود تصویر",
+
         confirmButtonText: "باشه",
       });
     } finally {
@@ -480,9 +588,7 @@ export default function EditPropertyClient({
 
   function removeImage(index: number) {
     updateForm({
-      images: currentForm.images.filter(
-        (_, imageIndex) => imageIndex !== index,
-      ),
+      images: currentForm.images.filter((_, i) => i !== index),
     });
   }
 
@@ -496,26 +602,23 @@ export default function EditPropertyClient({
     if (uploading) {
       Swal.fire({
         icon: "warning",
+
         title: "لطفا صبر کنید",
-        text: "آپلود تصاویر هنوز تمام نشده است",
+
+        text: "آپلود تصاویر تمام نشده است",
+
         confirmButtonText: "باشه",
       });
 
       return;
     }
 
-    if (updateMutation.isPending) {
-      return;
-    }
-
-    // =====================================================
-    // VALIDATION
-    // =====================================================
-
     if (!currentForm.title.trim()) {
       Swal.fire({
         icon: "warning",
+
         title: "عنوان ملک را وارد کنید",
+
         confirmButtonText: "باشه",
       });
 
@@ -525,7 +628,9 @@ export default function EditPropertyClient({
     if (!currentForm.type) {
       Swal.fire({
         icon: "warning",
+
         title: "نوع ملک را انتخاب کنید",
+
         confirmButtonText: "باشه",
       });
 
@@ -535,79 +640,28 @@ export default function EditPropertyClient({
     if (!currentForm.transactionType) {
       Swal.fire({
         icon: "warning",
+
         title: "نوع معامله را انتخاب کنید",
+
         confirmButtonText: "باشه",
       });
 
       return;
     }
-
-    // =====================================================
-    // PRICE VALIDATION
-    // =====================================================
-
-    if (isSale && currentForm.pricing.sale <= 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "قیمت فروش را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (isRent && currentForm.pricing.monthly <= 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "اجاره ماهانه را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (isMortgage && currentForm.pricing.mortgage <= 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "مبلغ رهن را وارد کنید",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    if (
-      isRentMortgage &&
-      currentForm.pricing.monthly <= 0 &&
-      currentForm.pricing.mortgage <= 0
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "اطلاعات رهن و اجاره را وارد کنید",
-        text: "حداقل یکی از مبلغ رهن یا اجاره باید وارد شود.",
-        confirmButtonText: "باشه",
-      });
-
-      return;
-    }
-
-    // =====================================================
-    // FINAL PRICING
-    // =====================================================
 
     const pricing = {
-      sale: isSale ? currentForm.pricing.sale : 0,
+      sale: isSale ? Number(currentForm.pricing.sale) || 0 : 0,
 
-      daily: isRent ? currentForm.pricing.daily : 0,
+      daily: isRent ? Number(currentForm.pricing.daily) || 0 : 0,
 
-      monthly: isRent || isRentMortgage ? currentForm.pricing.monthly : 0,
+      monthly:
+        isRent || isRentMortgage ? Number(currentForm.pricing.monthly) || 0 : 0,
 
-      mortgage: isMortgage || isRentMortgage ? currentForm.pricing.mortgage : 0,
+      mortgage:
+        isMortgage || isRentMortgage
+          ? Number(currentForm.pricing.mortgage) || 0
+          : 0,
     };
-
-    // =====================================================
-    // FINAL PAYLOAD
-    // =====================================================
 
     const payload: UpdateAdminPropertyPayload = {
       title: currentForm.title.trim(),
@@ -628,16 +682,25 @@ export default function EditPropertyClient({
 
       images: currentForm.images,
 
-      area: currentForm.area,
+      area: currentForm.area === "" ? undefined : Number(currentForm.area),
 
       pricing,
 
       facilities: {
-        bedrooms: currentForm.facilities.bedrooms,
+        bedrooms:
+          currentForm.facilities.bedrooms === ""
+            ? 0
+            : Number(currentForm.facilities.bedrooms),
 
-        bathrooms: currentForm.facilities.bathrooms,
+        bathrooms:
+          currentForm.facilities.bathrooms === ""
+            ? 0
+            : Number(currentForm.facilities.bathrooms),
 
-        capacity: currentForm.facilities.capacity,
+        capacity:
+          currentForm.facilities.capacity === ""
+            ? 0
+            : Number(currentForm.facilities.capacity),
 
         parking: currentForm.facilities.parking,
 
@@ -645,11 +708,7 @@ export default function EditPropertyClient({
       },
     };
 
-    console.log("UPDATE PROPERTY PAYLOAD:", JSON.stringify(payload, null, 2));
-
-    // =====================================================
-    // UPDATE
-    // =====================================================
+    console.log("UPDATE PAYLOAD", payload);
 
     updateMutation.mutate(
       {
@@ -657,12 +716,16 @@ export default function EditPropertyClient({
 
         data: payload,
       },
+
       {
         onSuccess: async () => {
           await Swal.fire({
             icon: "success",
+
             title: "موفق شد",
+
             text: "ملک با موفقیت ویرایش شد",
+
             confirmButtonText: "باشه",
           });
 
@@ -670,32 +733,51 @@ export default function EditPropertyClient({
         },
 
         onError: (error) => {
-          console.error("UPDATE PROPERTY ERROR:", error);
-
           Swal.fire({
             icon: "error",
+
             title: "خطا",
+
             text: error instanceof Error ? error.message : "خطا در ویرایش ملک",
+
             confirmButtonText: "باشه",
           });
         },
       },
     );
   }
-
-  // =====================================================
-  // RENDER
-  // =====================================================
-
   return (
     <div dir="rtl" className="w-full p-6">
       {/* HEADER */}
 
-      <div className="mb-6 flex items-center justify-between">
+      <div
+        className="
+        mb-6
+        flex
+        items-center
+        justify-between
+      "
+      >
         <div>
-          <h1 className="text-2xl font-bold dark:text-white">ویرایش ملک</h1>
+          <h1
+            className="
+            text-2xl
+            font-bold
+            dark:text-white
+          "
+          >
+            ویرایش ملک
+          </h1>
 
-          <p className="mt-2 text-sm text-gray-500">تغییر اطلاعات ملک</p>
+          <p
+            className="
+            mt-2
+            text-sm
+            text-gray-500
+          "
+          >
+            تغییر اطلاعات ملک
+          </p>
         </div>
 
         <Link
@@ -708,6 +790,7 @@ export default function EditPropertyClient({
             bg-gray-200
             px-4
             py-2
+
             dark:bg-[#444]
             dark:text-white
           "
@@ -717,8 +800,6 @@ export default function EditPropertyClient({
         </Link>
       </div>
 
-      {/* FORM */}
-
       <form
         onSubmit={handleSubmit}
         className="
@@ -727,6 +808,7 @@ export default function EditPropertyClient({
           bg-white
           p-6
           shadow-sm
+
           dark:bg-[#353535]
         "
       >
@@ -750,30 +832,37 @@ export default function EditPropertyClient({
               value: "apartment",
               label: "آپارتمان",
             },
+
             {
               value: "villa",
               label: "ویلا",
             },
+
             {
               value: "house",
               label: "خانه",
             },
+
             {
               value: "hotel",
               label: "هتل",
             },
+
             {
               value: "suite",
               label: "سوئیت",
             },
+
             {
               value: "land",
               label: "زمین",
             },
+
             {
               value: "office",
               label: "اداری",
             },
+
             {
               value: "commercial",
               label: "تجاری",
@@ -781,7 +870,7 @@ export default function EditPropertyClient({
           ]}
         />
 
-        {/* TRANSACTION TYPE */}
+        {/* TRANSACTION */}
 
         <SelectInput
           label="نوع معامله"
@@ -792,14 +881,17 @@ export default function EditPropertyClient({
               value: "sale",
               label: "فروش",
             },
+
             {
               value: "rent",
               label: "اجاره",
             },
+
             {
               value: "mortgage",
               label: "رهن",
             },
+
             {
               value: "rent-mortgage",
               label: "رهن و اجاره",
@@ -810,7 +902,7 @@ export default function EditPropertyClient({
         {/* STATUS */}
 
         <SelectInput
-          label="وضعیت"
+          label="وضعیت ملک"
           value={currentForm.status}
           onChange={handleStatusChange}
           options={[
@@ -818,10 +910,12 @@ export default function EditPropertyClient({
               value: "available",
               label: "فعال",
             },
+
             {
               value: "reserved",
               label: "رزرو شده",
             },
+
             {
               value: "inactive",
               label: "غیرفعال",
@@ -831,7 +925,13 @@ export default function EditPropertyClient({
 
         {/* LOCATION */}
 
-        <div className="grid gap-4 md:grid-cols-2">
+        <div
+          className="
+            grid
+            gap-4
+            md:grid-cols-2
+          "
+        >
           <Input
             label="شهر"
             name="city"
@@ -852,165 +952,231 @@ export default function EditPropertyClient({
         <Input
           label="متراژ (متر مربع)"
           name="area"
-          type="number"
-          value={currentForm.area}
+          type="text"
+          value={currentForm.area === "" ? "" : String(currentForm.area)}
           onChange={handleAreaChange}
         />
 
-        {/* PRICING */}
+        {/* PRICE */}
 
         <div>
-          <h2 className="mb-4 text-lg font-semibold dark:text-white">
+          <h2
+            className="
+              mb-4
+              text-lg
+              font-semibold
+              dark:text-white
+            "
+          >
             اطلاعات قیمت
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div
+            className="
+              grid
+              gap-4
+
+              md:grid-cols-2
+              lg:grid-cols-4
+            "
+          >
             <Input
-              label="قیمت فروش (تومان)"
+              label="قیمت فروش"
               name="sale"
-              type="number"
+              type="text"
               value={currentForm.pricing.sale}
               disabled={!isSale}
               onChange={(e) => updatePricing("sale", e)}
             />
 
             <Input
-              label="قیمت روزانه (تومان)"
+              label="قیمت روزانه"
               name="daily"
-              type="number"
+              type="text"
               value={currentForm.pricing.daily}
               disabled={!isRent}
               onChange={(e) => updatePricing("daily", e)}
             />
 
             <Input
-              label="اجاره ماهانه (تومان)"
+              label="اجاره ماهانه"
               name="monthly"
-              type="number"
+              type="text"
               value={currentForm.pricing.monthly}
               disabled={!isRent && !isRentMortgage}
               onChange={(e) => updatePricing("monthly", e)}
             />
 
             <Input
-              label="رهن (تومان)"
+              label="رهن"
               name="mortgage"
-              type="number"
+              type="text"
               value={currentForm.pricing.mortgage}
               disabled={!isMortgage && !isRentMortgage}
               onChange={(e) => updatePricing("mortgage", e)}
             />
           </div>
-
-          {!currentForm.transactionType && (
-            <p className="mt-3 text-sm text-gray-500">
-              ابتدا نوع معامله را انتخاب کنید.
-            </p>
-          )}
-
-          {isSale && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک فروشی است؛ فقط قیمت فروش فعال است.
-            </p>
-          )}
-
-          {isRent && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک اجاره‌ای است؛ قیمت روزانه و اجاره ماهانه فعال هستند.
-            </p>
-          )}
-
-          {isMortgage && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک رهنی است؛ فقط مبلغ رهن فعال است.
-            </p>
-          )}
-
-          {isRentMortgage && (
-            <p className="mt-3 text-sm text-gray-500">
-              ملک رهن و اجاره است؛ مبلغ رهن و اجاره ماهانه فعال هستند.
-            </p>
-          )}
         </div>
 
         {/* FACILITIES */}
 
         <div>
-          <h2 className="mb-4 text-lg font-semibold dark:text-white">
+          <h2
+            className="
+              mb-4
+              text-lg
+              font-semibold
+              dark:text-white
+            "
+          >
             امکانات و ظرفیت
           </h2>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div
+            className="
+              grid
+              gap-4
+              md:grid-cols-2
+            "
+          >
             <Input
               label="تعداد اتاق خواب"
               name="bedrooms"
-              type="number"
+              type="text"
               value={currentForm.facilities.bedrooms}
               onChange={(e) => updateFacilityNumber("bedrooms", e)}
             />
 
             <Input
-              label="تعداد حمام"
-              name="bathrooms"
-              type="number"
-              value={currentForm.facilities.bathrooms}
-              onChange={(e) => updateFacilityNumber("bathrooms", e)}
-            />
-
-            <Input
               label="ظرفیت نفرات"
               name="capacity"
-              type="number"
+              type="text"
               value={currentForm.facilities.capacity}
               onChange={(e) => updateFacilityNumber("capacity", e)}
             />
           </div>
 
-          <div className="mt-5 flex flex-wrap gap-6">
-            <label className="flex cursor-pointer items-center gap-2 dark:text-white">
+          <div
+            className="
+              mt-5
+              grid
+              gap-4
+              md:grid-cols-2
+            "
+          >
+            {/* BATHROOM */}
+
+            <label
+              className="
+                flex
+                cursor-pointer
+                items-center
+                gap-3
+                rounded-xl
+                border
+                p-3
+                dark:border-gray-600
+                dark:text-white
+              "
+            >
+              <input
+                type="checkbox"
+                checked={Number(currentForm.facilities.bathrooms) > 0}
+                onChange={(e) => updateBathroom(e.target.checked)}
+                className="
+                  h-5
+                  w-5
+                "
+              />
+              حمام دارد
+            </label>
+
+            {/* PARKING */}
+
+            <label
+              className="
+                flex
+                cursor-pointer
+                items-center
+                gap-3
+                rounded-xl
+                border
+                p-3
+                dark:border-gray-600
+                dark:text-white
+              "
+            >
               <input
                 type="checkbox"
                 checked={currentForm.facilities.parking}
                 onChange={(e) =>
                   updateFacilityBoolean("parking", e.target.checked)
                 }
-                className="h-5 w-5"
+                className="
+                  h-5
+                  w-5
+                "
               />
               پارکینگ دارد
             </label>
 
-            <label className="flex cursor-pointer items-center gap-2 dark:text-white">
+            {/* POOL */}
+
+            <label
+              className="
+                flex
+                cursor-pointer
+                items-center
+                gap-3
+                rounded-xl
+                border
+                p-3
+                dark:border-gray-600
+                dark:text-white
+              "
+            >
               <input
                 type="checkbox"
                 checked={currentForm.facilities.pool}
                 onChange={(e) =>
                   updateFacilityBoolean("pool", e.target.checked)
                 }
-                className="h-5 w-5"
+                className="
+                  h-5
+                  w-5
+                "
               />
               استخر دارد
             </label>
           </div>
         </div>
-
         {/* DESCRIPTION */}
 
         <div>
-          <label className="mb-2 block text-sm dark:text-white">توضیحات</label>
+          <label
+            className="
+              mb-2
+              block
+              text-sm
+              dark:text-white
+            "
+          >
+            توضیحات
+          </label>
 
           <textarea
             name="description"
             value={currentForm.description}
             onChange={handleChange}
             className="
-              min-h-32
+              min-h-[120px]
               w-full
               rounded-xl
               border
               border-gray-300
               p-3
               outline-none
-              focus:border-primary500
+
               dark:border-gray-600
               dark:bg-[#444]
               dark:text-white
@@ -1021,66 +1187,85 @@ export default function EditPropertyClient({
         {/* IMAGES */}
 
         <div>
-          <label className="mb-3 block dark:text-white">تصاویر ملک</label>
+          <h2
+            className="
+              mb-4
+              text-lg
+              font-semibold
+              dark:text-white
+            "
+          >
+            تصاویر ملک
+          </h2>
 
           <input
             type="file"
-            accept="image/*"
             multiple
-            disabled={uploading}
+            accept="image/*"
             onChange={handleImageChange}
-            className="dark:text-white"
+            className="
+              block
+              w-full
+              rounded-xl
+              border
+              p-3
+              dark:border-gray-600
+              dark:text-white
+            "
           />
 
           {uploading && (
-            <p className="mt-2 text-sm text-gray-500">در حال آپلود تصاویر...</p>
+            <p
+              className="
+                  mt-3
+                  text-sm
+                  text-blue-500
+                "
+            >
+              در حال آپلود تصاویر...
+            </p>
           )}
 
           {currentForm.images.length > 0 && (
             <div
               className="
-                mt-4
-                grid
-                gap-4
-                sm:grid-cols-2
-                md:grid-cols-3
-                lg:grid-cols-4
-              "
+                  mt-5
+                  grid
+                  grid-cols-2
+                  gap-4
+                  md:grid-cols-4
+                "
             >
-              {currentForm.images.map((img, index) => (
+              {currentForm.images.map((image, index) => (
                 <div
-                  key={`${img}-${index}`}
+                  key={image}
                   className="
-                      relative
-                      overflow-hidden
-                      rounded-xl
-                    "
+                          relative
+                        "
                 >
                   <img
-                    src={img}
-                    alt={`تصویر ملک ${index + 1}`}
+                    src={image}
+                    alt="property"
                     className="
-                        h-40
-                        w-full
-                        rounded-xl
-                        object-cover
-                      "
+                            h-32
+                            w-full
+                            rounded-xl
+                            object-cover
+                          "
                   />
 
                   <button
                     type="button"
                     onClick={() => removeImage(index)}
                     className="
-                        absolute
-                        right-2
-                        top-2
-                        rounded-full
-                        bg-white
-                        p-2
-                        text-red-500
-                        shadow
-                        hover:bg-red-50
-                      "
+                            absolute
+                            right-2
+                            top-2
+                            rounded-full
+                            bg-red-500
+                            p-1
+                            text-white
+                          "
                   >
                     <X size={16} />
                   </button>
@@ -1088,42 +1273,57 @@ export default function EditPropertyClient({
               ))}
             </div>
           )}
-
-          {currentForm.images.length === 0 && (
-            <p className="mt-3 text-sm text-gray-500">
-              تصویری برای این ملک ثبت نشده است.
-            </p>
-          )}
         </div>
 
-        {/* SUBMIT */}
+        {/* BUTTONS */}
 
-        <button
-          type="submit"
-          disabled={updateMutation.isPending || uploading}
+        <div
           className="
             flex
-            items-center
-            gap-2
-            rounded-xl
-            bg-primary500
-            px-5
-            py-3
-            text-white
-            transition
-            hover:opacity-90
-            disabled:cursor-not-allowed
-            disabled:opacity-50
+            justify-start
+            gap-3
+            pt-6
           "
         >
-          <Save size={18} />
+          <button
+            type="submit"
+            disabled={updateMutation.isPending}
+            className="
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              bg-primary500
+              px-6
+              py-3
+              text-white
+              disabled:opacity-50
+            "
+          >
+            <Save size={18} />
 
-          {updateMutation.isPending
-            ? "در حال ذخیره..."
-            : uploading
-              ? "در حال آپلود..."
-              : "ذخیره تغییرات"}
-        </button>
+            {updateMutation.isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
+          </button>
+
+          <Link
+            href={`/admin/properties/${propertyId}`}
+            className="
+              flex
+              items-center
+              gap-2
+              rounded-xl
+              bg-gray-200
+              px-6
+              py-3
+
+              dark:bg-[#444]
+              dark:text-white
+            "
+          >
+            <X size={18} />
+            انصراف
+          </Link>
+        </div>
       </form>
     </div>
   );

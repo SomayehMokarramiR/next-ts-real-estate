@@ -20,6 +20,7 @@ export default function VillaRentalSection() {
     : Array.isArray(data?.properties)
       ? data.properties
       : [];
+  console.log("VILLA DATA:", properties);
 
   // فقط ۴ ویلا برای لندینگ
   const visibleVillas = properties.slice(0, 4);
@@ -94,50 +95,83 @@ export default function VillaRentalSection() {
                   "
                 />
 
-                {/* Overlay */}
                 <div
                   className="
-                    absolute
-                    bottom-3
-                    right-3
-                    left-3
-                    flex
-                    items-center
-                    justify-between
-                    bg-white/90
-                    dark:bg-[#353535]
-                    backdrop-blur-sm
-                    rounded-full
-                    px-3
-                    py-2
-                    shadow
-                  "
+    absolute
+    bottom-3
+    right-3
+    left-3
+    rounded-2xl
+    bg-white/95
+    dark:bg-[#353535]
+    backdrop-blur-sm
+    px-4
+    py-3
+    shadow-lg
+  "
                 >
-                  <span
+                  <h3
                     className="
-                      text-gray-800
-                      dark:text-white
-                      text-xs
-                      font-medium
-                      truncate
-                    "
+      text-sm
+      font-bold
+      text-gray-900
+      dark:text-white
+      truncate
+    "
                   >
-                    {villa.location?.city || "نامشخص"}
-                  </span>
+                    {villa.title || "ویلای زیبا"}
+                  </h3>
 
-                  <span
+                  <p
                     className="
-                      bg-primary500
-                      text-white
-                      text-xs
-                      font-semibold
-                      rounded-full
-                      px-3
-                      py-1
-                    "
+      mt-2
+      text-xs
+      text-gray-600
+      dark:text-gray-300
+      line-clamp-2
+      min-h-[32px]
+    "
                   >
-                    {villa.facilities?.capacity ?? 0} نفر
-                  </span>
+                    {villa.description || "اقامتگاه زیبا و مجهز"}
+                  </p>
+
+                  <div
+                    className="
+      mt-3
+      flex
+      items-center
+      justify-between
+      gap-2
+    "
+                  >
+                    <span
+                      className="
+        text-xs
+        font-medium
+        text-gray-700
+        dark:text-gray-200
+      "
+                    >
+                      {villa.location?.city || "نامشخص"}
+                    </span>
+
+                    {villa.facilities?.capacity &&
+                      villa.facilities.capacity > 0 && (
+                        <span
+                          className="
+            rounded-full
+            bg-primary500
+            px-3
+            py-1
+            text-xs
+            font-semibold
+            text-white
+          "
+                        >
+                          {villa.facilities.capacity} نفر
+                        </span>
+                      )}
+                  </div>
                 </div>
               </Link>
             ))}
