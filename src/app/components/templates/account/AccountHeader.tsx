@@ -8,7 +8,6 @@ import { useMe } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useReadNotification } from "@/hooks/useReadNotification";
 import { useReadAllNotifications } from "@/hooks/useReadAllNotifications";
-
 import { useTheme } from "../../../context/ThemeContext";
 import { useSettings } from "@/hooks/useSettings";
 
@@ -24,9 +23,7 @@ export default function AccountHeader() {
   const router = useRouter();
 
   const { data } = useMe();
-
   const { data: settingsData } = useSettings();
-
   const { dark, toggleTheme } = useTheme();
 
   const { data: notificationsData, isLoading: notificationsLoading } =
@@ -42,21 +39,29 @@ export default function AccountHeader() {
   const fullName =
     [user?.name, user?.lastName].filter(Boolean).join(" ") || "کاربر";
 
-  const notifications = notificationsData?.notifications || [];
+  const notifications: NotificationItem[] =
+    notificationsData?.notifications || [];
 
   const notificationSettings = settingsData?.settings?.notifications;
 
+  // =========================
+  // FILTER NOTIFICATIONS
+  // =========================
+
   const visibleNotifications = notifications.filter((item) => {
+    // رزروها
     if (item.type === "reservation") {
       return notificationSettings?.reservation ?? true;
     }
 
+    // پیام‌های سیستم
     if (item.type === "system" || item.type === "message") {
-      return notificationSettings?.messages ?? true;
+      return notificationSettings?.systemMessages ?? true;
     }
 
+    // پیشنهادها و تخفیف‌ها
     if (item.type === "offer") {
-      return notificationSettings?.offers ?? true;
+      return notificationSettings?.offersAndDiscounts ?? true;
     }
 
     return true;
@@ -65,7 +70,10 @@ export default function AccountHeader() {
   const visibleUnreadCount = visibleNotifications.filter(
     (item) => !item.isRead,
   ).length;
-  // دسته بندی اعلان ها
+
+  // =========================
+  // CATEGORIES
+  // =========================
 
   const reservationNotifications = visibleNotifications.filter(
     (item) => item.type === "reservation",
@@ -78,11 +86,20 @@ export default function AccountHeader() {
   const offerNotifications = visibleNotifications.filter(
     (item) => item.type === "offer",
   );
+
+  // =========================
+  // READ NOTIFICATION
+  // =========================
+
   const handleNotificationClick = (id: string, isRead: boolean) => {
     if (!isRead) {
       readMutation.mutate(id);
     }
   };
+
+  // =========================
+  // TOGGLE NOTIFICATIONS
+  // =========================
 
   const handleToggleNotifications = () => {
     const willOpen = !showNotifications;
@@ -93,6 +110,10 @@ export default function AccountHeader() {
       readAllMutation.mutate();
     }
   };
+
+  // =========================
+  // RENDER NOTIFICATION
+  // =========================
 
   const renderNotification = (item: NotificationItem) => (
     <button
@@ -139,6 +160,7 @@ export default function AccountHeader() {
       "
     >
       {/* User Info */}
+
       <div>
         <p className="text-sm text-primary500 font-bold">خوش آمدید</p>
 
@@ -146,8 +168,10 @@ export default function AccountHeader() {
       </div>
 
       {/* Actions */}
+
       <div className="flex items-center gap-3">
         {/* Theme */}
+
         <button
           type="button"
           onClick={toggleTheme}
@@ -167,6 +191,7 @@ export default function AccountHeader() {
         </button>
 
         {/* Notifications */}
+
         <div className="relative">
           <button
             type="button"
@@ -256,6 +281,7 @@ export default function AccountHeader() {
               ) : (
                 <div className="space-y-5">
                   {/* رزروها */}
+
                   {reservationNotifications.length > 0 && (
                     <div>
                       <h4 className="mb-3 font-bold text-right dark:text-white">
@@ -268,7 +294,8 @@ export default function AccountHeader() {
                     </div>
                   )}
 
-                  {/* پیام های سیستم */}
+                  {/* پیام‌های سیستم */}
+
                   {systemNotifications.length > 0 && (
                     <div>
                       <h4 className="mb-3 font-bold text-right dark:text-white">
@@ -281,7 +308,8 @@ export default function AccountHeader() {
                     </div>
                   )}
 
-                  {/* پیشنهادات */}
+                  {/* پیشنهادها و تخفیف‌ها */}
+
                   {offerNotifications.length > 0 && (
                     <div>
                       <h4 className="mb-3 font-bold text-right dark:text-white">
@@ -300,6 +328,7 @@ export default function AccountHeader() {
         </div>
 
         {/* Profile */}
+
         <button
           type="button"
           onClick={() => router.push("/account/profile")}

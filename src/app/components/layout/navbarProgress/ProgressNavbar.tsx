@@ -14,7 +14,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { useRef, useState } from "react";
+import { useRef, useState, Dispatch, SetStateAction } from "react";
 
 import NewsIcon from "./NewsIcon";
 import { BLUE } from "./constants";
@@ -28,6 +28,8 @@ import { useTheme } from "@/app/context/ThemeContext";
 
 type Props = {
   progress: number;
+  dark: boolean;
+  setDark: Dispatch<SetStateAction<boolean>>;
 };
 
 type NavLink = {
@@ -66,13 +68,13 @@ function Avatar() {
   );
 }
 
-export default function ProgressNavbar({ progress }: Props) {
+export default function ProgressNavbar({ progress, dark, setDark }: Props) {
   const router = useRouter();
   const pathname = usePathname();
 
   const { data } = useMe();
   const logoutMutation = useLogout();
-  const { dark, toggleTheme } = useTheme();
+  const { dark: themeDark, toggleTheme } = useTheme();
 
   const isLoggedIn = Boolean(data?.success && data?.user);
 
@@ -270,7 +272,7 @@ export default function ProgressNavbar({ progress }: Props) {
               backgroundColor: BLUE,
             }}
           >
-            {dark ? (
+            {themeDark ? (
               <Sun size={15} className="text-white" />
             ) : (
               <Moon size={15} className="text-white" />

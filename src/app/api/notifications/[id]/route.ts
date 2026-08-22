@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+
 import { cookies } from "next/headers";
 
 import { connectDB } from "@/app/lib/mongodb";
+
 import { verifyToken } from "@/app/lib/auth";
 
 import Notification from "@/app/models/Notification";
@@ -15,13 +17,15 @@ export async function PATCH(
   {
     params,
   }: {
-    params: {
+    params: Promise<{
       id: string;
-    };
+    }>;
   },
 ) {
   try {
     await connectDB();
+
+    const { id } = await params;
 
     const cookieStore = await cookies();
 
@@ -57,15 +61,12 @@ export async function PATCH(
 
     const notification = await Notification.findOneAndUpdate(
       {
-        _id: params.id,
-
+        _id: id,
         userId: decoded.id,
       },
-
       {
         isRead: true,
       },
-
       {
         new: true,
       },
@@ -86,9 +87,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         success: true,
-
         message: "اعلان خوانده شد",
-
         notification,
       },
       {
@@ -101,7 +100,6 @@ export async function PATCH(
     return NextResponse.json(
       {
         success: false,
-
         message: "خطا در تغییر وضعیت اعلان",
       },
       {

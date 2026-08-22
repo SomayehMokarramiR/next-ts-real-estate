@@ -586,20 +586,26 @@ export async function POST(request: NextRequest) {
 // UPDATE RESERVATION
 // ===============================
 
-export async function PUT(
-  request: NextRequest,
-  context: {
-    params: Promise<{
-      id: string;
-    }>;
-  },
-) {
+export async function PUT(request: NextRequest) {
   try {
     await checkAdmin();
     await connectDB();
 
-    const { id } = await context.params;
     const body = await request.json();
+
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه رزرو ارسال نشده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
     const reservation = await Reservation.findById(id);
 
@@ -655,7 +661,6 @@ export async function PUT(
     reservation.propertyId = new mongoose.Types.ObjectId(newPropertyId);
 
     reservation.checkIn = newCheckIn;
-
     reservation.checkOut = newCheckOut;
 
     reservation.nights = calculateNights(newCheckIn, newCheckOut);
@@ -673,18 +678,16 @@ export async function PUT(
 
     await reservation.save();
 
-    // ===============================
-    // NOTIFICATION UPDATE
-    // ===============================
-
     if (statusChanged) {
+      const message = `وضعیت رزرو شما به ${body.status} تغییر کرد`;
+
       const notificationExists = await Notification.findOne({
         userId: reservation.userId,
         type: "reservation",
         title: "وضعیت رزرو تغییر کرد",
-        message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+        message,
         createdAt: {
-          $gte: new Date(Date.now() - 5000), // 5 ثانیه اخیر
+          $gte: new Date(Date.now() - 5000),
         },
       });
 
@@ -692,11 +695,12 @@ export async function PUT(
         await createNotification({
           userId: String(reservation.userId),
           title: "وضعیت رزرو تغییر کرد",
-          message: `وضعیت رزرو شما به ${body.status} تغییر کرد`,
+          message,
           type: "reservation",
         });
       }
     }
+
     return NextResponse.json({
       success: true,
       message: "رزرو ویرایش شد",
@@ -720,20 +724,26 @@ export async function PUT(
 // DELETE RESERVATION
 // ===============================
 
-export async function DELETE(
-  request: NextRequest,
-  context: {
-    params: Promise<{
-      id: string;
-    }>;
-  },
-) {
+export async function DELETE(request: NextRequest) {
   try {
     await checkAdmin();
-
     await connectDB();
 
-    const { id } = await context.params;
+    const body = await request.json();
+
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "شناسه رزرو ارسال نشده است",
+        },
+        {
+          status: 400,
+        },
+      );
+    }
 
     const reservation = await Reservation.findById(id);
 
@@ -751,10 +761,6 @@ export async function DELETE(
 
     await Reservation.findByIdAndDelete(id);
 
-    // ===============================
-    // NOTIFICATION DELETE
-    // ===============================
-
     await createNotification({
       userId: String(reservation.userId),
       title: "رزرو حذف شد",
@@ -764,7 +770,6 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-
       message: "رزرو حذف شد",
     });
   } catch (error) {

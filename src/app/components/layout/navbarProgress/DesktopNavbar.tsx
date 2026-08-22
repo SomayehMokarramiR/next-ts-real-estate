@@ -10,9 +10,7 @@ export default function DesktopNavbar() {
       className="
         flex
         items-center
-
         gap-6
-
         max-[813px]:gap-3
       "
       dir="rtl"
@@ -24,50 +22,33 @@ export default function DesktopNavbar() {
         return (
           <button
             key={item.label}
+            type="button"
             className={`
               flex
-
               items-center
-
               gap-1
-
-
               whitespace-nowrap
 
-
               text-sm
-
               max-[813px]:text-xs
 
-
               font-medium
-
-
               transition-all
-
 
               ${
                 highlight
                   ? `
-                bg-primary500
-
-                text-white
-
-
-                px-4
-
-                py-2
-
-
-                rounded-full
-                `
+                    bg-primary500
+                    text-white
+                    px-4
+                    py-2
+                    rounded-full
+                  `
                   : `
-                text-foreground
-
-                hover:text-primary500
-                `
+                    text-foreground
+                    hover:text-primary500
+                  `
               }
-
             `}
           >
             <span>{item.label}</span>
