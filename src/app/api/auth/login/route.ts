@@ -1,13 +1,19 @@
 import { NextResponse } from "next/server";
+
 import bcrypt from "bcryptjs";
 
 import { connectDB } from "../../../lib/mongodb";
+
 import User from "../../../models/User";
+
+import AdminSettings from "../../../models/AdminSettings";
+
 import { createToken } from "../../../lib/auth";
 
 export async function POST(request: Request) {
   try {
-    // اتصال دیتابیس
+    console.log("🔥 LOGIN API START");
+
     await connectDB();
 
     let body;
@@ -59,9 +65,41 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!user.password) {
-      console.error("USER PASSWORD NOT FOUND:", user.email);
+    const role = user.role?.trim();
 
+    console.log("🔥 USER INFO:", {
+      email: user.email,
+      role,
+    });
+
+    // ==============================
+    // SYSTEM LOGIN CHECK
+    // ==============================
+
+    const settings = await AdminSettings.findOne().select("system").lean();
+
+    const loginEnabled = settings?.system?.userLogin ?? true;
+
+    console.log("🔥 SYSTEM:", settings?.system);
+
+    console.log("🔥 LOGIN ENABLED:", loginEnabled);
+
+    // فقط کاربر معمولی بلاک شود
+    if (role !== "admin" && loginEnabled === false) {
+      console.log("🚫 NORMAL USER LOGIN BLOCKED");
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "ورود کاربران در حال حاضر غیرفعال است.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
+
+    if (!user.password) {
       return NextResponse.json(
         {
           success: false,
@@ -90,21 +128,19 @@ export async function POST(request: Request) {
     const token = createToken({
       id: user._id.toString(),
       email: user.email,
-      role: user.role,
+      role,
     });
 
     const response = NextResponse.json(
       {
         success: true,
-
         message: "ورود با موفقیت انجام شد",
-
         user: {
           id: user._id.toString(),
           name: user.name,
           lastName: user.lastName,
           email: user.email,
-          role: user.role,
+          role,
         },
       },
       {
@@ -114,19 +150,17 @@ export async function POST(request: Request) {
 
     response.cookies.set("token", token, {
       httpOnly: true,
-
       secure: process.env.NODE_ENV === "production",
-
       sameSite: "lax",
-
       maxAge: 60 * 60 * 24 * 7,
-
       path: "/",
     });
 
+    console.log("✅ LOGIN SUCCESS");
+
     return response;
   } catch (error) {
-    console.error("LOGIN ERROR FULL:", error);
+    console.error("LOGIN ERROR:", error);
 
     return NextResponse.json(
       {

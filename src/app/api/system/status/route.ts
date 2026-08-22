@@ -9,10 +9,21 @@ export async function GET() {
 
     const settings = await AdminSettings.findOne().select("system").lean();
 
+    const system = settings?.system as {
+      maintenanceMode?: boolean;
+      userRegistration?: boolean;
+      userLogin?: boolean;
+    };
+
     return NextResponse.json(
       {
         success: true,
-        maintenanceMode: settings?.system?.maintenanceMode ?? false,
+
+        maintenanceMode: system?.maintenanceMode ?? false,
+
+        userRegistration: system?.userRegistration ?? true,
+
+        userLogin: system?.userLogin ?? true,
       },
       {
         status: 200,
@@ -25,6 +36,8 @@ export async function GET() {
       {
         success: false,
         maintenanceMode: false,
+        userRegistration: true,
+        userLogin: true,
       },
       {
         status: 500,

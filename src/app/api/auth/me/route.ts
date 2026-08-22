@@ -3,11 +3,13 @@ import { cookies } from "next/headers";
 
 import { connectDB } from "../../../lib/mongodb";
 import User from "../../../models/User";
+import AdminSettings from "../../../models/AdminSettings";
 import { verifyToken } from "../../../lib/auth";
 
 type DecodedToken = {
   id: string;
   email: string;
+  role?: string;
 };
 
 async function getAuthenticatedUser() {
@@ -36,6 +38,24 @@ async function getAuthenticatedUser() {
     throw new Error("USER_NOT_FOUND");
   }
 
+  // ==============================
+  // SYSTEM LOGIN CHECK
+  // ==============================
+
+  const settings = await AdminSettings.findOne().lean();
+
+  console.log("🔥 FULL ADMIN SETTINGS:", JSON.stringify(settings, null, 2));
+
+  const loginEnabled = settings?.system?.userLogin ?? true;
+
+  console.log("🔥 LOGIN ENABLED:", loginEnabled);
+
+  if (user.role !== "admin" && loginEnabled === false) {
+    console.log("🚫 USER SESSION BLOCKED");
+
+    throw new Error("LOGIN_DISABLED");
+  }
+
   return user;
 }
 
@@ -44,16 +64,15 @@ async function getAuthenticatedUser() {
 ========================= */
 
 export async function GET() {
-  const response = NextResponse;
-
   try {
     await connectDB();
 
     const user = await getAuthenticatedUser();
 
-    return response.json(
+    return NextResponse.json(
       {
         success: true,
+
         user: {
           id: user._id.toString(),
           name: user.name,
@@ -63,37 +82,37 @@ export async function GET() {
           role: user.role,
         },
       },
-      { status: 200 },
+      {
+        status: 200,
+      },
     );
   } catch (error) {
     console.error(
       "ME GET ERROR:",
-      error instanceof Error
-        ? {
-            message: error.message,
-            stack: error.stack,
-          }
-        : error,
+      error instanceof Error ? error.message : error,
     );
 
-    const res = response.json(
+    const response = NextResponse.json(
       {
         success: false,
-        message: "کاربر وارد نشده است",
+
+        message:
+          error instanceof Error && error.message === "LOGIN_DISABLED"
+            ? "ورود کاربران توسط مدیریت غیرفعال شده است."
+            : "کاربر وارد نشده است",
       },
       {
         status: 401,
       },
     );
 
-    // پاک کردن توکن خراب یا منقضی شده
-    res.cookies.set("token", "", {
+    response.cookies.set("token", "", {
       httpOnly: true,
       expires: new Date(0),
       path: "/",
     });
 
-    return res;
+    return response;
   }
 }
 
@@ -123,7 +142,9 @@ export async function PUT(request: Request) {
           success: false,
           message: "نام الزامی است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -133,7 +154,9 @@ export async function PUT(request: Request) {
           success: false,
           message: "نام خانوادگی الزامی است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -143,7 +166,9 @@ export async function PUT(request: Request) {
           success: false,
           message: "شماره تلفن الزامی است",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -156,7 +181,9 @@ export async function PUT(request: Request) {
     return NextResponse.json(
       {
         success: true,
+
         message: "اطلاعات پروفایل با موفقیت به‌روزرسانی شد",
+
         user: {
           id: user._id.toString(),
           name: user.name,
@@ -166,7 +193,9 @@ export async function PUT(request: Request) {
           role: user.role,
         },
       },
-      { status: 200 },
+      {
+        status: 200,
+      },
     );
   } catch (error) {
     console.error("ME PUT ERROR:", error);
@@ -176,7 +205,9 @@ export async function PUT(request: Request) {
         success: false,
         message: "خطا در به‌روزرسانی اطلاعات پروفایل",
       },
-      { status: 500 },
+      {
+        status: 500,
+      },
     );
   }
 }

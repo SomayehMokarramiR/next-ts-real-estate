@@ -53,18 +53,26 @@ export async function GET() {
 
     let settings = await AdminSettings.findOne();
 
-    // اگر تنظیمات وجود نداشت ایجاد شود
     if (!settings) {
       settings = await AdminSettings.create(DEFAULT_SETTINGS);
     }
 
-    // هماهنگ کردن تنظیمات قدیمی با ساختار جدید
+    // هماهنگ کردن notification های قدیمی
     settings.notifications = {
       reservation: settings.notifications?.reservation ?? true,
 
       systemMessages: settings.notifications?.systemMessages ?? true,
 
       offersAndDiscounts: settings.notifications?.offersAndDiscounts ?? true,
+    };
+
+    // هماهنگ کردن system settings قدیمی
+    settings.system = {
+      maintenanceMode: settings.system?.maintenanceMode ?? false,
+
+      userRegistration: settings.system?.userRegistration ?? true,
+
+      userLogin: settings.system?.userLogin ?? true,
     };
 
     await settings.save();
@@ -150,13 +158,16 @@ export async function PUT(request: Request) {
       settings = await AdminSettings.create(DEFAULT_SETTINGS);
     }
 
-    // فقط همان بخش آپدیت شود
+    // فقط همان بخش تغییر کند
+
     settings.set(section, {
       ...settings.get(section),
+
       ...values,
     });
 
-    // اطمینان از کامل بودن notification ها
+    // تکمیل notification ها
+
     if (section === "notifications") {
       settings.notifications = {
         reservation:
@@ -171,6 +182,20 @@ export async function PUT(request: Request) {
           values.offersAndDiscounts ??
           settings.notifications.offersAndDiscounts ??
           true,
+      };
+    }
+
+    // تکمیل system ها
+
+    if (section === "system") {
+      settings.system = {
+        maintenanceMode:
+          values.maintenanceMode ?? settings.system.maintenanceMode ?? false,
+
+        userRegistration:
+          values.userRegistration ?? settings.system.userRegistration ?? true,
+
+        userLogin: values.userLogin ?? settings.system.userLogin ?? true,
       };
     }
 

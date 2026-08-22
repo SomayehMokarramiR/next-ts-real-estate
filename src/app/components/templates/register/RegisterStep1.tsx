@@ -16,6 +16,7 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [alertMessage, setAlertMessage] = useState("");
 
   const registerMutation = useRegister();
 
@@ -30,6 +31,7 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
     }
 
     setError("");
+    setAlertMessage("");
 
     try {
       const data = await registerMutation.mutateAsync({
@@ -42,9 +44,11 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
 
       if (!tempUserId) {
         setError("شناسه ثبت‌نام از سرور دریافت نشد");
+
         return;
       }
 
+      // حفظ روند قبلی
       onUserCreated(String(tempUserId));
 
       setProgress(33.33);
@@ -54,9 +58,21 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
       console.error("REGISTER STEP 1 ERROR:", error);
 
       if (error instanceof Error) {
+        // خطاهای سیستمی
+        if (
+          error.message.includes("غیرفعال") ||
+          error.message.includes("غیر فعال") ||
+          error.message.includes("disabled")
+        ) {
+          setAlertMessage(error.message);
+
+          return;
+        }
+
+        // خطاهای مربوط به فرم
         setError(error.message);
       } else {
-        setError("خطایی در ثبت ایمیل رخ داد");
+        setAlertMessage("خطایی در ثبت ایمیل رخ داد");
       }
     }
   };
@@ -72,6 +88,22 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
       gap-4
       "
     >
+      {alertMessage && (
+        <div
+          className="
+          rounded-lg
+          bg-red-50
+          text-red-600
+          text-sm
+          text-center
+          py-3
+          px-4
+          "
+        >
+          {alertMessage}
+        </div>
+      )}
+
       {/* Email */}
 
       <div className="relative">
@@ -80,7 +112,10 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
+
             setError("");
+
+            setAlertMessage("");
           }}
           placeholder="ایمیل خود را وارد کنید"
           dir="rtl"
@@ -126,7 +161,7 @@ export default function RegisterStep1({ onNext, onUserCreated }: Props) {
         />
       </div>
 
-      {/* Error */}
+      {/* Email Error */}
 
       {error && (
         <p

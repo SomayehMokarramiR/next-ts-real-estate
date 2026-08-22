@@ -1,12 +1,34 @@
 import { NextResponse } from "next/server";
 
 import { connectDB } from "@/app/lib/mongodb";
+
 import { sendVerificationEmail } from "@/app/lib/email";
+
 import TempUser from "@/app/models/TempUser";
+
+import AdminSettings from "@/app/models/AdminSettings";
 
 export async function POST(request: Request) {
   try {
     await connectDB();
+
+    // =========================
+    // Check User Registration Status
+    // =========================
+
+    const settings = await AdminSettings.findOne().select("system").lean();
+
+    if (settings?.system?.userRegistration === false) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "ثبت‌نام کاربران در حال حاضر غیرفعال است.",
+        },
+        {
+          status: 403,
+        },
+      );
+    }
 
     const body = await request.json();
 
@@ -22,7 +44,9 @@ export async function POST(request: Request) {
           success: false,
           message: "لطفا ایمیل خود را وارد کنید",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -36,7 +60,9 @@ export async function POST(request: Request) {
           success: false,
           message: "فرمت ایمیل صحیح نیست",
         },
-        { status: 400 },
+        {
+          status: 400,
+        },
       );
     }
 
@@ -57,11 +83,17 @@ export async function POST(request: Request) {
     ).toString();
 
     console.log("");
+
     console.log("=================================");
+
     console.log("🚀 REGISTER OTP");
+
     console.log("📧 EMAIL:", normalizedEmail);
+
     console.log("🔐 CODE:", verificationCode);
+
     console.log("=================================");
+
     console.log("");
 
     /* =========================
@@ -77,8 +109,11 @@ export async function POST(request: Request) {
 
     const tempUser = await TempUser.create({
       email: normalizedEmail,
+
       verificationCode,
+
       isVerified: false,
+
       expiresAt,
     });
 
@@ -88,7 +123,8 @@ export async function POST(request: Request) {
 
     let emailSent = true;
 
-    // فقط در production ایمیل واقعی ارسال شود
+    // فقط production ایمیل واقعی ارسال شود
+
     if (process.env.NODE_ENV === "production") {
       emailSent = await sendVerificationEmail(
         normalizedEmail,
@@ -119,10 +155,12 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: true,
+
         message:
           process.env.NODE_ENV === "production"
             ? "کد تایید به ایمیل شما ارسال شد"
             : "کد تایید در ترمینال نمایش داده شد",
+
         tempUserId: tempUser._id.toString(),
       },
       {
@@ -135,6 +173,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         success: false,
+
         message:
           error instanceof Error ? error.message : "خطایی در ثبت ایمیل رخ داد",
       },
