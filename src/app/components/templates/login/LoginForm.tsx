@@ -39,7 +39,11 @@ export default function LoginForm() {
               text: "با موفقیت وارد حساب کاربری شدید",
               confirmButtonText: "ادامه",
             }).then(() => {
-              router.push("/");
+              if (data.user?.role === "admin") {
+                router.replace("/admin");
+              } else {
+                router.replace("/");
+              }
             });
           }
         },

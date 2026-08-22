@@ -1,3 +1,5 @@
+import { headers } from "next/headers";
+
 import AdminGuard from "./AdminGuard";
 import AdminSidebar from "./components/AdminSidebar";
 import AdminHeader from "./components/AdminHeader";
@@ -8,6 +10,14 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+
+  // صفحه لاگین ادمین بدون چک ادمین باز شود
+  if (pathname === "/admin/login") {
+    return children;
+  }
+
   await requireAdminPage();
 
   return (

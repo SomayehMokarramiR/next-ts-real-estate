@@ -1,5 +1,7 @@
 import "./globals.css";
+
 import Providers from "./providers";
+import MaintenanceGuard from "./components/guards/MaintenanceGuard";
 
 export default function RootLayout({
   children,
@@ -10,7 +12,9 @@ export default function RootLayout({
     <html lang="fa" dir="rtl">
       <body>
         <main>
-          <Providers>{children}</Providers>
+          <Providers>
+            <MaintenanceGuard>{children}</MaintenanceGuard>
+          </Providers>
         </main>
       </body>
     </html>

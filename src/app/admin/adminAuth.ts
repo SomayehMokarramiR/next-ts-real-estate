@@ -14,7 +14,7 @@ export async function requireAdminPage() {
 
     // کاربر لاگین نیست
     if (!token) {
-      redirect("/login");
+      redirect("/admin/login");
     }
 
     const decoded = verifyToken(token) as {
@@ -22,17 +22,15 @@ export async function requireAdminPage() {
     };
 
     if (!decoded?.id) {
-      redirect("/login");
+      redirect("/admin/login");
     }
 
     const user = await User.findById(decoded.id).select("role").lean();
 
-    // کاربر وجود ندارد
     if (!user) {
-      redirect("/login");
+      redirect("/admin/login");
     }
 
-    // کاربر ادمین نیست
     if (user.role !== "admin") {
       redirect("/");
     }
@@ -41,6 +39,6 @@ export async function requireAdminPage() {
   } catch (error) {
     console.error("ADMIN PAGE AUTH ERROR:", error);
 
-    redirect("/login");
+    redirect("/admin/login");
   }
 }
