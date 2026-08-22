@@ -8,6 +8,7 @@ import { useProperties } from "@/hooks/useProperties";
 export default function VillaRentalSection() {
   const { data, isLoading } = useProperties({
     limit: "10",
+    type: "villa",
   });
 
   // ======================================
@@ -20,24 +21,8 @@ export default function VillaRentalSection() {
       ? data.properties
       : [];
 
-  // ======================================
-  // VILLAS
-  // ======================================
-
-  const villas = properties.filter((property) => property.type === "villa");
-
   // فقط ۴ ویلا برای لندینگ
-  const visibleVillas = villas.slice(0, 4);
-
-  // ======================================
-  // DEBUG
-  // ======================================
-
-  console.log("=== VILLA RENTAL SECTION ===");
-  console.log("All properties:", properties.length);
-  console.log("All villas:", villas.length);
-  console.log("Visible villas:", visibleVillas.length);
-  console.log("Villa data:", villas);
+  const visibleVillas = properties.slice(0, 4);
 
   return (
     <section className="py-12">
@@ -59,7 +44,7 @@ export default function VillaRentalSection() {
         )}
 
         {/* Empty */}
-        {!isLoading && villas.length === 0 && (
+        {!isLoading && visibleVillas.length === 0 && (
           <p className="text-center text-gray-500">
             ویلایی برای نمایش وجود ندارد
           </p>
@@ -96,7 +81,7 @@ export default function VillaRentalSection() {
               >
                 <Image
                   src={villa.images?.[0] || "/images/placeholder.jpg"}
-                  alt={villa.title}
+                  alt={villa.title || "ویلا"}
                   width={600}
                   height={350}
                   className="

@@ -1,6 +1,94 @@
+/* =========================================================
+   Tailwind
+   ========================================================= */
+
 @import "tailwindcss";
 
+/* =========================================================
+   Vazirmatn - Local Font
+   ========================================================= */
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Thin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-ExtraLight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-ExtraBold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Black.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* =========================================================
+   Dark Mode
+   ========================================================= */
+
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* =========================================================
+   Light Theme
+   ========================================================= */
 
 :root {
   --font-size: 16px;
@@ -44,11 +132,17 @@
   --muted: #ececf0;
   --muted-foreground: #717182;
 
+  /* Radius */
   --radius: 0.625rem;
 
+  /* Font Weight */
   --font-weight-medium: 500;
   --font-weight-normal: 400;
 }
+
+/* =========================================================
+   Dark Theme
+   ========================================================= */
 
 .dark {
   /* Theme */
@@ -91,7 +185,15 @@
   --muted-foreground: #b9bbc6;
 }
 
+/* =========================================================
+   Tailwind Theme
+   ========================================================= */
+
 @theme inline {
+  /* Font */
+  --font-sans: "Vazirmatn", sans-serif;
+  --default-font-family: "Vazirmatn", sans-serif;
+
   /* Background */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -108,6 +210,7 @@
 
   /* Footer */
   --color-footer-background: var(--footer-background);
+
   /* Search */
   --color-search-tab-background: var(--search-tab-background);
   --color-search-input-background: var(--search-input-background);
@@ -130,8 +233,7 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 
-  /* Static */
-
+  /* Static Colors */
   --color-primary500: #1e40af;
   --color-primary600: #1b3a9f;
   --color-primary700: #152d7c;
@@ -150,13 +252,18 @@
   --color-white: #fffffa;
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* =========================================================
+   Base
+   ========================================================= */
 
-  body {
-    @apply bg-background text-foreground;
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    border-color: var(--border);
   }
 
   html {
@@ -165,12 +272,12 @@
     font-size: var(--font-size);
   }
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: inherit;
-    padding: 0;
-    margin: 0;
+  body {
+    @apply bg-background text-foreground;
+
+    font-family: "Vazirmatn", sans-serif;
+    font-weight: 400;
+    line-height: 1.5;
   }
 
   h1 {
@@ -208,10 +315,20 @@
     font-size: var(--text-base);
     font-weight: var(--font-weight-normal);
     line-height: 1.5;
+    font-family: inherit;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
   }
 }
 
-/* Login Swiper */
+/* =========================================================
+   Login Swiper
+   ========================================================= */
 
 .login-swiper .swiper-pagination {
   bottom: 16px;
@@ -224,17 +341,25 @@
 .login-swiper .swiper-pagination-bullet {
   width: 10px;
   height: 10px;
+
   background-color: #ffffff !important;
+
   opacity: 0.7 !important;
+
   border-radius: 9999px;
+
   transition: 0.3s;
+
   margin: 0 !important;
 }
 
 .login-swiper .swiper-pagination-bullet-active {
   width: 28px !important;
   height: 10px !important;
+
   background-color: #1e40af !important;
+
   opacity: 1 !important;
+
   border-radius: 9999px;
 }
