@@ -5,10 +5,31 @@ import { useState } from "react";
 import Search from "@/app/components/modules/search/Search";
 import ContentReseve from "../components/templates/houseReserve/contentReseve/ContentReseve";
 import MainLayout from "../components/layout/MainLayout";
+import { useProperties, type PropertiesResponse } from "@/hooks/useProperties";
+
+type ReserveFilters = Record<string, string>;
 
 export default function Page() {
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<ReserveFilters>({});
   const [resetKey, setResetKey] = useState(0);
+  const { data } = useProperties({
+    limit: "100",
+  });
+  const properties = (data as PropertiesResponse | undefined)?.properties ?? [];
+
+  const reserveProperties = properties.filter((property) => {
+    const dailyPrice = Number(property.pricing?.daily ?? 0);
+
+    return dailyPrice > 0 && property.status !== "inactive";
+  });
+
+  const cityOptions = Array.from(
+    new Set(
+      reserveProperties
+        .map((property) => property.location?.city)
+        .filter(Boolean),
+    ),
+  );
 
   const clearFilters = () => {
     setFilters({});
@@ -22,22 +43,23 @@ export default function Page() {
           key={resetKey}
           variant="houseReserve"
           onSearch={(data) => {
-            const apiFilters = {
-              search: data["جستجو"] || "",
+            const apiFilters: ReserveFilters = {
+              search: data["جستجو"] ?? "",
+              city: data["مقصد یا هتل شما"] ?? "",
+              sort: data["مرتب سازی براساس"] ?? "",
+              facilities: data["امکانات هتل"] ?? "",
+              rating: data["امتیاز هتل"] ?? "",
+              minPrice: data["حداقل قیمت"] ?? "",
+              maxPrice: data["حداکثر قیمت"] ?? "",
 
-              city: data["مقصد یا هتل شما"] || "",
+              // فقط اقامتگاه‌های قابل رزرو
+              bookingType: "reserve",
 
-              sort: data["مرتب سازی براساس"] || "",
-
-              facility: data["امکانات هتل"] || "",
-
-              rating: data["امتیاز هتل"] || "",
-
-              minPrice: data["حداقل قیمت"] || "",
-
-              maxPrice: data["حداکثر قیمت"] || "",
+              // برای جلوگیری از کم آمدن نتایج رزرو
+              limit: "100",
             };
-            console.log("API FILTERS ===>", apiFilters);
+
+            console.log("RESERVE FILTERS ===>", apiFilters);
 
             setFilters(apiFilters);
           }}
@@ -52,7 +74,7 @@ export default function Page() {
               type: "select",
               label: "مقصد یا هتل شما",
               placeholder: "انتخاب شهر",
-              options: ["محمودآباد", "رشت", "گیلان"],
+              options: cityOptions,
             },
 
             {
@@ -73,7 +95,13 @@ export default function Page() {
               type: "select",
               label: "امتیاز هتل",
               placeholder: "انتخاب امتیاز",
-              options: ["5 ستاره", "4 ستاره"],
+              options: [
+                "5 ستاره به بالا",
+                "4 ستاره به بالا",
+                "3 ستاره به بالا",
+                "2 ستاره به بالا",
+                "1 ستاره به بالا",
+              ],
             },
 
             {
@@ -96,11 +124,6 @@ export default function Page() {
             {
               type: "button",
               label: "حذف فیلتر",
-            },
-
-            {
-              type: "button",
-              label: "۳۳ آگهی پیدا شد",
             },
           ]}
         />

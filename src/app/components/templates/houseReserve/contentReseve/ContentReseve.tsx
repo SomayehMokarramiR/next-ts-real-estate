@@ -46,10 +46,8 @@ export default function ContentReseve({ filters = {} }: Props) {
   // ===============================
 
   const { data, isLoading, error } = useProperties({
-    ...filters,
     limit: "100",
   });
-
   const properties: Property[] =
     (data as PropertiesResponse | undefined)?.properties ?? [];
 
@@ -59,14 +57,74 @@ export default function ContentReseve({ filters = {} }: Props) {
     return dailyPrice > 0 && property.status !== "inactive";
   });
 
-  console.log(
-    "RESERVE PROPERTIES:",
-    apiProperties.map((p) => ({
-      title: p.title,
-      status: p.status,
-      bookingType: p.bookingType,
-    })),
-  );
+  const displayedProperties = apiProperties
+    .filter((property) => {
+      const search = filters.search?.trim().toLowerCase() || "";
+
+      const selectedCity = filters.city?.trim().toLowerCase() || "";
+
+      const title = property.title?.trim().toLowerCase() || "";
+
+      const city = property.location?.city?.trim().toLowerCase() || "";
+
+      const address = property.location?.address?.trim().toLowerCase() || "";
+
+      // سرچ نام، شهر، آدرس
+      const searchMatch =
+        !search ||
+        title.includes(search) ||
+        city.includes(search) ||
+        address.includes(search);
+
+      // فیلتر شهر انتخابی
+      const cityMatch = !selectedCity || city === selectedCity;
+
+      // قیمت
+      const price = Number(property.pricing?.daily ?? 0);
+
+      const min = Number(filters.minPrice || 0);
+
+      const max = Number(filters.maxPrice || Infinity);
+
+      const priceMatch = price >= min && price <= max;
+
+      // امکانات
+      const facility = filters.facilities?.trim();
+
+      const facilityMatch =
+        !facility ||
+        (facility === "استخر" && property.facilities?.pool === true) ||
+        (facility === "پارکینگ" && property.facilities?.parking === true);
+
+      // امتیاز
+      const ratingValue = filters.rating
+        ? Number(filters.rating.split(" ")[0])
+        : 0;
+
+      const ratingMatch =
+        !filters.rating || Number(property.rating ?? 0) >= ratingValue;
+
+      console.log("RATING TEST", {
+        title: property.title,
+        propertyRating: property.rating,
+        filterRating: filters.rating,
+      });
+
+      return (
+        searchMatch && cityMatch && priceMatch && facilityMatch && ratingMatch
+      );
+    })
+    .sort((a, b) => {
+      if (filters.sort === "محبوب‌ترین") {
+        return Number(b.views ?? 0) - Number(a.views ?? 0);
+      }
+
+      if (filters.sort === "ارزان‌ترین") {
+        return Number(a.pricing?.daily ?? 0) - Number(b.pricing?.daily ?? 0);
+      }
+
+      return 0;
+    });
 
   const activeProp = apiProperties.find((item) => item._id === activePin);
 
@@ -131,7 +189,7 @@ export default function ContentReseve({ filters = {} }: Props) {
         content-start
       "
       >
-        {apiProperties.length === 0 ? (
+        {displayedProperties.length === 0 ? (
           <div
             className="
               flex
@@ -165,7 +223,7 @@ export default function ContentReseve({ filters = {} }: Props) {
             </div>
           </div>
         ) : (
-          apiProperties.map((property) => (
+          displayedProperties.map((property) => (
             <div
               key={property._id}
               onMouseEnter={() => setActivePin(property._id)}
