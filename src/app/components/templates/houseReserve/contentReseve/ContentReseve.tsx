@@ -17,7 +17,11 @@ import Image from "next/image";
 
 import MapPinCmp from "./MapPinCmp";
 
-import { useProperties, type Property } from "@/hooks/useProperties";
+import {
+  useProperties,
+  type Property,
+  type PropertiesResponse,
+} from "@/hooks/useProperties";
 
 type Props = {
   filters?: Record<string, string>;
@@ -37,45 +41,33 @@ function formatPrice(price: number) {
 
 export default function ContentReseve({ filters = {} }: Props) {
   const [activePin, setActivePin] = useState<string | null>(null);
-
   // ===============================
   // GET PROPERTIES
   // ===============================
 
   const { data, isLoading, error } = useProperties({
     ...filters,
-
-    // مهم:
-    // صفحه رزرو نباید فقط 10 ملک بگیرد
-    // چون ممکن است 28 ملک رزروی داشته باشیم
     limit: "100",
   });
 
-  // ===============================
-  // RESERVE LOGIC
-  // ===============================
+  const properties: Property[] =
+    (data as PropertiesResponse | undefined)?.properties ?? [];
 
-  const apiProperties: Property[] = (data?.properties ?? []).filter(
-    (property) => {
-      const dailyPrice = Number(property.pricing?.daily ?? 0);
+  const apiProperties = properties.filter((property) => {
+    const dailyPrice = Number(property.pricing?.daily ?? 0);
 
-      console.log("CHECK PROPERTY:", {
-        title: property.title,
-        bookingType: property.bookingType,
-        status: property.status,
-        dailyPrice,
-      });
-
-      return property.status !== "inactive" && dailyPrice > 0;
-    },
-  );
+    return dailyPrice > 0 && property.status !== "inactive";
+  });
 
   console.log(
     "RESERVE PROPERTIES:",
-    data?.properties?.filter(
-      (p) => p.bookingType === "daily" || p.bookingType === "monthly",
-    ).length,
+    apiProperties.map((p) => ({
+      title: p.title,
+      status: p.status,
+      bookingType: p.bookingType,
+    })),
   );
+
   const activeProp = apiProperties.find((item) => item._id === activePin);
 
   if (isLoading) {
