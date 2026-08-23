@@ -1,6 +1,7 @@
 "use client";
 
 import { MapPin, Bed, Bath, Users, Car, Star } from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,9 +11,13 @@ import PropertyFavoriteButton from "../../templates/properties/PropertyFavoriteB
 
 type Props = {
   property: Property;
+  showTransactionOnPriceBox?: boolean;
 };
 
-export default function PropertyCard({ property }: Props) {
+export default function PropertyCard({
+  property,
+  showTransactionOnPriceBox = false,
+}: Props) {
   const transactionLabels: Record<
     NonNullable<Property["transactionType"]>,
     string
@@ -73,8 +78,6 @@ export default function PropertyCard({ property }: Props) {
             />
           </Link>
 
-          {/* FAVORITE */}
-
           <PropertyFavoriteButton propertyId={property._id} />
 
           {/* RATING */}
@@ -128,7 +131,6 @@ export default function PropertyCard({ property }: Props) {
             <MapPin size={11} className="text-white shrink-0" />
           </div>
         </div>
-
         {/* BODY */}
 
         <Link href={`/properties/${property._id}`}>
@@ -172,6 +174,8 @@ export default function PropertyCard({ property }: Props) {
               </div>
             )}
 
+            {/* FEATURES */}
+
             <div
               className="
                 flex
@@ -207,6 +211,7 @@ export default function PropertyCard({ property }: Props) {
 
               <span className="flex items-center gap-[3px]">
                 <Car size={12} />
+
                 {property.facilities?.parking ? "دارد" : "ندارد"}
               </span>
             </div>
@@ -219,50 +224,72 @@ export default function PropertyCard({ property }: Props) {
               "
             />
 
+            {/* PRICE BOX */}
+            {/* PRICE BOX */}
+
             <div
               className="
-                flex
-                flex-col
-                gap-1.5
-                bg-[#EDEDED]
-                dark:bg-[#272727]
-                rounded-xl
-                px-3
-                py-2.5
-              "
+    flex
+    flex-col
+    gap-1.5
+    bg-[#EDEDED]
+    dark:bg-[#272727]
+    rounded-xl
+    px-3
+    py-2.5
+  "
             >
-              {showMonthlyRent && (
-                <div className="flex justify-between">
-                  <span className="text-xs text-gray-500">اجاره ماهانه</span>
-
-                  <span className="font-bold">
-                    {monthlyRent
-                      ? `${monthlyRent.toLocaleString("fa-IR")} تومان`
-                      : "توافقی"}
+              {property.transactionType === "sale" ? (
+                <div className="flex justify-center">
+                  <span
+                    className="
+          text-xs
+          font-semibold
+          text-gray-700
+          dark:text-gray-200
+        "
+                  >
+                    این ملک برای فروش ارائه شده است
                   </span>
                 </div>
-              )}
+              ) : (
+                <>
+                  {showMonthlyRent && (
+                    <div className="flex justify-between">
+                      <span className="text-xs text-gray-500">
+                        اجاره ماهانه
+                      </span>
 
-              {showMortgage && (
-                <div className="flex justify-between">
-                  <span className="text-xs text-gray-500">مبلغ رهن</span>
+                      <span className="font-bold">
+                        {monthlyRent
+                          ? `${monthlyRent.toLocaleString("fa-IR")} تومان`
+                          : "توافقی"}
+                      </span>
+                    </div>
+                  )}
 
-                  <span className="font-bold">
-                    {mortgage
-                      ? `${mortgage.toLocaleString("fa-IR")} تومان`
-                      : "توافقی"}
-                  </span>
-                </div>
-              )}
+                  {showMortgage && (
+                    <div className="flex justify-between">
+                      <span className="text-xs text-gray-500">مبلغ رهن</span>
 
-              {showDailyPrice && (
-                <div className="flex justify-between">
-                  <span className="text-xs text-gray-500">اجاره شبانه</span>
+                      <span className="font-bold">
+                        {mortgage
+                          ? `${mortgage.toLocaleString("fa-IR")} تومان`
+                          : "توافقی"}
+                      </span>
+                    </div>
+                  )}
 
-                  <span className="font-bold">
-                    {dailyPrice!.toLocaleString("fa-IR")} تومان
-                  </span>
-                </div>
+                  {showDailyPrice && (
+                    <div className="flex justify-between">
+                      <span className="text-xs text-gray-500">اجاره شبانه</span>
+
+                      <span className="font-bold">
+                        {dailyPrice!.toLocaleString("fa-IR")} تومان
+                      </span>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 

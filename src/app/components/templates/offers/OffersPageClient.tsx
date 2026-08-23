@@ -6,32 +6,15 @@ import { useProperties } from "@/hooks/useProperties";
 export default function OffersPageClient() {
   const { data, isLoading, error } = useProperties({
     page: "1",
-    limit: "50",
+    limit: "100",
+    discounted: "true",
   });
-
-  // ======================================
-  // API DATA
-  // ======================================
 
   const properties = Array.isArray(data)
     ? data
     : Array.isArray(data?.properties)
       ? data.properties
       : [];
-
-  // ======================================
-  // DISCOUNTED PROPERTIES
-  // ======================================
-
-  const discountedProperties = properties.filter((property) => {
-    const discount = Number(property.pricing?.discount ?? 0);
-
-    return Number.isFinite(discount) && discount > 0;
-  });
-
-  // ======================================
-  // PAGE
-  // ======================================
 
   return (
     <section
@@ -55,10 +38,6 @@ export default function OffersPageClient() {
           mx-auto
         "
       >
-        {/* ==============================
-            HEADER
-        ============================== */}
-
         <div className="text-center mb-10">
           <h1
             className="
@@ -83,55 +62,37 @@ export default function OffersPageClient() {
           </p>
         </div>
 
-        {/* ==============================
-            LOADING
-        ============================== */}
-
         {isLoading && (
           <div className="flex justify-center py-16">
-            <p className="text-center text-gray-500 dark:text-gray-300">
-              در حال بارگذاری...
-            </p>
+            <p className="text-gray-500">در حال بارگذاری...</p>
           </div>
         )}
-
-        {/* ==============================
-            ERROR
-        ============================== */}
 
         {!isLoading && error && (
           <div className="flex justify-center py-16">
-            <p className="text-center text-red-500">خطا در دریافت تخفیف‌ها</p>
+            <p className="text-red-500">خطا در دریافت تخفیف‌ها</p>
           </div>
         )}
 
-        {/* ==============================
-            EMPTY
-        ============================== */}
-
-        {!isLoading && !error && discountedProperties.length === 0 && (
+        {!isLoading && !error && properties.length === 0 && (
           <div className="flex justify-center py-16">
-            <p className="text-center text-gray-500 dark:text-gray-300">
+            <p className="text-gray-500 dark:text-gray-300">
               در حال حاضر تخفیفی برای نمایش وجود ندارد
             </p>
           </div>
         )}
 
-        {/* ==============================
-            OFFERS
-        ============================== */}
-
-        {!isLoading && !error && discountedProperties.length > 0 && (
+        {!isLoading && !error && properties.length > 0 && (
           <div
             className="
-                grid
-                grid-cols-1
-                sm:grid-cols-2
-                lg:grid-cols-3
-                gap-6
-              "
+              grid
+              grid-cols-1
+              sm:grid-cols-2
+              lg:grid-cols-3
+              gap-6
+            "
           >
-            {discountedProperties.map((property) => (
+            {properties.map((property) => (
               <div key={property._id} className="w-full">
                 <OfferCard offer={property} />
               </div>

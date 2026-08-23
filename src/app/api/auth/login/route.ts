@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
 
-import { connectDB } from "../../../lib/mongodb";
-
-import User from "../../../models/User";
-
-import AdminSettings from "../../../models/AdminSettings";
-
-import { createToken } from "../../../lib/auth";
+import { connectDB } from "@/app/lib/mongodb";
+import User from "@/app/models/User";
+import AdminSettings from "@/app/models/AdminSettings";
+import { createToken } from "@/app/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -65,29 +62,24 @@ export async function POST(request: Request) {
       );
     }
 
-    const role = user.role?.trim();
+    const role = user.role?.trim() || "user";
 
-    console.log("🔥 USER INFO:", {
+    console.log("🔥 USER:", {
       email: user.email,
       role,
     });
 
-    // ==============================
-    // SYSTEM LOGIN CHECK
-    // ==============================
+    // ==========================
+    // SYSTEM LOGIN SETTING
+    // ==========================
 
     const settings = await AdminSettings.findOne().select("system").lean();
 
     const loginEnabled = settings?.system?.userLogin ?? true;
 
-    console.log("🔥 SYSTEM:", settings?.system);
-
     console.log("🔥 LOGIN ENABLED:", loginEnabled);
 
-    // فقط کاربر معمولی بلاک شود
     if (role !== "admin" && loginEnabled === false) {
-      console.log("🚫 NORMAL USER LOGIN BLOCKED");
-
       return NextResponse.json(
         {
           success: false,
@@ -103,7 +95,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          message: "اطلاعات کاربر ناقص است",
+          message: "رمز عبور کاربر وجود ندارد",
         },
         {
           status: 500,
@@ -111,9 +103,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const passwordValid = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
 
-    if (!passwordValid) {
+    if (!isValidPassword) {
       return NextResponse.json(
         {
           success: false,
@@ -160,12 +152,12 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error) {
-    console.error("LOGIN ERROR:", error);
+    console.error("🔥 LOGIN ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: error instanceof Error ? error.message : "خطای سرور",
       },
       {
         status: 500,

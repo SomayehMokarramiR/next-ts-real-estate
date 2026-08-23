@@ -68,17 +68,15 @@ export default function VillaRentalSection() {
                 key={villa._id}
                 href={`/properties/${villa._id}`}
                 className="
-                  relative
-                  rounded-2xl
-                  overflow-hidden
-                  cursor-pointer
-                  group
-                  shadow-sm
-                  hover:shadow-lg
-                  transition
-                  block
-                  w-full
-                "
+    relative
+    block
+    overflow-hidden
+    rounded-2xl
+    group
+    shadow-sm
+    hover:shadow-lg
+    transition
+  "
               >
                 <Image
                   src={villa.images?.[0] || "/images/placeholder.jpg"}
@@ -86,91 +84,71 @@ export default function VillaRentalSection() {
                   width={600}
                   height={350}
                   className="
-                    w-full
-                    h-56
-                    object-cover
-                    transition-transform
-                    duration-300
-                    group-hover:scale-105
-                  "
+      w-full
+      h-56
+      object-cover
+      transition-transform
+      duration-300
+      group-hover:scale-105
+    "
                 />
 
                 <div
                   className="
-    absolute
-    bottom-3
-    right-3
-    left-3
-    rounded-2xl
-    bg-white/95
-    dark:bg-[#353535]
-    backdrop-blur-sm
-    px-4
-    py-3
-    shadow-lg
-  "
+      absolute
+      bottom-3
+      right-3
+      left-3
+      rounded-xl
+      bg-white/95
+      dark:bg-[#353535]/95
+      px-3
+      py-2
+      shadow-md
+      backdrop-blur-sm
+    "
                 >
-                  <h3
-                    className="
-      text-sm
-      font-bold
-      text-gray-900
-      dark:text-white
-      truncate
-    "
-                  >
-                    {villa.title || "ویلای زیبا"}
-                  </h3>
-
-                  <p
-                    className="
-      mt-2
-      text-xs
-      text-gray-600
-      dark:text-gray-300
-      line-clamp-2
-      min-h-[32px]
-    "
-                  >
-                    {villa.description || "اقامتگاه زیبا و مجهز"}
-                  </p>
-
-                  <div
-                    className="
-      mt-3
-      flex
-      items-center
-      justify-between
-      gap-2
-    "
-                  >
-                    <span
+                  <div className="flex items-start justify-between gap-2">
+                    <h3
                       className="
-        text-xs
-        font-medium
-        text-gray-700
-        dark:text-gray-200
-      "
+          text-sm
+          font-bold
+          text-gray-900
+          dark:text-white
+          truncate
+        "
                     >
-                      {villa.location?.city || "نامشخص"}
-                    </span>
+                      {villa.title || "ویلای زیبا"}
+                    </h3>
 
                     {villa.facilities?.capacity &&
                       villa.facilities.capacity > 0 && (
                         <span
                           className="
-            rounded-full
-            bg-primary500
-            px-3
-            py-1
-            text-xs
-            font-semibold
-            text-white
-          "
+              shrink-0
+              rounded-full
+              bg-primary500
+              px-2
+              py-1
+              text-[10px]
+              font-semibold
+              text-white
+            "
                         >
                           {villa.facilities.capacity} نفر
                         </span>
                       )}
+                  </div>
+
+                  <div
+                    className="
+        mt-1
+        text-xs
+        text-gray-500
+        dark:text-gray-400
+      "
+                  >
+                    {villa.location?.city || "نامشخص"}
                   </div>
                 </div>
               </Link>

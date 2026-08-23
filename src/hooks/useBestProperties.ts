@@ -1,8 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+
 import type { Property } from "./useProperties";
 
 async function fetchBestProperties(): Promise<Property[]> {
-  const res = await fetch("/api/properties?featured=true&sort=بالاترین امتیاز");
+  const res = await fetch("/api/properties/best", {
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     throw new Error("خطا در دریافت بهترین اقامتگاه‌ها");
@@ -14,11 +17,11 @@ async function fetchBestProperties(): Promise<Property[]> {
     throw new Error(data.message || "خطا در دریافت اطلاعات بهترین اقامتگاه‌ها");
   }
 
-  return data.properties ?? [];
+  return Array.isArray(data.properties) ? data.properties : [];
 }
 
 export function useBestProperties() {
-  return useQuery({
+  return useQuery<Property[], Error>({
     queryKey: ["best-properties"],
 
     queryFn: fetchBestProperties,

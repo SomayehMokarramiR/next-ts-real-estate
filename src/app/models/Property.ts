@@ -15,8 +15,10 @@ export interface IProperty extends Document {
     | "office"
     | "commercial";
 
-  transactionType: "rent" | "mortgage" | "rent-mortgage" | "sale";
+  // نوع معامله
+  transactionType: "rent" | "mortgage" | "rent-mortgage" | "sale" | "none";
 
+  // نوع رزرو
   bookingType: "daily" | "monthly" | "none";
 
   images: string[];
@@ -97,7 +99,9 @@ const PropertySchema = new Schema<IProperty>(
     transactionType: {
       type: String,
 
-      enum: ["rent", "mortgage", "rent-mortgage", "sale"],
+      enum: ["rent", "mortgage", "rent-mortgage", "sale", "none"],
+
+      default: "none",
 
       required: true,
     },
@@ -157,37 +161,32 @@ const PropertySchema = new Schema<IProperty>(
 
     area: {
       type: Number,
+
       default: 0,
     },
 
     pricing: {
-      // قیمت فروش
       salePrice: {
         type: Number,
       },
 
-      // قیمت روزانه
       daily: {
         type: Number,
         default: 0,
       },
 
-      // اجاره ماهانه
       monthly: {
         type: Number,
       },
 
-      // مبلغ رهن
       mortgage: {
         type: Number,
       },
 
-      // قیمت قبلی
       oldPrice: {
         type: Number,
       },
 
-      // درصد تخفیف
       discount: {
         type: Number,
       },
@@ -207,11 +206,13 @@ const PropertySchema = new Schema<IProperty>(
 
     rating: {
       type: Number,
+
       default: 0,
     },
 
     views: {
       type: Number,
+
       default: 0,
     },
 
@@ -241,7 +242,8 @@ const PropertySchema = new Schema<IProperty>(
   },
 );
 
-// جلوگیری از استفاده مدل قدیمی در Hot Reload
+// جلوگیری از مدل قدیمی در hot reload
+
 if (mongoose.models.Property) {
   delete mongoose.models.Property;
 }

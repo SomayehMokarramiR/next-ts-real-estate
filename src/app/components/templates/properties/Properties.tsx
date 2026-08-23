@@ -1,22 +1,26 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
-  ArrowLeft,
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  Users,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import { Building2, ChevronLeft, ChevronRight } from "lucide-react";
+
+import { useSearchParams } from "next/navigation";
+
 import PropertyCard from "./PropertyCard";
+
+// =====================================================
+// PROPERTY LOCATION
+// =====================================================
 
 interface PropertyLocation {
   city?: string;
   address?: string;
   province?: string;
 }
+
+// =====================================================
+// PROPERTY FACILITIES
+// =====================================================
 
 interface PropertyFacilities {
   capacity?: number;
@@ -27,107 +31,313 @@ interface PropertyFacilities {
   pool?: boolean;
 }
 
+// =====================================================
+// PROPERTY PRICING
+// =====================================================
+
+interface PropertyPricing {
+  daily?: number;
+  monthly?: number;
+  mortgage?: number;
+  sale?: number;
+  oldPrice?: number;
+  discount?: number;
+}
+
+// =====================================================
+// PROPERTY
+// =====================================================
+
 interface Property {
   _id: string;
+
   title: string;
+
   description?: string;
+
   type?: string;
+
   image?: string;
+
   images?: string[];
+
   location?: PropertyLocation;
+
   facilities?: PropertyFacilities;
+
+  pricing?: PropertyPricing;
+
+  transactionType?: "rent" | "mortgage" | "rent-mortgage" | "sale";
+
+  bookingType?: "daily" | "monthly" | "none";
+
   status?: "available" | "reserved" | "inactive";
+
   createdAt?: string;
 }
 
-interface PropertiesProps {
-  filters?: {
-    city?: string;
-    guests?: string;
-    type?: string;
-  };
+// =====================================================
+// FILTERS
+// =====================================================
+
+interface PropertiesFilters {
+  city?: string;
+
+  guests?: string;
+
+  type?: string;
+
+  transactionType?: string;
+
+  bookingType?: "daily" | "monthly" | "none";
+
+  checkIn?: string;
+
+  checkOut?: string;
 }
+
+// =====================================================
+// PROPS
+// =====================================================
+
+interface PropertiesProps {
+  filters?: PropertiesFilters;
+}
+
+// =====================================================
+// RESPONSE
+// =====================================================
 
 interface PropertiesResponse {
   success: boolean;
+
   properties: Property[];
+
   total: number;
+
   totalPages: number;
+
   currentPage: number;
+
   limit: number;
+
   message?: string;
 }
 
+// =====================================================
+// CONSTANT
+// =====================================================
+
 const ITEMS_PER_PAGE = 6;
 
-const PROPERTY_TYPE_LABELS: Record<string, string> = {
-  apartment: "آپارتمان",
-  villa: "ویلا",
-  house: "خانه",
-  hotel: "هتل",
-  suite: "سوئیت",
-};
+// =====================================================
+// COMPONENT
+// =====================================================
 
-function getPropertyImage(property: Property) {
-  if (property.image) {
-    return property.image;
-  }
+export default function Properties({ filters = {} }: PropertiesProps) {
+  const searchParams = useSearchParams();
 
-  if (property.images?.length) {
-    return property.images[0];
-  }
+  // =====================================================
+  // STATE
+  // =====================================================
 
-  return "/images/galary1.png";
-}
-
-function getPropertyType(type?: string) {
-  if (!type) {
-    return "ملک";
-  }
-
-  return PROPERTY_TYPE_LABELS[type] ?? type;
-}
-
-export default function Properties({ filters }: PropertiesProps) {
   const [properties, setProperties] = useState<Property[]>([]);
+
   const [total, setTotal] = useState(0);
+
   const [totalPages, setTotalPages] = useState(1);
+
   const [currentPage, setCurrentPage] = useState(1);
 
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
+
+  const previousFilterKeyRef = useRef<string | null>(null);
+
+  // =====================================================
+  // URL FILTERS
+  // =====================================================
+
+  const cityFromUrl = searchParams.get("city")?.trim() ?? "";
+
+  const guestsFromUrl = searchParams.get("guests")?.trim() ?? "";
+
+  const typeFromUrl = searchParams.get("type")?.trim() ?? "";
+
+  const transactionTypeFromUrl =
+    searchParams.get("transactionType")?.trim() ?? "";
+
+  const bookingTypeFromUrl = searchParams.get("bookingType")?.trim() ?? "";
+
+  const checkInFromUrl = searchParams.get("checkIn")?.trim() ?? "";
+
+  const checkOutFromUrl = searchParams.get("checkOut")?.trim() ?? "";
+
+  // =====================================================
+  // FINAL VALUES
+  // =====================================================
+
+  const city = cityFromUrl || filters.city || "";
+
+  const guests = guestsFromUrl || filters.guests || "";
+
+  const propertyType = typeFromUrl || filters.type || "";
+
+  const transactionType =
+    transactionTypeFromUrl || filters.transactionType || "";
+
+  const bookingType = bookingTypeFromUrl || filters.bookingType || "";
+
+  const checkIn = checkInFromUrl || filters.checkIn || "";
+
+  const checkOut = checkOutFromUrl || filters.checkOut || "";
+
+  // =====================================================
+  // FILTER KEY
+  // =====================================================
+
+  const filterKey = JSON.stringify({
+    city,
+
+    guests,
+
+    propertyType,
+
+    transactionType,
+
+    bookingType,
+
+    checkIn,
+
+    checkOut,
+  });
+  // =====================================================
+  // FETCH PROPERTIES
+  // =====================================================
 
   useEffect(() => {
     let cancelled = false;
 
-    const fetchProperties = async () => {
+    async function fetchProperties() {
       try {
+        // ===============================
+        // RESET PAGE ON FILTER CHANGE
+        // ===============================
+
+        if (
+          previousFilterKeyRef.current !== null &&
+          previousFilterKeyRef.current !== filterKey
+        ) {
+          previousFilterKeyRef.current = filterKey;
+
+          if (currentPage !== 1) {
+            setCurrentPage(1);
+
+            return;
+          }
+        }
+
+        previousFilterKeyRef.current = filterKey;
+
         setLoading(true);
+
         setError("");
+
+        // ===============================
+        // BUILD PARAMS
+        // ===============================
 
         const params = new URLSearchParams();
 
         params.set("page", String(currentPage));
+
         params.set("limit", String(ITEMS_PER_PAGE));
 
-        if (filters?.city?.trim()) {
-          params.set("city", filters.city.trim());
+        // ===============================
+        // CITY
+        // ===============================
+
+        if (city) {
+          params.set("city", city);
         }
 
-        if (filters?.guests?.trim()) {
-          params.set("guests", filters.guests.trim());
+        // ===============================
+        // GUESTS
+        // ===============================
+
+        if (guests) {
+          params.set("guests", guests);
         }
 
-        if (filters?.type?.trim()) {
-          params.set("type", filters.type.trim());
+        // ===============================
+        // PROPERTY TYPE
+        // ===============================
+
+        if (propertyType) {
+          params.set("type", propertyType);
         }
 
-        const response = await fetch(`/api/properties?${params.toString()}`, {
+        // ===============================
+        // TRANSACTION TYPE
+        // ===============================
+
+        if (transactionType) {
+          params.set("transactionType", transactionType);
+        }
+
+        // ===============================
+        // BOOKING
+        // ===============================
+
+        if (bookingType) {
+          params.set("bookingType", bookingType);
+        }
+
+        // ===============================
+        // DATES
+        // ===============================
+
+        if (checkIn) {
+          params.set("checkIn", checkIn);
+        }
+
+        if (checkOut) {
+          params.set("checkOut", checkOut);
+        }
+
+        const url = `/api/properties?${params.toString()}`;
+
+        console.log("PROPERTIES API URL:", url);
+
+        console.log("PROPERTIES FILTERS:", {
+          city,
+
+          guests,
+
+          propertyType,
+
+          transactionType,
+
+          bookingType,
+
+          checkIn,
+
+          checkOut,
+
+          currentPage,
+        });
+
+        // ===============================
+        // REQUEST
+        // ===============================
+
+        const response = await fetch(url, {
           method: "GET",
           cache: "no-store",
         });
 
-        const data: PropertiesResponse = await response.json();
+        const data = (await response.json()) as PropertiesResponse;
 
         if (!response.ok || !data.success) {
           throw new Error(data.message || "خطا در دریافت املاک");
@@ -137,17 +347,27 @@ export default function Properties({ filters }: PropertiesProps) {
           return;
         }
 
-        setProperties(data.properties ?? []);
-        setTotal(data.total ?? 0);
-        setTotalPages(data.totalPages ?? 1);
+        // ===============================
+        // SET DATA
+        // ===============================
 
-        if (data.currentPage) {
-          setCurrentPage(data.currentPage);
-        }
+        setProperties(Array.isArray(data.properties) ? data.properties : []);
+
+        setTotal(Number(data.total) || 0);
+
+        setTotalPages(Math.max(1, Number(data.totalPages) || 1));
       } catch (err) {
         if (cancelled) {
           return;
         }
+
+        console.error("PROPERTIES FETCH ERROR:", err);
+
+        setProperties([]);
+
+        setTotal(0);
+
+        setTotalPages(1);
 
         setError(err instanceof Error ? err.message : "خطا در دریافت املاک");
       } finally {
@@ -155,16 +375,30 @@ export default function Properties({ filters }: PropertiesProps) {
           setLoading(false);
         }
       }
-    };
+    }
 
     fetchProperties();
 
     return () => {
       cancelled = true;
     };
-  }, [currentPage, filters?.city, filters?.guests, filters?.type]);
+  }, [
+    filterKey,
+    currentPage,
+    city,
+    guests,
+    propertyType,
+    transactionType,
+    bookingType,
+    checkIn,
+    checkOut,
+  ]);
 
-  const handlePageChange = (page: number) => {
+  // =====================================================
+  // PAGE CHANGE
+  // =====================================================
+
+  function handlePageChange(page: number) {
     if (page < 1 || page > totalPages || page === currentPage) {
       return;
     }
@@ -173,42 +407,85 @@ export default function Properties({ filters }: PropertiesProps) {
 
     window.scrollTo({
       top: 0,
+
       behavior: "smooth",
     });
-  };
+  }
+  // =====================================================
+  // LOADING
+  // =====================================================
 
   if (loading) {
     return (
-      <section className="max-w-7xl mx-auto px-4" dir="rtl">
+      <section className="mx-auto max-w-7xl px-4" dir="rtl">
         <div className="mb-6">
-          <div className="h-8 w-40 rounded-lg bg-gray-200 dark:bg-[#353535] animate-pulse" />
-          <div className="mt-2 h-4 w-28 rounded bg-gray-200 dark:bg-[#353535] animate-pulse" />
+          <div
+            className="
+            h-8
+            w-40
+            animate-pulse
+            rounded-lg
+            bg-gray-200
+          "
+          />
         </div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div
+          className="
+          grid
+          grid-cols-1
+          gap-5
+          sm:grid-cols-2
+          lg:grid-cols-3
+        "
+        >
           {Array.from({
             length: ITEMS_PER_PAGE,
           }).map((_, index) => (
             <div
               key={index}
               className="
-                overflow-hidden
-                rounded-2xl
-                border
-                border-gray-100
-                dark:border-[#353535]
-                bg-white
-                dark:bg-[#272727]
-                animate-pulse
-              "
+              animate-pulse
+              overflow-hidden
+              rounded-2xl
+              border
+              bg-white
+            "
             >
-              <div className="h-52 bg-gray-200 dark:bg-[#353535]" />
+              <div
+                className="
+                h-52
+                bg-gray-200
+              "
+              />
 
               <div className="space-y-3 p-4">
-                <div className="h-4 w-3/4 rounded bg-gray-200 dark:bg-[#353535]" />
-                <div className="h-3 w-full rounded bg-gray-200 dark:bg-[#353535]" />
-                <div className="h-3 w-2/3 rounded bg-gray-200 dark:bg-[#353535]" />
-                <div className="h-11 w-full rounded-xl bg-gray-200 dark:bg-[#353535]" />
+                <div
+                  className="
+                  h-4
+                  w-3/4
+                  rounded
+                  bg-gray-200
+                "
+                />
+
+                <div
+                  className="
+                  h-3
+                  w-full
+                  rounded
+                  bg-gray-200
+                "
+                />
+
+                <div
+                  className="
+                  h-10
+                  w-full
+                  rounded-xl
+                  bg-gray-200
+                "
+                />
               </div>
             </div>
           ))}
@@ -217,24 +494,43 @@ export default function Properties({ filters }: PropertiesProps) {
     );
   }
 
+  // =====================================================
+  // ERROR
+  // =====================================================
+
   if (error) {
     return (
-      <section className="max-w-7xl mx-auto px-4 py-20" dir="rtl">
+      <section
+        className="
+ mx-auto
+ max-w-7xl
+ px-4
+ py-20
+ "
+        dir="rtl"
+      >
         <div className="text-center">
-          <p className="mb-5 text-sm text-red-500">{error}</p>
+          <p
+            className="
+ text-red-500
+ mb-5
+ "
+          >
+            {error}
+          </p>
 
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              window.location.reload();
+            }}
             className="
-              rounded-full
-              bg-primary500
-              px-6
-              py-2.5
-              text-sm
-              text-white
-              hover:bg-primary600
-            "
+ rounded-full
+ bg-primary500
+ px-6
+ py-2
+ text-white
+ "
           >
             تلاش مجدد
           </button>
@@ -243,138 +539,255 @@ export default function Properties({ filters }: PropertiesProps) {
     );
   }
 
+  // =====================================================
+  // MAIN RENDER
+  // =====================================================
+
   return (
-    <section className="max-w-7xl mx-auto px-4" dir="rtl">
-      {/* Header */}
-      <div className="mb-6 flex items-end justify-between">
+    <section
+      className="
+ mx-auto
+ max-w-7xl
+ px-4
+ "
+      dir="rtl"
+    >
+      {/* HEADER */}
+
+      <div
+        className="
+ mb-6
+ flex
+ items-end
+ justify-between
+ "
+      >
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1
+            className="
+ text-2xl
+ font-bold
+ "
+          >
             همه املاک
           </h1>
 
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-300">
-            {total.toLocaleString("fa-IR")} ملک یافت شد
+          <p
+            className="
+ mt-2
+ text-sm
+ text-gray-500
+ "
+          >
+            {total.toLocaleString("fa-IR")}
+            ملک یافت شد
           </p>
         </div>
 
         {totalPages > 1 && (
-          <span className="text-xs text-gray-400">
-            صفحه {currentPage.toLocaleString("fa-IR")} از{" "}
-            {totalPages.toLocaleString("fa-IR")}
+          <span
+            className="
+text-xs
+text-gray-400
+"
+          >
+            صفحه {currentPage}
+            از {totalPages}
           </span>
         )}
       </div>
 
-      {/* Empty */}
-      {properties.length === 0 ? (
-        <div className="py-24 text-center">
-          <Building2 className="mx-auto mb-4 h-12 w-12 text-gray-300" />
+      {/* FILTER TAGS */}
 
-          <h2 className="text-lg font-bold text-gray-700 dark:text-white">
+      {(city || guests || propertyType || transactionType || bookingType) && (
+        <div
+          className="
+mb-6
+flex
+flex-wrap
+gap-2
+"
+        >
+          {city && (
+            <span
+              className="
+rounded-full
+bg-gray-100
+px-3
+py-1
+text-xs
+"
+            >
+              شهر:
+              {city}
+            </span>
+          )}
+
+          {propertyType && (
+            <span
+              className="
+rounded-full
+bg-gray-100
+px-3
+py-1
+text-xs
+"
+            >
+              نوع:
+              {propertyType}
+            </span>
+          )}
+
+          {transactionType && (
+            <span
+              className="
+rounded-full
+bg-gray-100
+px-3
+py-1
+text-xs
+"
+            >
+              معامله:
+              {transactionType}
+            </span>
+          )}
+
+          {bookingType && (
+            <span
+              className="
+rounded-full
+bg-gray-100
+px-3
+py-1
+text-xs
+"
+            >
+              رزرو:
+              {bookingType}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* EMPTY */}
+
+      {properties.length === 0 ? (
+        <div
+          className="
+py-24
+text-center
+"
+        >
+          <Building2
+            className="
+mx-auto
+mb-4
+h-12
+w-12
+text-gray-300
+"
+          />
+
+          <h2
+            className="
+text-lg
+font-bold
+"
+          >
             ملکی پیدا نشد
           </h2>
 
-          <p className="mt-2 text-sm text-gray-400">
+          <p
+            className="
+mt-2
+text-sm
+text-gray-400
+"
+          >
             فیلترها را تغییر دهید و دوباره امتحان کنید.
           </p>
         </div>
       ) : (
         <>
-          {/* Grid */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* GRID */}
+
+          <div
+            className="
+grid
+grid-cols-1
+gap-5
+sm:grid-cols-2
+lg:grid-cols-3
+"
+          >
             {properties.map((property) => (
               <PropertyCard key={property._id} property={property} />
             ))}
           </div>
 
-          {/* Pagination */}
+          {/* PAGINATION */}
+
           {totalPages > 1 && (
             <div
               className="
-                mt-10
-                mb-5
-                flex
-                items-center
-                justify-center
-                gap-2
-              "
-              dir="rtl"
+mt-10
+mb-5
+flex
+justify-center
+items-center
+gap-2
+"
             >
               <button
                 type="button"
-                onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
                 className="
-                  flex
-                  items-center
-                  gap-1
-                  rounded-xl
-                  px-3
-                  py-2
-                  text-sm
-                  text-gray-600
-                  dark:text-white
-                  hover:bg-primary500/10
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
-                "
+rounded-xl
+px-3
+py-2
+border
+disabled:opacity-40
+"
               >
-                قبلی
-                <ChevronRight className="h-4 w-4" />
+                <ChevronRight size={18} />
               </button>
 
-              <div className="flex items-center gap-1">
-                {Array.from(
-                  { length: totalPages },
-                  (_, index) => index + 1,
-                ).map((page) => (
+              {Array.from({
+                length: totalPages,
+              }).map((_, index) => {
+                const page = index + 1;
+
+                return (
                   <button
                     key={page}
                     type="button"
                     onClick={() => handlePageChange(page)}
-                    className={`
-                      flex
-                      h-9
-                      w-9
-                      items-center
-                      justify-center
-                      rounded-xl
-                      text-sm
-                      font-medium
-                      transition
-                      ${
-                        page === currentPage
-                          ? "bg-primary500 text-white shadow-sm"
-                          : "border border-gray-200 text-gray-600 hover:bg-primary500/10 dark:border-[#444] dark:text-white"
-                      }
-                    `}
+                    className={
+                      page === currentPage
+                        ? "bg-primary500 text-white rounded-xl w-9 h-9"
+                        : "border rounded-xl w-9 h-9"
+                    }
                   >
-                    {page.toLocaleString("fa-IR")}
+                    {page}
                   </button>
-                ))}
-              </div>
+                );
+              })}
 
               <button
                 type="button"
-                onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
                 className="
-                  flex
-                  items-center
-                  gap-1
-                  rounded-xl
-                  px-3
-                  py-2
-                  text-sm
-                  text-gray-600
-                  dark:text-white
-                  hover:bg-primary500/10
-                  disabled:cursor-not-allowed
-                  disabled:opacity-40
-                "
+rounded-xl
+px-3
+py-2
+border
+disabled:opacity-40
+"
               >
-                <ChevronLeft className="h-4 w-4" />
-                بعدی
+                <ChevronLeft size={18} />
               </button>
             </div>
           )}

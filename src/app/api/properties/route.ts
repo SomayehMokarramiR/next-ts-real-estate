@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { FilterQuery } from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
 import Property from "@/app/models/Property";
+import Reservation from "@/app/models/Reservation";
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 12;
@@ -14,33 +16,43 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
 
     const city = searchParams.get("city")?.trim() || "";
-    const guests = searchParams.get("guests")?.trim() || "";
+
     const type = searchParams.get("type")?.trim() || "";
+
+    const guests = searchParams.get("guests")?.trim() || "";
+
     const transactionType = searchParams.get("transactionType")?.trim() || "";
 
-    // فقط املاک دارای تخفیف
-    const discounted = searchParams.get("discounted") === "true";
+    const bookingType = searchParams.get("bookingType")?.trim() || "";
 
-    // فقط املاک قابل رزرو
+    const checkIn = searchParams.get("checkIn")?.trim() || "";
+
+    const checkOut = searchParams.get("checkOut")?.trim() || "";
+
     const reserve = searchParams.get("reserve") === "true";
 
-    const pageParam = Number(searchParams.get("page"));
-    const limitParam = Number(searchParams.get("limit"));
+    const discounted = searchParams.get("discounted") === "true";
 
-    const page =
-      Number.isInteger(pageParam) && pageParam > 0 ? pageParam : DEFAULT_PAGE;
+    const isReservationSearch =
+      reserve || Boolean(bookingType) || Boolean(checkIn && checkOut);
 
-    const limit =
-      Number.isInteger(limitParam) && limitParam > 0 && limitParam <= MAX_LIMIT
-        ? limitParam
-        : DEFAULT_LIMIT;
+    const page = Math.max(Number(searchParams.get("page")) || DEFAULT_PAGE, 1);
 
-    const filter: Record<string, unknown> = {};
+    const limit = Math.min(
+      Number(searchParams.get("limit")) || DEFAULT_LIMIT,
+      MAX_LIMIT,
+    );
 
-    // =========================
-    // فقط املاک رزروی
-    // =========================
-    if (reserve) {
+    const filter: FilterQuery<unknown> = {};
+
+    // ============================
+    // BOOKING MODE
+    // ============================
+
+    /**
+     * در حالت تخفیف، ملک های daily حذف نشوند
+     */
+    if (isReservationSearch) {
       filter.bookingType = {
         $in: ["daily", "monthly"],
       };
@@ -48,11 +60,16 @@ export async function GET(request: NextRequest) {
       filter.status = {
         $ne: "inactive",
       };
+    } else if (!discounted) {
+      filter.bookingType = {
+        $nin: ["daily", "monthly"],
+      };
     }
 
-    // =========================
-    // شهر
-    // =========================
+    // ============================
+    // CITY
+    // ============================
+
     if (city) {
       filter["location.city"] = {
         $regex: city,
@@ -60,23 +77,26 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // =========================
-    // نوع ملک
-    // =========================
+    // ============================
+    // TYPE
+    // ============================
+
     if (type) {
       filter.type = type;
     }
 
-    // =========================
-    // نوع معامله
-    // =========================
-    if (transactionType) {
+    // ============================
+    // TRANSACTION TYPE
+    // ============================
+
+    if (transactionType && !isReservationSearch) {
       filter.transactionType = transactionType;
     }
 
-    // =========================
-    // ظرفیت
-    // =========================
+    // ============================
+    // GUESTS
+    // ============================
+
     if (guests) {
       const capacity = Number(guests);
 
@@ -87,55 +107,103 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // =========================
-    // تخفیف
-    // =========================
+    // ============================
+    // DISCOUNT
+    // oldPrice > daily
+    // ============================
+
     if (discounted) {
-      filter["pricing.discount"] = {
-        $gt: 0,
+      filter.$expr = {
+        $gt: ["$pricing.oldPrice", "$pricing.daily"],
       };
     }
 
-    // =========================
-    // Pagination
-    // =========================
+    // ============================
+    // DATE AVAILABILITY
+    // ============================
+
+    if (checkIn && checkOut) {
+      const start = new Date(checkIn);
+
+      const end = new Date(checkOut);
+
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "تاریخ نامعتبر است",
+          },
+          {
+            status: 400,
+          },
+        );
+      }
+
+      const reservations = await Reservation.find({
+        checkIn: {
+          $lt: end,
+        },
+
+        checkOut: {
+          $gt: start,
+        },
+
+        status: {
+          $nin: ["cancelled", "canceled", "rejected"],
+        },
+      })
+        .select("propertyId")
+        .lean();
+
+      if (reservations.length) {
+        filter._id = {
+          $nin: reservations.map((item) => item.propertyId),
+        };
+      }
+    }
+
+    console.log("FINAL PROPERTY FILTER:", JSON.stringify(filter, null, 2));
+
     const skip = (page - 1) * limit;
 
     const [properties, total] = await Promise.all([
       Property.find(filter)
+
         .sort({
           createdAt: -1,
         })
+
         .skip(skip)
+
         .limit(limit)
+
         .lean(),
 
       Property.countDocuments(filter),
     ]);
 
-    const totalPages = Math.max(1, Math.ceil(total / limit));
+    return NextResponse.json({
+      success: true,
 
-    return NextResponse.json(
-      {
-        success: true,
-        properties,
-        total,
-        totalPages,
-        currentPage: page,
-        limit,
-      },
-      {
-        status: 200,
-      },
-    );
+      properties,
+
+      total,
+
+      totalPages: Math.max(1, Math.ceil(total / limit)),
+
+      currentPage: page,
+
+      limit,
+    });
   } catch (error) {
-    console.error("GET PROPERTIES ERROR:", error);
+    console.error("PROPERTY API ERROR:", error);
 
     return NextResponse.json(
       {
         success: false,
         message: "خطا در دریافت املاک",
       },
+
       {
         status: 500,
       },

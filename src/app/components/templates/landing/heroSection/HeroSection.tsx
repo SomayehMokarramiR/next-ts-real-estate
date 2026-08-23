@@ -2,9 +2,11 @@
 
 import { ChevronDown, Search } from "lucide-react";
 import Image from "next/image";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { validateSearchHome } from "@/validators/searchHomeValidator";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
+
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import {
   setDestination,
@@ -13,9 +15,21 @@ import {
   setGuests,
   setType,
 } from "@/store/slices/searchPropertiesSlice";
-import { useRouter } from "next/navigation";
 
-type Tab = "buy" | "rent" | "selling";
+import type { TransactionType } from "@/store/slices/searchPropertiesSlice";
+
+// =====================================================
+// TYPES
+// =====================================================
+
+interface TransactionTab {
+  value: TransactionType;
+  label: string;
+}
+
+// =====================================================
+// COMPONENT
+// =====================================================
 
 export default function HeroSection() {
   const dispatch = useAppDispatch();
@@ -25,368 +39,519 @@ export default function HeroSection() {
     (state) => state.searchProperties,
   );
 
+  const [transactionTabs, setTransactionTabs] = useState<TransactionTab[]>([]);
+
+  const [isLoadingTabs, setIsLoadingTabs] = useState(true);
+
+  // =====================================================
+  // LOAD TRANSACTION TYPES
+  // =====================================================
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTransactionTypes() {
+      try {
+        setIsLoadingTabs(true);
+
+        const response = await fetch("/api/properties/types", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error("خطا در دریافت انواع معاملات");
+        }
+
+        const data = await response.json();
+
+        if (!data?.success || !Array.isArray(data.types)) {
+          throw new Error("پاسخ API معتبر نیست");
+        }
+
+        if (!cancelled) {
+          const tabs: TransactionTab[] = [
+            ...data.types,
+            {
+              value: "booking",
+              label: "رزرو",
+            },
+          ];
+
+          setTransactionTabs(tabs);
+
+          const exists = tabs.some(
+            (item: TransactionTab) => item.value === type,
+          );
+
+          if (!exists) {
+            dispatch(setType("sale"));
+          }
+        }
+      } catch (error) {
+        console.error("LOAD TABS ERROR:", error);
+
+        if (!cancelled) {
+          setTransactionTabs([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingTabs(false);
+        }
+      }
+    }
+
+    loadTransactionTypes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch]);
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  function handleSearch() {
+    const city = destination.trim();
+
+    const start = checkIn.trim();
+
+    const end = checkOut.trim();
+
+    const count = guests.trim();
+
+    if (!city) {
+      Swal.fire({
+        icon: "warning",
+
+        title: "مقصد را وارد کنید",
+
+        text: "لطفاً شهر مورد نظر را وارد کنید",
+
+        confirmButtonText: "باشه",
+      });
+
+      return;
+    }
+
+    const params = new URLSearchParams();
+
+    params.set("city", city);
+
+    // ==============================
+    // BOOKING SEARCH
+    // ==============================
+
+    if (type === "booking") {
+      // رزرو فقط با شهر هم مجاز است
+      // تاریخ و نفرات اگر وارد شدند ارسال می‌شوند
+
+      params.set("bookingType", "daily");
+
+      if (start) {
+        params.set("checkIn", start);
+      }
+
+      if (end) {
+        params.set("checkOut", end);
+      }
+
+      if (count) {
+        params.set("guests", count);
+      }
+    } else {
+      // ==============================
+      // NORMAL SEARCH
+      // ==============================
+
+      params.set("transactionType", type);
+    }
+    const url = `/properties?${params.toString()}`;
+
+    console.log("SEARCH URL:", url);
+
+    router.push(url);
+  }
+
   const tabActive = "bg-white dark:bg-[#272727] text-gray-800 dark:text-white";
 
-  const tabInactive =
-    "bg-white/30 dark:bg-white/10 text-white hover:bg-white/20 dark:hover:bg-white/10";
+  const tabInactive = "bg-white/30 text-white hover:bg-white/20";
 
+  const formGridClass =
+    type === "booking" ? "lg:grid-cols-5" : "lg:grid-cols-2";
   return (
     <div className="min-h-auto bg-white dark:bg-[#272727]">
       <section className="relative overflow-hidden pt-16">
-        <div className="relative min-h-212.5 sm:min-h-[780px] lg:min-h-[650px]">
+        <div
+          className="
+            relative
+            min-h-[850px]
+            sm:min-h-[780px]
+            lg:min-h-[650px]
+          "
+        >
+          {/* HERO IMAGE */}
+
           <Image
             src="/images/Home-Header.jpg"
             alt="خانه مدرن"
             fill
-            className="object-cover object-center opacity-60"
+            sizes="100vw"
+            priority
+            className="
+              object-cover
+              object-center
+              opacity-60
+            "
           />
 
-          <div className="absolute inset-0 bg-[#080808]/20" />
+          <div
+            className="
+              absolute
+              inset-0
+              bg-[#080808]/20
+            "
+          />
 
-          <div className="relative z-10 flex justify-center w-full pt-28 md:pt-36 lg:pt-40 px-6 font-primary-font-bold">
+          {/* HERO TEXT */}
+
+          <div
+            className="
+              relative
+              z-10
+              flex
+              w-full
+              justify-center
+              px-6
+              pt-28
+              md:pt-36
+              lg:pt-40
+            "
+          >
             <div className="max-w-xl text-center">
-              <h1 className="text-[#FFFFFA] text-4xl sm:text-5xl font-extrabold leading-snug mb-4">
+              <h1
+                className="
+                  mb-4
+                  text-4xl
+                  font-extrabold
+                  leading-snug
+                  text-[#FFFFFA]
+                  sm:text-5xl
+                "
+              >
                 خانه رویایی
                 <br />
                 خودت رو پیدا کن
               </h1>
 
-              <p className="text-[#FFFFFA] text-sm leading-7 max-w-sm font-primary-font-semibold">
-                ما آژانس املاکی هستیم که به شما کمک می‌کنیم بهترین آپارتمان‌های
-                رویایی را پیدا کنید.
+              <p
+                className="
+                  max-w-sm
+                  text-sm
+                  leading-7
+                  text-[#FFFFFA]
+                "
+              >
+                ما آژانس املاکی هستیم که به شما کمک می‌کنیم بهترین خانه‌ها را
+                پیدا کنید.
               </p>
             </div>
           </div>
 
-          {/* Search card */}
+          {/* SEARCH BOX */}
 
-          <div className="absolute bottom-13.5 left-0 right-0 z-20">
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
-              {/* Tabs */}
+          <div
+            className="
+              absolute
+              bottom-12
+              left-0
+              right-0
+              z-20
+            "
+          >
+            <div
+              className="
+                mx-auto
+                max-w-7xl
+                px-4
+                md:px-6
+              "
+            >
+              {/* TABS */}
 
               <div
                 className="
-                flex
-                justify-start
-                gap-2
-                max-[404px]:gap-1
-                mb-0
+                  mb-0
+                  flex
+                  gap-2
+                  justify-start
                 "
               >
-                <button
-                  onClick={() => dispatch(setType("buy"))}
-                  className={`
-                  rounded-t-xl
-                  font-semibold
-                  whitespace-nowrap
-                  transition
+                {isLoadingTabs ? (
+                  <>
+                    <div
+                      className="
+                        h-11
+                        w-28
+                        animate-pulse
+                        rounded-t-xl
+                        bg-white/40
+                      "
+                    />
 
-                  px-3
-                  max-[404px]:px-2
-                  sm:px-5
+                    <div
+                      className="
+                        h-11
+                        w-28
+                        animate-pulse
+                        rounded-t-xl
+                        bg-white/40
+                      "
+                    />
+                  </>
+                ) : (
+                  transactionTabs.map((tab) => (
+                    <button
+                      key={tab.value}
+                      type="button"
+                      onClick={() => dispatch(setType(tab.value))}
+                      className={`
+                        rounded-t-xl
+                        px-5
+                        py-3
+                        text-sm
+                        font-semibold
+                        transition
 
-                  py-2.5
-                  max-[404px]:py-1.5
-                  sm:py-3
+                        ${type === tab.value ? tabActive : tabInactive}
 
-                  text-xs
-                  max-[404px]:text-[10px]
-                  sm:text-sm
-
-                   ${type === "buy" ? tabActive : tabInactive}
-                  `}
-                >
-                  خرید ملک
-                </button>
-
-                <button
-                  onClick={() => dispatch(setType("rent"))}
-                  className={`
-                  rounded-t-xl
-                  font-semibold
-                  whitespace-nowrap
-                  transition
-
-                  px-3
-                  max-[404px]:px-2
-                  sm:px-5
-
-                  py-2.5
-                  max-[404px]:py-1.5
-                  sm:py-3
-
-                  text-xs
-                  max-[404px]:text-[10px]
-                  sm:text-sm
-
-                   ${type === "rent" ? tabActive : tabInactive}
-                  `}
-                >
-                  رهن و اجاره
-                </button>
-
-                <button
-                  onClick={() => dispatch(setType("selling"))}
-                  className={`
-                  rounded-t-xl
-                  font-semibold
-                  whitespace-nowrap
-                  transition
-
-                  px-3
-                  max-[404px]:px-2
-                  sm:px-5
-
-                  py-2.5
-                  max-[404px]:py-1.5
-                  sm:py-3
-
-                  text-xs
-                  max-[404px]:text-[10px]
-                  sm:text-sm
-
-                    ${type === "selling" ? tabActive : tabInactive}
-                  `}
-                >
-                  خرید و فروش
-                </button>
+                      `}
+                    >
+                      {tab.label}
+                    </button>
+                  ))
+                )}
               </div>
 
-              {/* Search Form */}
+              {/* FORM */}
 
               <div
                 className="
-               bg-white
-              dark:bg-[#272727]
-                rounded-b-2xl
-                rounded-tl-2xl
-                shadow-2xl
-                overflow-hidden
+                  overflow-hidden
+                  rounded-b-2xl
+                  rounded-tl-2xl
+                  bg-white
+                  shadow-2xl
+                  dark:bg-[#272727]
                 "
               >
                 <div
-                  className=" grid
- grid-cols-1
- sm:grid-cols-2
- lg:grid-cols-5
- divide-y
- lg:divide-y-0
- lg:divide-x
- divide-gray-200
- dark:divide-[#3a3a3a]"
+                  className={`
+                    grid
+                    grid-cols-1
+                    divide-y
+                    divide-gray-200
+                    dark:divide-[#3a3a3a]
+
+                    sm:grid-cols-2
+
+                    ${formGridClass}
+
+                    lg:divide-x
+                    lg:divide-y-0
+                  `}
                 >
-                  {/* Destination */}
+                  {/* DESTINATION */}
+
                   <div
-                    className=" lg:col-span-1
- px-5
- py-4
- flex
- flex-col
- gap-1"
+                    className="
+                      flex
+                      flex-col
+                      gap-1
+                      px-5
+                      py-4
+                    "
                   >
-                    <label className="text-xs font-semibold text-foreground tracking-wide">
+                    <label
+                      className="
+                        text-xs
+                        font-semibold
+                      "
+                    >
                       انتخاب مقصد
                     </label>
 
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        placeholder="استان، شهر، فاصله..."
                         value={destination}
+                        placeholder="شهر یا استان"
                         onChange={(e) =>
                           dispatch(setDestination(e.target.value))
                         }
                         className="
-                        w-full
-                        text-sm
-                       text-foreground
-placeholder:text-gray-400
-dark:placeholder:text-gray-500
-                        bg-transparent
-                        focus:outline-none
+                          w-full
+                          bg-transparent
+                          text-sm
+                          outline-none
                         "
                       />
 
-                      <ChevronDown
-                        size={16}
-                        className="text-gray-400 dark:text-gray-300 shrink-0"
-                      />
+                      <ChevronDown size={16} className="text-gray-400" />
                     </div>
                   </div>
-                  <div
-                    className=" lg:col-span-1
- px-5
- py-4
- flex
- flex-col
- gap-1"
-                  >
-                    <label className="text-xs font-semibold text-[#1E2022] dark:text-white tracking-wide">
-                      تاریخ ورود
-                    </label>
+                  {/* CHECK IN */}
 
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="وارد کنید..."
-                        value={checkIn}
-                        onChange={(e) => dispatch(setCheckIn(e.target.value))}
-                        className="
-      w-full
-      text-sm
-     text-foreground
-placeholder:text-gray-400
-dark:placeholder:text-gray-500
-      bg-transparent
-      focus:outline-none
-      "
-                      />
-
-                      <ChevronDown
-                        size={16}
-                        className="text-gray-400 dark:text-gray-300 shrink-0"
-                      />
-                    </div>
-                  </div>
-                  {/* Check-out */}
-                  <div
-                    className=" lg:col-span-1
- px-5
- py-4
- flex
- flex-col
- gap-1"
-                  >
-                    <label className="text-xs font-semibold text-foreground tracking-wide">
-                      تاریخ خروج
-                    </label>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="وارد کنید..."
-                        value={checkOut}
-                        onChange={(e) => dispatch(setCheckOut(e.target.value))}
-                        className="
-      w-full
-      text-sm
-     text-foreground
-placeholder:text-gray-400
-dark:placeholder:text-gray-500
-      bg-transparent
-      focus:outline-none
-      "
-                      />
-
-                      <ChevronDown
-                        size={16}
-                        className="text-gray-400 dark:text-gray-300 shrink-0"
-                      />
-                    </div>
-                  </div>
-                  {/* Guests */}
-                  <div
-                    className=" lg:col-span-1
- px-5
- py-4
- flex
- flex-col
- gap-1"
-                  >
-                    <label className="text-xs font-semibold text-foreground tracking-wide">
-                      تعداد نفرات
-                    </label>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="وارد کنید..."
-                        value={guests}
-                        onChange={(e) => dispatch(setGuests(e.target.value))}
-                        className="w-full text-sm text-foreground placeholder:text-gray-400 dark:placeholder:text-gray-500 bg-transparent focus:outline-none"
-                      />
-
-                      <ChevronDown
-                        size={16}
-                        className="text-gray-400 dark:text-gray-300 shrink-0"
-                      />
-                    </div>
-                  </div>
-                  {/* Search Button */}
-                  <div className="flex items-center px-5 py-4">
-                    <button
-                      onClick={() => {
-                        console.log({
-                          destination,
-                          checkIn,
-                          checkOut,
-                          guests,
-                          type,
-                        });
-
-                        const validation = validateSearchHome({
-                          destination,
-                          checkIn,
-                          checkOut,
-                          guests,
-                        });
-
-                        if (!validation.valid) {
-                          Swal.fire({
-                            icon: "warning",
-                            title: "اطلاعات ناقص",
-                            text: "لطفاً مقصد، تاریخ ورود، تاریخ خروج و تعداد نفرات را کامل کنید",
-                            confirmButtonText: "باشه",
-                            confirmButtonColor: "#00A86B",
-                            customClass: {
-                              popup: "rtl",
-                            },
-                          });
-
-                          return;
-                        }
-
-                        const params = new URLSearchParams();
-
-                        if (destination.trim()) {
-                          params.set("destination", destination.trim());
-                        }
-
-                        if (checkIn.trim()) {
-                          params.set("checkIn", checkIn.trim());
-                        }
-
-                        if (checkOut.trim()) {
-                          params.set("checkOut", checkOut.trim());
-                        }
-
-                        if (guests.trim()) {
-                          params.set("guests", guests.trim());
-                        }
-
-                        params.set("type", type);
-
-                        router.push(`/properties?${params.toString()}`);
-                      }}
-                      type="button"
+                  {type === "booking" && (
+                    <div
                       className="
-                    flex
-                    w-full
-                    items-center
-                    justify-center
-                    gap-2
-                    rounded-xl
-                    bg-primary500
-                    px-6
-                    py-3
-                    text-sm
-                    font-bold
-                    text-white
-                    shadow-md
-                    shadow-primary500/30
-                    transition-colors
-                    hover:bg-primary600
-                  "
+                        flex
+                        flex-col
+                        gap-1
+                        px-5
+                        py-4
+                      "
+                    >
+                      <label
+                        className="
+                          text-xs
+                          font-semibold
+                        "
+                      >
+                        تاریخ ورود
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={checkIn}
+                          placeholder="1405/05/20"
+                          onChange={(e) => dispatch(setCheckIn(e.target.value))}
+                          className="
+                            w-full
+                            bg-transparent
+                            text-sm
+                            outline-none
+                          "
+                        />
+
+                        <ChevronDown size={16} className="text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CHECK OUT */}
+
+                  {type === "booking" && (
+                    <div
+                      className="
+                        flex
+                        flex-col
+                        gap-1
+                        px-5
+                        py-4
+                      "
+                    >
+                      <label
+                        className="
+                          text-xs
+                          font-semibold
+                        "
+                      >
+                        تاریخ خروج
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={checkOut}
+                          placeholder="1405/05/23"
+                          onChange={(e) =>
+                            dispatch(setCheckOut(e.target.value))
+                          }
+                          className="
+                            w-full
+                            bg-transparent
+                            text-sm
+                            outline-none
+                          "
+                        />
+
+                        <ChevronDown size={16} className="text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* GUESTS */}
+
+                  {type === "booking" && (
+                    <div
+                      className="
+                        flex
+                        flex-col
+                        gap-1
+                        px-5
+                        py-4
+                      "
+                    >
+                      <label
+                        className="
+                          text-xs
+                          font-semibold
+                        "
+                      >
+                        تعداد نفرات
+                      </label>
+
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={guests}
+                          placeholder="مثلاً 4 نفر"
+                          onChange={(e) => dispatch(setGuests(e.target.value))}
+                          className="
+                            w-full
+                            bg-transparent
+                            text-sm
+                            outline-none
+                          "
+                        />
+
+                        <ChevronDown size={16} className="text-gray-400" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SEARCH BUTTON */}
+
+                  <div
+                    className="
+                      flex
+                      items-center
+                      px-5
+                      py-4
+                    "
+                  >
+                    <button
+                      type="button"
+                      onClick={handleSearch}
+                      className="
+                        flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-primary500
+                        px-6
+                        py-3
+                        text-sm
+                        font-bold
+                        text-white
+                        shadow-md
+                        transition
+                        hover:bg-primary600
+                      "
                     >
                       <Search size={16} strokeWidth={2.5} />
                       جستجو کن
