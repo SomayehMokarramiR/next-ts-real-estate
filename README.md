@@ -2,6 +2,8 @@
 
 A full-stack real estate platform built with Next.js, TypeScript, MongoDB, React Query, Redux Toolkit and Tailwind CSS.
 
+---
+
 ## Tech Stack
 
 - Next.js 16
@@ -12,6 +14,7 @@ A full-stack real estate platform built with Next.js, TypeScript, MongoDB, React
 - Tailwind CSS
 - JWT Authentication
 - Nodemailer (Gmail SMTP)
+- Cloudinary Image Storage
 - Cloudflare Deployment
 
 ---
@@ -32,7 +35,7 @@ npm run dev
 
 Open:
 
-```
+```text
 http://localhost:3000
 ```
 
@@ -43,43 +46,67 @@ http://localhost:3000
 Create a `.env.local` file in the project root and add the following variables:
 
 ```env
-# MongoDB
+# =========================
+# MongoDB Database
+# =========================
+
 MONGODB_URI=your_mongodb_connection_string
 
 
+# =========================
 # Authentication
-JWT_SECRET=your_jwt_secret_key
+# =========================
+
+JWT_SECRET=your_random_secret_key
 
 
-# Email Service (Gmail SMTP)
-# Used for registration verification codes
-# and password reset emails
+# =========================
+# Cloudinary Image Upload
+# =========================
+
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+
+CLOUDINARY_API_KEY=your_api_key
+
+CLOUDINARY_API_SECRET=your_api_secret
+
+
+# =========================
+# Gmail SMTP
+# Email verification & Password reset
+# =========================
 
 EMAIL_USER=your_gmail_address@gmail.com
+
 EMAIL_PASSWORD=your_google_app_password
+
 EMAIL_FROM=your_gmail_address@gmail.com
 
 
+# =========================
 # Application URL
+# =========================
 
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-
-
-# Optional
-
-NODE_ENV=development
 ```
 
-### Gmail App Password Setup
+---
 
-To send verification emails using Gmail:
+## Gmail App Password Setup
+
+This project uses Gmail SMTP with Nodemailer for:
+
+- Email verification codes
+- Password reset emails
+
+Setup steps:
 
 1. Enable 2-Step Verification on your Google Account.
-2. Create an App Password.
-3. Put the generated password in:
+2. Create a Google App Password.
+3. Add the generated password to:
 
-```
-EMAIL_PASSWORD
+```env
+EMAIL_PASSWORD=your_google_app_password
 ```
 
 Example:
@@ -109,7 +136,7 @@ Never commit `.env.local` to GitHub.
 
 ### Reservation System
 
-- Search properties
+- Property search
 - Jalali date picker
 - Availability checking
 - Prevent double booking
@@ -119,6 +146,7 @@ Never commit `.env.local` to GitHub.
 
 - Admin authentication
 - Property management
+- Image upload management
 - Reservation management
 - User management
 - Notification management
@@ -126,9 +154,9 @@ Never commit `.env.local` to GitHub.
 
 ---
 
-## Build Production
+## Production Build
 
-Before deployment test production build:
+Before deployment test the production build:
 
 ```bash
 npm run build
@@ -144,15 +172,35 @@ npm start
 
 ## Deployment
 
-The project can be deployed on platforms supporting Next.js.
+The project can be deployed on Cloudflare and other platforms supporting Next.js.
 
-Required environment variables must be added in the deployment dashboard.
+Required environment variables must be added in the deployment dashboard before deployment.
+
+```env
+MONGODB_URI
+
+JWT_SECRET
+
+CLOUDINARY_CLOUD_NAME
+
+CLOUDINARY_API_KEY
+
+CLOUDINARY_API_SECRET
+
+EMAIL_USER
+
+EMAIL_PASSWORD
+
+EMAIL_FROM
+
+NEXT_PUBLIC_APP_URL
+```
 
 ---
 
 ## Project Structure
 
-```
+```text
 src/
  ├─ app/
  │  ├─ api/
@@ -160,6 +208,7 @@ src/
  │  ├─ models/
  │  ├─ lib/
  │  └─ services/
+ │
  ├─ hooks/
  └─ store/
 ```
@@ -171,29 +220,5 @@ src/
 - Do not upload `.env.local`
 - Do not expose MongoDB credentials
 - Do not expose JWT_SECRET
-- Use App Passwords instead of Gmail account passwords
-
-## Environment Variables
-
-Before running the project, create a `.env.local` file in the root directory and add the following environment variables:
-
-```env
-# MongoDB Connection
-MONGODB_URI=your_mongodb_connection_string
-
-
-# JWT Authentication Secret
-JWT_SECRET=your_random_secret_key
-
-
-# Cloudinary Configuration (Image Upload)
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
-
-
-# Gmail SMTP Configuration (Email Verification & Password Reset)
-EMAIL_USER=your_gmail_address
-EMAIL_PASSWORD=your_google_app_password
-EMAIL_FROM=your_gmail_address
-```
+- Do not expose Cloudinary API Secret
+- Use Gmail App Password instead of your normal Gmail password
