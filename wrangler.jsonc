@@ -1,5 +1,5 @@
 {
-  "name": "ada-real-estate",
+  "name": "next-ts-real-estate",
   "compatibility_date": "2026-08-24",
   "compatibility_flags": ["nodejs_compat"],
   "main": ".open-next/worker.js",
