@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
-
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 
 import {
@@ -18,6 +17,11 @@ import {
 
 import type { TransactionType } from "@/store/slices/searchPropertiesSlice";
 
+import DatePicker from "react-multi-date-picker";
+import type { DateObject } from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+
 // =====================================================
 // TYPES
 // =====================================================
@@ -27,6 +31,36 @@ interface TransactionTab {
   label: string;
 }
 
+function toPersianNumber(value: string) {
+  return value.replace(/[0-9]/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
+}
+
+function normalizeDate(value: string) {
+  const clean = value.replace(/[^\d/]/g, "");
+
+  const parts = clean.split("/");
+
+  if (parts.length !== 3) {
+    return toPersianNumber(clean);
+  }
+
+  const first = parts[0];
+  const second = parts[1];
+  const third = parts[2];
+
+  let year = first;
+  let month = second;
+  let day = third;
+
+  // اگر کاربر روز/ماه/سال وارد کرد
+  if (first.length <= 2 && third.length === 4) {
+    year = third;
+    month = second;
+    day = first;
+  }
+
+  return toPersianNumber(`${year}/${month}/${day}`);
+}
 // =====================================================
 // COMPONENT
 // =====================================================
@@ -405,83 +439,78 @@ export default function HeroSection() {
                   {type === "booking" && (
                     <div
                       className="
-                        flex
-                        flex-col
-                        gap-1
-                        px-5
-                        py-4
-                      "
+      flex
+      flex-col
+      gap-1
+      px-5
+      py-4
+    "
                     >
-                      <label
-                        className="
-                          text-xs
-                          font-semibold
-                        "
-                      >
+                      <label className="text-xs font-semibold">
                         تاریخ ورود
                       </label>
-
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={checkIn}
-                          placeholder="1405/05/20"
-                          onChange={(e) => dispatch(setCheckIn(e.target.value))}
-                          className="
-                            w-full
-                            bg-transparent
-                            text-sm
-                            outline-none
-                          "
-                        />
-
-                        <ChevronDown size={16} className="text-gray-400" />
-                      </div>
+                      <DatePicker
+                        calendar={persian}
+                        locale={persian_fa}
+                        value={checkIn || ""}
+                        onChange={(date: DateObject | null) => {
+                          dispatch(
+                            setCheckIn(date ? date.format("YYYY/MM/DD") : ""),
+                          );
+                        }}
+                        calendarPosition="bottom-right"
+                        inputClass="
+    w-full
+    bg-transparent
+    text-sm
+    text-gray-900
+    dark:text-white
+    outline-none
+    text-right
+  "
+                        placeholder="۱۴۰۵/۰۵/۲۰"
+                      />
                     </div>
                   )}
 
                   {/* CHECK OUT */}
-
                   {type === "booking" && (
                     <div
                       className="
-                        flex
-                        flex-col
-                        gap-1
-                        px-5
-                        py-4
-                      "
+      flex
+      flex-col
+      gap-1
+      px-5
+      py-4
+    "
                     >
-                      <label
-                        className="
-                          text-xs
-                          font-semibold
-                        "
-                      >
+                      <label className="text-xs font-semibold">
                         تاریخ خروج
                       </label>
 
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="text"
-                          value={checkOut}
-                          placeholder="1405/05/23"
-                          onChange={(e) =>
-                            dispatch(setCheckOut(e.target.value))
-                          }
-                          className="
-                            w-full
-                            bg-transparent
-                            text-sm
-                            outline-none
-                          "
-                        />
-
-                        <ChevronDown size={16} className="text-gray-400" />
-                      </div>
+                      <DatePicker
+                        calendar={persian}
+                        locale={persian_fa}
+                        value={checkOut || ""}
+                        onChange={(date: DateObject | null) => {
+                          dispatch(
+                            setCheckOut(date ? date.format("YYYY/MM/DD") : ""),
+                          );
+                        }}
+                        calendarPosition="bottom-right"
+                        inputClass="
+    w-full
+    bg-transparent
+    text-sm
+    text-gray-900
+    dark:text-white
+    outline-none
+    text-right
+  "
+                        placeholder="۱۴۰۵/۰۵/۲۳"
+                      />
                     </div>
                   )}
-
                   {/* GUESTS */}
 
                   {type === "booking" && (
