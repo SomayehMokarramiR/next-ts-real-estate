@@ -1,31 +1,41 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+});
 
 export async function sendVerificationEmail(email: string, code: string) {
   try {
     console.log("==============================");
-    console.log("RESEND DEBUG");
+    console.log("SMTP EMAIL DEBUG");
     console.log("==============================");
 
-    console.log("API KEY:", process.env.RESEND_API_KEY ? "EXISTS" : "MISSING");
-
-    console.log("FROM:", process.env.RESEND_FROM_EMAIL);
+    console.log("FROM:", process.env.EMAIL_USER ? "EXISTS" : "MISSING");
 
     console.log("TO:", email);
     console.log("CODE:", code);
 
-    const { data, error } = await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: [email],
+    await transporter.sendMail({
+      from: `"Bahr Real Estate" <${process.env.EMAIL_FROM}>`,
+
+      to: email,
+
       subject: "کد تایید ثبت نام",
+
       html: `
         <div dir="rtl" style="
           font-family:Arial;
           text-align:center;
           padding:30px;
         ">
-          <h2>تایید ایمیل</h2>
+
+          <h2>
+            تایید ایمیل
+          </h2>
 
           <p>
             کد تایید شما:
@@ -46,17 +56,15 @@ export async function sendVerificationEmail(email: string, code: string) {
       `,
     });
 
-    if (error) {
-      console.error("RESEND ERROR:", JSON.stringify(error, null, 2));
-
-      return false;
-    }
-
-    console.log("EMAIL SENT:", JSON.stringify(data, null, 2));
+    console.log("EMAIL SENT SUCCESSFULLY");
 
     return true;
   } catch (error) {
-    console.error("SEND EMAIL ERROR:", error);
+    console.error("SMTP SEND ERROR:", error);
+
+    if (error instanceof Error) {
+      console.error("MESSAGE:", error.message);
+    }
 
     return false;
   }

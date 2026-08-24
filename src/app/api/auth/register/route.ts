@@ -120,19 +120,14 @@ export async function POST(request: Request) {
     /* =========================
        Send OTP
     ========================= */
+    // =========================
+    // Send OTP Email
+    // =========================
 
-    let emailSent = true;
-
-    // فقط production ایمیل واقعی ارسال شود
-
-    if (process.env.NODE_ENV === "production") {
-      emailSent = await sendVerificationEmail(
-        normalizedEmail,
-        verificationCode,
-      );
-    } else {
-      console.log("🧪 DEVELOPMENT MODE - RESEND SKIPPED");
-    }
+    const emailSent = await sendVerificationEmail(
+      normalizedEmail,
+      verificationCode,
+    );
 
     if (!emailSent) {
       await TempUser.findByIdAndDelete(tempUser._id);
@@ -156,10 +151,7 @@ export async function POST(request: Request) {
       {
         success: true,
 
-        message:
-          process.env.NODE_ENV === "production"
-            ? "کد تایید به ایمیل شما ارسال شد"
-            : "کد تایید در ترمینال نمایش داده شد",
+        message: "کد تایید به ایمیل شما ارسال شد",
 
         tempUserId: tempUser._id.toString(),
       },
