@@ -1,9 +1,13 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET as string;
+function getJwtSecret() {
+  const secret = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is missing in environment variables");
+  if (!secret) {
+    throw new Error("JWT_SECRET is missing in environment variables");
+  }
+
+  return secret;
 }
 
 export interface TokenPayload {
@@ -13,13 +17,13 @@ export interface TokenPayload {
 }
 
 export function createToken(payload: TokenPayload) {
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getJwtSecret(), {
     expiresIn: "7d",
   });
 }
 
 export function verifyToken(token: string): TokenPayload {
-  const decoded = jwt.verify(token, JWT_SECRET);
+  const decoded = jwt.verify(token, getJwtSecret());
 
   if (typeof decoded !== "object" || decoded === null || !("id" in decoded)) {
     throw new Error("INVALID_TOKEN");
