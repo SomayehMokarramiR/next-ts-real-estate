@@ -35,6 +35,8 @@ export async function GET(request: NextRequest) {
   try {
     await connectDB();
     console.log("COUNT:", await Property.countDocuments());
+    console.log("DB URI:", process.env.MONGODB_URI);
+console.log("DB COUNT:", await Property.countDocuments());
 
     const { searchParams } = new URL(request.url);
 
