@@ -34,6 +34,7 @@ const MAX_LIMIT = 100;
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
+    console.log("COUNT:", await Property.countDocuments());
 
     const { searchParams } = new URL(request.url);
 
