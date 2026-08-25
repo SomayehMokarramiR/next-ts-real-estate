@@ -1,8 +1,13 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
+
 import { FilterQuery } from "mongoose";
 
 import { connectDB } from "@/app/lib/mongodb";
+
 import Property from "@/app/models/Property";
+
 import Reservation from "@/app/models/Reservation";
 
 const DEFAULT_PAGE = 1;

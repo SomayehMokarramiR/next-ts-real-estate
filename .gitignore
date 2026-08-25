@@ -47,3 +47,7 @@ next-env.d.ts
 
 # OpenNext Cloudflare output
 .open-next/
+
+
+# Wrangler local files
+.wrangler/
