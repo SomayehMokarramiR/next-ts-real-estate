@@ -77,9 +77,10 @@ export async function GET(request: NextRequest) {
     // BOOKING MODE
     // ============================
 
-    /**
-     * در حالت تخفیف، ملک های daily حذف نشوند
-     */
+    // ============================
+    // BOOKING MODE
+    // ============================
+
     if (isReservationSearch) {
       filter.bookingType = {
         $in: ["daily", "monthly"],
@@ -88,12 +89,7 @@ export async function GET(request: NextRequest) {
       filter.status = {
         $ne: "inactive",
       };
-    } else if (!discounted) {
-      filter.bookingType = {
-        $nin: ["daily", "monthly"],
-      };
     }
-
     // ============================
     // CITY
     // ============================
@@ -110,7 +106,13 @@ export async function GET(request: NextRequest) {
     // ============================
 
     if (type) {
-      filter.type = type;
+      if (type === "villa") {
+        filter.type = {
+          $in: ["villa", "house"],
+        };
+      } else {
+        filter.type = type;
+      }
     }
 
     // ============================
