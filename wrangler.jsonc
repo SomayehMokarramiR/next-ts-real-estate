@@ -1,3 +1,6 @@
-Ubuntu
-Enter new UNIX username: نام کاربری بده
-New password: پسورد بده
+{
+  "name": "next-ts-real-estate",
+  "compatibility_date": "2026-08-24",
+  "compatibility_flags": ["nodejs_compat"],
+  "pages_build_output_dir": ".open-next",
+}
