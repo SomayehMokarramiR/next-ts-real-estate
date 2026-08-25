@@ -34,11 +34,14 @@ const MAX_LIMIT = 100;
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
-    console.log("COUNT:", await Property.countDocuments());
+
     console.log("DB URI:", process.env.MONGODB_URI);
-console.log("DB COUNT:", await Property.countDocuments());
+    console.log("DB COUNT:", await Property.countDocuments());
 
     const { searchParams } = new URL(request.url);
+
+    console.log("REQUEST URL:", request.url);
+    console.log("PARAMS:", Object.fromEntries(searchParams.entries()));
 
     const city = searchParams.get("city")?.trim() || "";
 
