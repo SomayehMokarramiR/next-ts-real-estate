@@ -44,4 +44,6 @@ next-env.d.ts
 # temporary database scripts
 /scripts/updateRating.mjs
  
- .open-next
+
+# OpenNext Cloudflare output
+.open-next/
