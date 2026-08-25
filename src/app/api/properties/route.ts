@@ -9,6 +9,23 @@ import { connectDB } from "@/app/lib/mongodb";
 import Property from "@/app/models/Property";
 
 import Reservation from "@/app/models/Reservation";
+import { toGregorian } from "jalaali-js";
+
+function jalaliToDate(value: string) {
+  const clean = value.replace(/[۰-۹]/g, (digit) =>
+    String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)),
+  );
+
+  const [jy, jm, jd] = clean.split("/").map(Number);
+
+  if (!jy || !jm || !jd) {
+    return null;
+  }
+
+  const gregorian = toGregorian(jy, jm, jd);
+
+  return new Date(gregorian.gy, gregorian.gm - 1, gregorian.gd);
+}
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 12;
@@ -128,11 +145,10 @@ export async function GET(request: NextRequest) {
     // ============================
 
     if (checkIn && checkOut) {
-      const start = new Date(checkIn);
+      const start = jalaliToDate(checkIn);
+      const end = jalaliToDate(checkOut);
 
-      const end = new Date(checkOut);
-
-      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+      if (!start || !end) {
         return NextResponse.json(
           {
             success: false,
@@ -166,7 +182,6 @@ export async function GET(request: NextRequest) {
         };
       }
     }
-
     console.log("FINAL PROPERTY FILTER:", JSON.stringify(filter, null, 2));
 
     const skip = (page - 1) * limit;

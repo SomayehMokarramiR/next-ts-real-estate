@@ -98,8 +98,29 @@ export default function HeroSection() {
 
         const data = await response.json();
 
-        if (!data?.success || !Array.isArray(data.types)) {
-          throw new Error("پاسخ API معتبر نیست");
+        console.log("TYPES API:", data);
+
+        if (Array.isArray(data.types)) {
+          setTransactionTabs(data.types);
+        } else {
+          setTransactionTabs([
+            {
+              value: "rent",
+              label: "اجاره",
+            },
+            {
+              value: "mortgage",
+              label: "رهن",
+            },
+            {
+              value: "rent-mortgage",
+              label: "رهن و اجاره",
+            },
+            {
+              value: "sale",
+              label: "خرید",
+            },
+          ]);
         }
 
         if (!cancelled) {
@@ -145,12 +166,17 @@ export default function HeroSection() {
   // SEARCH
   // =====================================================
 
+  function toEnglishNumber(value: string) {
+    return value.replace(/[۰-۹]/g, (digit) =>
+      String("۰۱۲۳۴۵۶۷۸۹".indexOf(digit)),
+    );
+  }
+
   function handleSearch() {
     const city = destination.trim();
 
-    const start = checkIn.trim();
-
-    const end = checkOut.trim();
+    const start = toEnglishNumber(checkIn.trim());
+    const end = toEnglishNumber(checkOut.trim());
 
     const count = guests.trim();
 
@@ -455,7 +481,11 @@ export default function HeroSection() {
                         value={checkIn || ""}
                         onChange={(date: DateObject | null) => {
                           dispatch(
-                            setCheckIn(date ? date.format("YYYY/MM/DD") : ""),
+                            setCheckIn(
+                              date
+                                ? toEnglishNumber(date.format("YYYY/MM/DD"))
+                                : "",
+                            ),
                           );
                         }}
                         calendarPosition="bottom-right"
@@ -494,7 +524,11 @@ export default function HeroSection() {
                         value={checkOut || ""}
                         onChange={(date: DateObject | null) => {
                           dispatch(
-                            setCheckOut(date ? date.format("YYYY/MM/DD") : ""),
+                            setCheckOut(
+                              date
+                                ? toEnglishNumber(date.format("YYYY/MM/DD"))
+                                : "",
+                            ),
                           );
                         }}
                         calendarPosition="bottom-right"
