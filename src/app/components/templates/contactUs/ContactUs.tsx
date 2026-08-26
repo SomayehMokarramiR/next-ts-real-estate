@@ -56,14 +56,14 @@ export default function ContactUs() {
           main="نظرات خود را به ما بگید"
         />
 
-        <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-stretch">
+        <div className="flex flex-col lg:flex-row-reverse gap-8 lg:gap-12 items-stretch w-full overflow-x-hidden">
           {/* Right – map */}
-          <div className="w-full lg:w-[55%] order-2 lg:order-2">
+          <div className="w-full lg:flex-1 min-w-0 order-2">
             <MapEmbed />
           </div>
 
           {/* Left – contact form */}
-          <div className="w-full lg:w-[45%] order-1 lg:order-1 bg-white dark:border-[#353535] dark:bg-[#272727] rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+          <div className="w-full lg:flex-1 min-w-0 order-1 lg:order-1 bg-white dark:border-[#353535] dark:bg-[#272727] rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
             <ContactForm />
           </div>
         </div>

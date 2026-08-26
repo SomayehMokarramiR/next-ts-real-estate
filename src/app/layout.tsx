@@ -10,7 +10,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <body>
+      <body className="overflow-x-hidden">
         <main>
           <Providers>
             <MaintenanceGuard>{children}</MaintenanceGuard>
