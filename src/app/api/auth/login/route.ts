@@ -47,9 +47,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const user = await User.findOne({
-      email,
-    });
+    console.log("LOGIN EMAIL:", email);
+
+    const user = await User.findOne({ email });
+
+    console.log("USER FOUND:", !!user);
+
+    if (user) {
+      console.log("USER ID:", user._id);
+    }
 
     if (!user) {
       return NextResponse.json(
