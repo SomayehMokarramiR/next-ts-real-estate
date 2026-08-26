@@ -80,15 +80,12 @@ export async function GET(request: NextRequest) {
     // ============================
     // BOOKING MODE
     // ============================
-
     if (isReservationSearch) {
       filter.bookingType = {
         $in: ["daily", "monthly"],
       };
 
-      filter.status = {
-        $ne: "inactive",
-      };
+      filter.status = "available";
     }
     // ============================
     // CITY

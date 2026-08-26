@@ -47,6 +47,8 @@ export default function ContentReseve({ filters = {} }: Props) {
 
   const { data, isLoading, error } = useProperties({
     limit: "100",
+    reserve: "true",
+    bookingType: "daily",
   });
   const properties: Property[] =
     (data as PropertiesResponse | undefined)?.properties ?? [];

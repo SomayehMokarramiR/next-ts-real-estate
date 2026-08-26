@@ -26,7 +26,7 @@ export default function MaintenancePage() {
         "
       >
         {/* Maintenance Icon */}
-              <div
+        <div
           className="
             mx-auto
             mb-6
