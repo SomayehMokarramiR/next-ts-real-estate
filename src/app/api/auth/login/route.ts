@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     await connectDB();
     console.log("DB NAME:", mongoose.connection.name);
     console.log("USERS COUNT:", await User.countDocuments());
+    const users = await User.find().select("email name lastName");
+    console.log("ALL USERS:", users);
 
     let body;
 
