@@ -112,14 +112,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // ============================
     // TRANSACTION TYPE
-    // ============================
-
     if (transactionType && !isReservationSearch) {
-      filter.transactionType = transactionType;
+      filter.transactionType = {
+        $in: [transactionType, "rent", "mortgage", "rent-mortgage"],
+      };
     }
-
     // ============================
     // GUESTS
     // ============================

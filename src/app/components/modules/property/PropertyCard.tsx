@@ -70,11 +70,18 @@ export default function PropertyCard({
         <div className="relative h-[172px]">
           <Link href={`/properties/${property._id}`}>
             <Image
-              src={property.images?.[0] || "/images/placeholder.jpg"}
+              src={
+                property.images?.[0]?.trim()
+                  ? property.images[0]
+                  : "/images/galary4.png"
+              }
               alt={property.title || "اقامتگاه"}
               fill
-              sizes="(max-width:768px)100vw,400px"
+              sizes="(max-width:768px) 100vw, 400px"
               className="object-cover"
+              onError={(e) => {
+                e.currentTarget.src = "/images/galary4.png";
+              }}
             />
           </Link>
 

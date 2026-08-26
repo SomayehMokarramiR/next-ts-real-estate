@@ -266,17 +266,15 @@ export default function MortgageHouse() {
   // ======================================
 
   const { data, isLoading, error } = useProperties({
-    // پیش‌فرض صفحه
+    // filters اول
+    ...filters,
+
+    // مقدار پیش فرض آخر تا overwrite نشود
     transactionType: filters.transactionType || "rent-mortgage",
 
-    // pagination
     page: String(page),
     limit: String(limit),
-
-    // filters
-    ...filters,
   });
-
   // ======================================
   // API DATA
   // ======================================

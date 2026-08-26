@@ -6,16 +6,20 @@ function formatPrice(n: number) {
 }
 
 export default function PropertyCard({ property }: { property: Property }) {
+  console.log("PROPERTY CARD:", property);
+  console.log("IMAGE VALUE:", property.image);
   return (
     <div className="bg-white dark:bg-[#272727] rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-[#272727] hover:shadow-md transition-shadow duration-200 flex flex-col">
       {/* Image */}
       <div className="relative overflow-hidden">
         <img
-          src={property.image}
+          src={property.image || "/images/galary4.png"}
           alt={property.title}
           className="w-full h-44 object-cover"
+          onError={(e) => {
+            e.currentTarget.src = "/images/galary4.png";
+          }}
         />
-
         {/* Rating badge */}
         <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2.5 py-[5px] rounded-full text-white bg-primary500 text-xs font-bold bg-primary500">
           <Star
