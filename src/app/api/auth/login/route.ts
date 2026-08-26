@@ -1,4 +1,5 @@
 export const runtime = "nodejs";
+import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
 import bcrypt from "bcryptjs";
@@ -13,6 +14,8 @@ export async function POST(request: Request) {
     console.log("🔥 LOGIN API START");
 
     await connectDB();
+    console.log("DB NAME:", mongoose.connection.name);
+    console.log("USERS COUNT:", await User.countDocuments());
 
     let body;
 
