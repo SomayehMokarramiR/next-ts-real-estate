@@ -222,5 +222,3 @@ src/
 - Do not expose JWT_SECRET
 - Do not expose Cloudinary API Secret
 - Use Gmail App Password instead of your normal Gmail password
-
-Cloudflare deployment trigger
